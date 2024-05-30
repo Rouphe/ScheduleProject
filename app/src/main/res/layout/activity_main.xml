@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#A0B4FE"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/NameApp"
+        android:layout_width="281dp"
+        android:layout_height="106dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="104dp"
+        android:fontFamily="@font/involve_bold"
+        android:gravity="center"
+        android:text="РАСПИСАНИЕ ФМИ КГУ"
+        android:textColor="@color/black"
+        android:textSize="40sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/SignIn_title"
+        android:layout_width="94dp"
+        android:layout_height="49dp"
+        android:layout_marginTop="78dp"
+        android:layout_marginStart="94dp"
+        android:fontFamily="@font/involve_medium"
+        android:gravity="center"
+        android:text="ВХОД"
+        android:textColor="@color/black"
+        android:textSize="32sp"
+        app:layout_constraintStart_toStartOf="@+id/NameApp"
+        app:layout_constraintTop_toBottomOf="@+id/NameApp" />
+
+
+    <EditText
+        android:id="@+id/GroupNumber"
+        android:layout_width="281dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="78dp"
+        android:background="@drawable/custom_semicircular_corners"
+        android:fontFamily="@font/involve_regular"
+        android:hint="Введите группу..."
+        android:padding="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/SignIn_title" />
+
+    <Button
+        android:id="@+id/SubgroupNumber"
+        android:layout_width="281dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="39dp"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/involve_regular"
+        android:backgroundTint="#D9D9D9"
+        android:hint="Выберите подгруппу"
+        android:padding="12dp"
+        android:gravity="left"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.285"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/GroupNumber"/>
+
+    <ImageView
+        android:id="@+id/ChevronDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/chevron_down"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="248dp"
+        app:layout_constraintStart_toStartOf="@+id/SubgroupNumber"
+        app:layout_constraintTop_toTopOf="@+id/SubgroupNumber" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
