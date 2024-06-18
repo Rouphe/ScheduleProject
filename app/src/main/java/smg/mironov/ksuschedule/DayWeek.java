@@ -4,7 +4,7 @@ import java.util.List;
 
 public class DayWeek {
 
-
+//fvdgfdv
     private int id;
     private String parity;
     private Subgroup subgroup;
