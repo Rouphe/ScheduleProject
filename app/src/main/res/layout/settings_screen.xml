@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
+
+
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -138,34 +142,37 @@
             android:id="@+id/icon_edit3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
             android:layout_marginLeft="80dp"
+            android:layout_marginTop="18dp"
             android:layout_marginRight="4dp"
-            android:background="@drawable/edit"/>
+            android:background="@drawable/edit" />
 
         <EditText
             android:id="@+id/editText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginEnd="6dp"
             android:fontFamily="@font/involve_medium"
             android:text="Числитель"
-            android:layout_gravity="center_vertical"
             android:textSize="14sp" />
+
+
 
     </LinearLayout>
 
-
     <Space
-        android:layout_width="match_parent"
-        android:layout_height="365dp" />
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_weight="1"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigatin_view"
+    <include
+        android:id="@+id/custom_navbar"
+        layout="@layout/custom_navbar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/custom_navbar_blue_item"
-        app:menu="@menu/bottom_nav" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
+
 
 </LinearLayout>
 

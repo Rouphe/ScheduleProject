@@ -1,23 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools">
-
-
-
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigatin_view"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="0dp"
-        android:layout_marginEnd="0dp"
-        android:background="?android:attr/windowBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav" />
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/textView"
@@ -27,21 +14,26 @@
         android:layout_marginTop="37dp"
         android:fontFamily="@font/involve_semibold"
         android:text="Состав преподавателей факултета ФМИ"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="24sp" />
 
     <ListView
-        android:layout_width="328dp"
-        android:layout_height="match_parent"
-        android:layout_marginTop="125dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
-        tools:listitem="@layout/item_info_teacher"
+        android:layout_width="match_parent"
+        android:layout_height="481dp"
+        android:layout_marginStart="16dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="8.0sp"/>
+        android:dividerHeight="8.0sp"
+        tools:listitem="@layout/item_info_teacher" />
 
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_weight="1"/>
 
+    <include
+        android:id="@+id/custom_navbar"
+        layout="@layout/custom_navbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

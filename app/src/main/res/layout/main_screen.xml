@@ -79,5 +79,17 @@
 
     </LinearLayout>
 
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="1dp"
+        android:layout_weight="1"/>
+
+    <include
+        android:id="@+id/custom_navbar"
+        layout="@layout/custom_navbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"/>
+
 
 </LinearLayout>

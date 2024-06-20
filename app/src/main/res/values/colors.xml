@@ -2,4 +2,6 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="navbar_blue_bg">#5278FF</color>
+    <color name="navbar_white_text">#C0CEFF</color>
 </resources>
