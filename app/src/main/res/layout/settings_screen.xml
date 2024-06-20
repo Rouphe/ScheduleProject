@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="37dp"
+            android:fontFamily="@font/involve_bold"
+            android:text="Расписание ФМИ"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/involve_regular"
+            android:text="v.0.0.1"
+            android:textSize="14sp"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="6dp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Настройки"
+        android:fontFamily="@font/involve_semibold"
+        android:textSize="20sp"
+        android:layout_marginTop="24dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="328dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/custom_blue_semcorners_item">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="17dp"
+            android:fontFamily="@font/involve_medium"
+            android:text="Сменить группу"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="138dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/edit" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="6dp"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/involve_medium"
+            android:text="113"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="328dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/custom_blue_semcorners_item">
+
+
+        <TextView
+            android:id="@+id/change_subgroup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="17dp"
+            android:fontFamily="@font/involve_medium"
+            android:text="Сменить подгруппу"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/icon_edit2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="100dp"
+            android:layout_marginTop="18dp"
+            android:background="@drawable/edit" />
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="6dp"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/involve_medium"
+            android:text="113.1"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="328dp"
+        android:layout_height="53dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/custom_blue_semcorners_item">
+
+        <TextView
+            android:id="@+id/change_week"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="17dp"
+            android:fontFamily="@font/involve_medium"
+            android:text="Сменить неделю"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/icon_edit3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginLeft="80dp"
+            android:layout_marginRight="4dp"
+            android:background="@drawable/edit"/>
+
+        <EditText
+            android:id="@+id/editText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:fontFamily="@font/involve_medium"
+            android:text="Числитель"
+            android:layout_gravity="center_vertical"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="365dp" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigatin_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/custom_navbar_blue_item"
+        app:menu="@menu/bottom_nav" />
+
+</LinearLayout>
+
