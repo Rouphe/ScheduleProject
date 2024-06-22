@@ -5,6 +5,12 @@ public class Teacher {
     private String name;
     private String post;
 
+    public Teacher(String name, String post) {
+
+        this.name = name;
+        this.post = post;
+    }
+
     //Getter and setters
     public int getId(){
         return id;

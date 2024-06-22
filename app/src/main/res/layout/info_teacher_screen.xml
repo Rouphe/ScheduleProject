@@ -17,6 +17,7 @@
         android:textSize="24sp" />
 
     <ListView
+        android:id="@+id/list_teachers"
         android:layout_width="match_parent"
         android:layout_height="481dp"
         android:layout_marginStart="16dp"
