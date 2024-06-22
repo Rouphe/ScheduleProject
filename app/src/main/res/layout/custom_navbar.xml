@@ -5,75 +5,103 @@
     android:background="@drawable/custom_navbar_blue_item"
     android:layout_gravity="bottom">
 
-
-    <ImageButton
-        android:id="@+id/teachers_button"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="6dp"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/teachers" />
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center_vertical"
+            android:paddingRight="47dp">
+            <ImageButton
+                android:id="@+id/teachers_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/teachers" />
 
 
-    <TextView
-        android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/teachers_button"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="false"
-        android:layout_marginStart="41dp"
-        android:layout_marginBottom="5dp"
-        android:fontFamily="@font/involve_regular"
-        android:text="Уч. состав"
-        android:textColor="@color/navbar_white_text"
-        android:textSize="10sp" />
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/involve_regular"
+                android:text="Уч. состав"
+                android:textColor="@color/navbar_white_text"
+                android:textSize="10sp" />
 
-    <TextView
-        android:id="@+id/home"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/home_button"
-        android:layout_alignParentBottom="false"
-        android:layout_marginStart="67dp"
-        android:layout_toEndOf="@+id/textView4"
-        android:fontFamily="@font/involve_regular"
-        android:text="Главная"
-        android:textColor="@color/navbar_white_text"
-        android:textSize="10sp" />
+        </LinearLayout>
 
-    <ImageButton
-        android:id="@+id/home_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginHorizontal="135dp"
-        android:layout_marginStart="78dp"
-        android:layout_toEndOf="@+id/teachers_button"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/home" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingRight="47dp">
 
-    <TextView
-        android:id="@+id/settings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/settings_button"
-        android:layout_marginStart="67dp"
-        android:layout_toEndOf="@+id/home"
-        android:fontFamily="@font/involve_regular"
-        android:text="Настройки"
-        android:textColor="@color/navbar_white_text"
-        android:textSize="10sp" />
 
-    <ImageButton
-        android:id="@+id/settings_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="6dp"
-        android:layout_marginStart="78dp"
-        android:layout_toEndOf="@+id/home_button"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/settings" />
+            <ImageButton
+                android:id="@+id/home_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/home" />
+
+            <TextView
+                android:id="@+id/home"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:fontFamily="@font/involve_regular"
+                android:text="Главная"
+                android:textColor="@color/navbar_white_text"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal">
+
+
+
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/home_button"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/settings" />
+            <TextView
+                android:id="@+id/settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/settings_button"
+                android:layout_toEndOf="@+id/home"
+                android:fontFamily="@font/involve_regular"
+                android:text="Настройки"
+                android:textColor="@color/navbar_white_text"
+                android:textSize="10sp" />
+
+        </LinearLayout>
+
+
+
+
+
+
+
+    </LinearLayout>
+
+
+
 
 </RelativeLayout>
