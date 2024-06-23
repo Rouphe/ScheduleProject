@@ -26,13 +26,13 @@ public class TeacherAdapter extends ArrayAdapter<Teacher> {
 
     @NonNull
     @Override
-    public View getView(int position, @NonNull View convertView, @NonNull ViewGroup parent) {
+    public View getView(int post, @NonNull View convertView, @NonNull ViewGroup parent) {
         View listItemView = convertView;
         if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.item_info_teacher, parent, false);
         }
 
-        Teacher currentTeacher = getItem(position);
+        Teacher currentTeacher = getItem(post);
 
         TextView nameTextView = listItemView.findViewById(R.id.NameTeacher);
         nameTextView.setText(currentTeacher.getName());

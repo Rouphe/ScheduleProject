@@ -18,8 +18,8 @@
 
     <ListView
         android:id="@+id/list_teachers"
-        android:layout_width="match_parent"
-        android:layout_height="481dp"
+        android:layout_width="340dp"
+        android:layout_height="573dp"
         android:layout_marginStart="16dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="8.0sp"
