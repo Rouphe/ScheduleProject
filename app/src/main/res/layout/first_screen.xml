@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#A0B4FE"
     android:orientation="vertical"
-    tools:context=".FirstScreen">
+    tools:context=".FirstActivity">
 
 
     <LinearLayout
@@ -93,7 +93,6 @@
         <Spinner
             android:id="@+id/SubgroupNumber"
             style="@style/spinner_style_black_arrow"
-            android:background="@drawable/custom_white_semcorners_item"
             android:layout_width="281dp"
             android:layout_height="50dp"
             android:layout_marginStart="39dp"
