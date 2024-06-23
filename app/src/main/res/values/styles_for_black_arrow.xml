@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
-    <style name="spinner_style">
-        <item name="android:background">@drawable/gradient_spinner</item>
+    <style name="spinner_style_black_arrow">
+        <item name="android:background">@drawable/gradient_spinner_black_on_white</item>
         <item name="android:layout_marginLeft">5dp</item>
         <item name="android:layout_marginRight">5dp</item>
         <item name="android:layout_marginBottom">5dp</item>

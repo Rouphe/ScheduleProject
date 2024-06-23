@@ -11,25 +11,27 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class StateAdapter  extends RecyclerView.Adapter<StateAdapter.ViewHolder>{
+import smg.mironov.ksuschedule.DayWeek;
+
+public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.ViewHolder>{
 
     private final LayoutInflater inflater;
-    private final List<State> states;
+    private final List<DayWeek> states;
 
-    StateAdapter(Context context, List<State> states) {
+    DayWeekAdapter(Context context, List<DayWeek> states) {
         this.states = states;
         this.inflater = LayoutInflater.from(context);
     }
     @Override
-    public StateAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DayWeekAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = inflater.inflate(R.layout.list_item, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(StateAdapter.ViewHolder holder, int position) {
-        State state = states.get(position);
+    public void onBindViewHolder(DayWeekAdapter.ViewHolder holder, int position) {
+        DayWeek state = states.get(position);
         holder.flagView.setImageResource(state.getFlagResource());
         holder.nameView.setText(state.getName());
         holder.capitalView.setText(state.getCapital());

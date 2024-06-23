@@ -49,7 +49,7 @@
 
                 <Spinner
                     android:id="@+id/Subgroup"
-                    style="@style/spinner_style"
+                    style="@style/spinner_style_white_arrow"
                     android:layout_width="115dp"
                     android:layout_height="wrap_content" />
             </LinearLayout>

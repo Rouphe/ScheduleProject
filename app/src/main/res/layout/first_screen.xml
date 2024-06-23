@@ -1,87 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#A0B4FE"
+    android:orientation="vertical"
     tools:context=".FirstScreen">
 
 
-    <TextView
-        android:id="@+id/NameApp"
-        android:layout_width="281dp"
-        android:layout_height="106dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="104dp"
-        android:fontFamily="@font/involve_bold"
-        android:gravity="center"
-        android:text="РАСПИСАНИЕ ФМИ КГУ"
-        android:textColor="@color/black"
-        android:textSize="40sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.285"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TextView
-        android:id="@+id/SignIn_title"
-        android:layout_width="94dp"
-        android:layout_height="49dp"
-        android:layout_marginTop="78dp"
-        android:layout_marginStart="94dp"
-        android:fontFamily="@font/involve_medium"
-        android:gravity="center"
-        android:text="ВХОД"
-        android:textColor="@color/black"
-        android:textSize="32sp"
-        app:layout_constraintStart_toStartOf="@+id/NameApp"
-        app:layout_constraintTop_toBottomOf="@+id/NameApp" />
-
-
-    <EditText
-        android:id="@+id/GroupNumber"
-        android:layout_width="281dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="78dp"
-        android:background="@drawable/custom_white_semcorners_item"
-        android:fontFamily="@font/involve_regular"
-        android:hint="Введите группу..."
-        android:padding="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.285"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/SignIn_title" />
-
-    <Spinner
-        android:id="@+id/SubgroupNumber"
-        android:layout_width="281dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="39dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/custom_white_semcorners_item"
-        android:fontFamily="@font/involve_regular"
-        android:gravity="left"
-        android:hint="Выберите подгруппу"
-        android:padding="12dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.285"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/GroupNumber" />
-
-    <ImageView
-        android:id="@+id/ChevronDown"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/chevron_down"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="248dp"
-        app:layout_constraintStart_toStartOf="@+id/SubgroupNumber"
-        app:layout_constraintTop_toTopOf="@+id/SubgroupNumber" />
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="25dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/NameApp"
+            android:layout_width="281dp"
+            android:layout_height="106dp"
+            android:layout_marginStart="39dp"
+            android:layout_marginTop="104dp"
+            android:fontFamily="@font/involve_bold"
+            android:gravity="center"
+            android:text="РАСПИСАНИЕ ФМИ КГУ"
+            android:textColor="@color/black"
+            android:textSize="40sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/SignIn_title"
+            android:layout_width="94dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="94dp"
+            android:layout_marginTop="78dp"
+            android:fontFamily="@font/involve_medium"
+            android:gravity="center"
+            android:text="ВХОД"
+            android:textColor="@color/black"
+            android:textSize="32sp" />
+    </LinearLayout>
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/GroupNumber"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="39dp"
+            android:layout_marginTop="78dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Введите группу..."
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Space
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Spinner
+            android:id="@+id/SubgroupNumber"
+            style="@style/spinner_style_black_arrow"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="39dp"
+            android:layout_marginTop="12dp"
+            android:gravity="left"
+            android:padding="12dp" />
+    </LinearLayout>
+
+
+</LinearLayout>
