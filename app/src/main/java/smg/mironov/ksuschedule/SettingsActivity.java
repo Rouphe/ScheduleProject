@@ -1,12 +1,10 @@
 package smg.mironov.ksuschedule;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -31,8 +29,8 @@ public class SettingsActivity extends AppCompatActivity {
         ImageView editWeekIcon = findViewById(R.id.imageViewWeekEdit);
 
         // Настройка кнопок навигационной панели
-        LinearLayout navButton1 = findViewById(R.id.settings_button);
-        LinearLayout navButton2 = findViewById(R.id.home_button);
+        ImageView navButton1 = findViewById(R.id.teachers_icon);
+        ImageView navButton2 = findViewById(R.id.home_icon);
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,10 +76,16 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void switchToScreen1() {
         // Логика переключения на первый экран
+        // Например, запуск новой активности:
+        Intent intent = new Intent(this, TeachersActivity.class);
+        startActivity(intent);
     }
 
     private void switchToScreen2() {
         // Логика переключения на второй экран
+        // Например, запуск новой активности:
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void changeGroup() {

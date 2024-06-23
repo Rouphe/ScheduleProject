@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#DAE2FF"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainScreen">
 
     <Space
         android:layout_width="match_parent"
@@ -79,6 +79,13 @@
 
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:padding="16dp"
+        android:scrollbars="vertical" />
 
     <Space
         android:layout_width="wrap_content"

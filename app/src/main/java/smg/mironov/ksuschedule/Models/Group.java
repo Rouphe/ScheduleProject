@@ -1,4 +1,4 @@
-package smg.mironov.ksuschedule;
+package smg.mironov.ksuschedule.Models;
 
 public class Group {
 

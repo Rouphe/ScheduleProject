@@ -9,14 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 
 
 import java.util.List;
 
 import smg.mironov.ksuschedule.R;
-import smg.mironov.ksuschedule.Teacher;
+import smg.mironov.ksuschedule.Models.Teacher;
 
 public class TeacherAdapter extends ArrayAdapter<Teacher> {
 

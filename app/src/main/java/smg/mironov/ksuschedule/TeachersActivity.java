@@ -1,17 +1,25 @@
 package smg.mironov.ksuschedule;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Adapters.TeacherAdapter;
+import smg.mironov.ksuschedule.Models.Teacher;
 
 public class TeachersActivity extends AppCompatActivity {
 
@@ -28,15 +36,12 @@ public class TeachersActivity extends AppCompatActivity {
         listView = findViewById(R.id.list_teachers);
         teacherList = new ArrayList<>();
 
-        // Получение данных с сервера (упрощенно)
-        fetchTeachersFromServer();
-
         adapter = new TeacherAdapter(this, teacherList);
         listView.setAdapter(adapter);
 
         // Инициализация кнопок навигационной панели
-        LinearLayout navButton1 = findViewById(R.id.home_button);
-        LinearLayout navButton2 = findViewById(R.id.settings_button);
+        ImageView navButton1 = findViewById(R.id.home_icon);
+        ImageView navButton2 = findViewById(R.id.settings_icon);
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,22 +58,53 @@ public class TeachersActivity extends AppCompatActivity {
                 switchToScreen2();
             }
         });
+
+        // Получение данных с сервера
+        fetchTeachersFromServer();
     }
 
     private void fetchTeachersFromServer() {
-        // Здесь должна быть логика получения данных с сервера.
-        // Пример данных:
-        teacherList.add(new Teacher("Иван Иванов", "Профессор"));
-        teacherList.add(new Teacher("Петр Петров", "Доцент"));
-        // ...
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://192.168.0.28:8081/") // Замените на ваш базовый URL
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        ApiService apiService = retrofit.create(ApiService.class);
+
+        Call<List<Teacher>> call = apiService.getAllTeachers();
+        call.enqueue(new Callback<List<Teacher>>() {
+            @Override
+            public void onResponse(Call<List<Teacher>> call, Response<List<Teacher>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    teacherList.clear();
+                    teacherList.addAll(response.body());
+                    adapter.notifyDataSetChanged();
+                } else {
+                    // Логика обработки кода ошибки
+                    Toast.makeText(TeachersActivity.this, "Ошибка при получении данных: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Teacher>> call, Throwable t) {
+                // Логика обработки ошибки соединения
+                Toast.makeText(TeachersActivity.this, "Ошибка соединения: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 
     private void switchToScreen1() {
         // Логика переключения на первый экран
+        // Например, запуск новой активности:
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
     private void switchToScreen2() {
         // Логика переключения на второй экран
+        // Например, запуск новой активности:
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 }
-

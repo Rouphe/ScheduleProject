@@ -1,4 +1,4 @@
-package smg.mironov.ksuschedule;
+package smg.mironov.ksuschedule.Models;
 
 public class Subject {
 
@@ -7,6 +7,11 @@ public class Subject {
     private String type;
 
     //Getters and setters
+
+     public Subject(String name, String type) {
+         this.name = name;
+         this.type = type;
+     }
     public int getId(){
         return id;
     }

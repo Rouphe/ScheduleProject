@@ -1,5 +1,6 @@
-package smg.mironov.ksuschedule;
+package smg.mironov.ksuschedule.Models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DayWeek {
@@ -13,6 +14,11 @@ public class DayWeek {
     private String timeStart;
     private String timeEnd;
     private String classroom;
+    private List<Period> additionalPeriods;
+
+    public DayWeek() {
+        additionalPeriods = new ArrayList<>();
+    }
 
 
     //Getters and Setters
@@ -86,6 +92,14 @@ public class DayWeek {
 
     public void setClassroom(String classroom)     {
         this.classroom = classroom;
+    }
+
+    public List<Period> getAdditionalPeriods() {
+        return additionalPeriods;
+    }
+
+    public void setAdditionalPeriods(List<Period> additionalPeriods) {
+        this.additionalPeriods = additionalPeriods;
     }
 
 }

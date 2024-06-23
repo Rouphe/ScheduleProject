@@ -2,15 +2,18 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="365dp"
     android:layout_height="wrap_content"
     android:background="@drawable/custom_blue_semcorners_item"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="8dp">
 
     <TextView
         android:id="@+id/NameAndNumDay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="7dp"
         android:fontFamily="@font/involve_medium"
         android:text="Среда | 12.10"
         android:textColor="#3A3E4D"
@@ -35,6 +38,7 @@
                 android:id="@+id/FirstTimeStartAndEnd"
                 android:layout_width="31dp"
                 android:layout_height="30dp"
+                android:layout_marginStart="8dp"
                 android:fontFamily="@font/involve_medium"
                 android:gravity="center"
                 android:text="08:00 09:30"
@@ -75,210 +79,18 @@
                 android:id="@+id/FirstNumAudit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
                 android:fontFamily="@font/involve_medium"
                 android:text="206"
                 android:textColor="#0229B3"
                 android:textSize="12dp" />
 
         </LinearLayout>
-
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/additionalPeriodsLayout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
-
-            <TextView
-                android:id="@+id/SecondTimeStartAndEnd"
-                android:layout_width="31dp"
-                android:layout_height="30dp"
-                android:fontFamily="@font/involve_medium"
-                android:gravity="center"
-                android:text="09:40 11:10"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/SecondTypeAndNameDis"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="Практика|Геометрия и топология"
-                android:textColor="@color/black"
-                android:textSize="16dp" />
-
-            <TextView
-                android:id="@+id/SecondInfoTeacher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_regular"
-                android:text="Селиванова И.Н. Ст. преподаватель"
-                android:textColor="#262933"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/SecondNumAudit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="202"
-                android:textColor="#0229B3"
-                android:textSize="12dp" />
-
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
-
-            <TextView
-                android:id="@+id/ThirdTimeStartAndEnd"
-                android:layout_width="31dp"
-                android:layout_height="30dp"
-                android:fontFamily="@font/involve_medium"
-                android:gravity="center"
-                android:text="11:20 12:50"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/ThirdTypeAndNameDis"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="Практика|Математическая логика"
-                android:textColor="@color/black"
-                android:textSize="16dp" />
-
-            <TextView
-                android:id="@+id/ThirdInfoTeacher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_regular"
-                android:text="Селиванова И.Н. Ст. преподаватель"
-                android:textColor="#262933"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/ThirdNumAudit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="202"
-                android:textColor="#0229B3"
-                android:textSize="12dp" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="10dp" />
-
-            <TextView
-                android:id="@+id/FourthTimeStartAndEnd"
-                android:layout_width="31dp"
-                android:layout_height="30dp"
-                android:fontFamily="@font/involve_medium"
-                android:gravity="center"
-                android:text="13:10 14:40"
-                android:textColor="@color/black"
-                android:textSize="12dp" />
-
-        </LinearLayout>
-
-        <Space
-            android:layout_width="8dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/FourthTypeAndNameDis"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="Практика|Математическая логика"
-                android:textColor="@color/black"
-                android:textSize="16dp" />
-
-            <TextView
-                android:id="@+id/FourthInfoTeacher"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_regular"
-                android:text="Селиванова И.Н. Ст. преподаватель"
-                android:textColor="#262933"
-                android:textSize="10dp" />
-
-            <TextView
-                android:id="@+id/FourthNumAudit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_medium"
-                android:text="202"
-                android:textColor="#0229B3"
-                android:textSize="12dp" />
-        </LinearLayout>
-    </LinearLayout>
-
+        android:orientation="vertical" />
 </LinearLayout>
