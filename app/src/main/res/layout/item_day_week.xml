@@ -25,8 +25,8 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -59,7 +59,7 @@
 
             <TextView
                 android:id="@+id/FirstTypeAndNameDis"
-                android:layout_width="wrap_content"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/involve_medium"
                 android:text="Лекция|Дискретная математика"
