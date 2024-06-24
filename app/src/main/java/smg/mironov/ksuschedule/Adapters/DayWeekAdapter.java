@@ -28,16 +28,20 @@ import smg.mironov.ksuschedule.R;
 
 
 import smg.mironov.ksuschedule.Utils.DaySchedule;
+import smg.mironov.ksuschedule.Utils.SharedPrefManager;
 
 
 public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.ScheduleViewHolder> {
     private Context context;
     private List<DaySchedule> scheduleList;
-    private String filterParity = "ЧИСЛИТЕЛЬ";
+    private SharedPrefManager sharedPrefManager;
+    private String filterParity;
 
     public DayWeekAdapter(Context context) {
         this.context = context;
         this.scheduleList = new ArrayList<>();
+        this.sharedPrefManager = new SharedPrefManager(context); // Инициализация SharedPrefManager
+        this.filterParity = sharedPrefManager.getParity();
     }
 
     public void setFilterParity(String filterParity) {

@@ -101,18 +101,11 @@
             android:text="Сменить неделю"
             android:textSize="14sp" />
 
-        <ImageView
-            android:id="@+id/imageViewWeekEdit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="18dp"
-            android:layout_marginRight="4dp"
-            android:background="@drawable/edit" />
 
         <Spinner
             android:id="@+id/editTextWeek"
-            android:layout_width="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_width="175dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="6dp"/>
@@ -122,6 +115,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/save_settings"
         android:layout_width="210dp"
         android:layout_height="45dp"
         android:layout_marginTop="30dp"

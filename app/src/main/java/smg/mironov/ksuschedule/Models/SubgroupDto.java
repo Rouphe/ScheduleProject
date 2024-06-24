@@ -3,7 +3,7 @@ package smg.mironov.ksuschedule.Models;
 public class SubgroupDto {
     private int id;
     private String number;
-    private Group group;
+    private GroupDto groupDto;
 
     //Getters and setters
     public int getId(){
@@ -22,12 +22,12 @@ public class SubgroupDto {
         this.number = number;
     }
 
-    public Group getGroup(){
-        return group;
+    public GroupDto getGroup(){
+        return groupDto;
     }
 
-    public void setGroup(Group group){
-        this.group = group;
+    public void setGroup(GroupDto groupDto){
+        this.groupDto = groupDto;
     }
 }
 

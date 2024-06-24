@@ -27,14 +27,32 @@
             android:orientation="vertical"
             android:background="@drawable/custom_filter_semcorners_item">
 
-            <TextView
-                android:id="@+id/Group"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/involve_bold"
-                android:text="  Группа 113"
-                android:textColor="#C0CEFF"
-                android:textSize="20dp" />
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/Group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_bold"
+                    android:layout_marginStart="8dp"
+                    android:text="Группа"
+                    android:textColor="#C0CEFF"
+                    android:textSize="20dp" />
+
+                <TextView
+                    android:id="@+id/group_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_bold"
+                    android:layout_marginStart="4dp"
+                    android:text="113"
+                    android:textColor="@color/navbar_white_text"
+                    android:textSize="20sp"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -50,6 +68,7 @@
                     android:id="@+id/Subgroup"
                     style="@style/spinner_style_white_arrow"
                     android:layout_width="115dp"
+                    android:textAlignment="center"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
@@ -67,14 +86,22 @@
             android:layout_height="wrap_content" />
 
         <TextView
-            android:id="@+id/weekView"
+            android:id="@+id/week"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:fontFamily="@font/involve_semibold"
-            android:text="Неделя - Числитель"
+            android:text="Неделя - "
             android:textColor="@color/black"
             android:textSize="14dp" />
+        <TextView
+            android:id="@+id/weekType"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/involve_semibold"
+            android:text=""
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
 
     </LinearLayout>
 

@@ -1,12 +1,24 @@
 package smg.mironov.ksuschedule;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import smg.mironov.ksuschedule.Utils.SharedPrefManager;
 
@@ -14,26 +26,53 @@ public class SettingsActivity extends AppCompatActivity {
 
     private EditText groupEditText;
     private EditText subgroupEditText;
-    private EditText weekEditText;
     private SharedPrefManager sharedPrefManager;
+    private TextView saveButton;
+    private ArrayAdapter<String> spinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_screen);
+        sharedPrefManager = new SharedPrefManager(this);
 
         // Инициализация элементов интерфейса
         groupEditText = findViewById(R.id.editTextGroup);
-        subgroupEditText = findViewById(R.id.editTextSubgroup);
-        weekEditText = findViewById(R.id.editTextWeek);
+        saveButton = findViewById(R.id.SaveAll);
 
         ImageView editGroupIcon = findViewById(R.id.imageViewGroupEdit);
-        ImageView editSubgroupIcon = findViewById(R.id.imageViewSubgroupEdit);
-        ImageView editWeekIcon = findViewById(R.id.imageViewWeekEdit);
 
         // Настройка кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
         ImageView navButton2 = findViewById(R.id.home_icon);
+
+        groupEditText.setText(sharedPrefManager.getGroupNumber());
+
+
+
+
+
+        Spinner editTextWeek = findViewById(R.id.editTextWeek);
+        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        editTextWeek.setAdapter(spinnerAdapter);
+
+
+        editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedValue = (String) parent.getItemAtPosition(position);
+                changeParity(selectedValue);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+
+
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,22 +99,16 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        editSubgroupIcon.setOnClickListener(new View.OnClickListener() {
+        saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Логика смены подгруппы
-                changeSubgroup();
+                changeGroup();
             }
         });
 
-        editWeekIcon.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Логика смены недели
-                changeWeek();
-            }
-        });
+
     }
+
 
     private void switchToScreen1() {
         // Логика переключения на первый экран
@@ -97,16 +130,11 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPrefManager.setGroupNumber(newGroup);
     }
 
-    private void changeSubgroup() {
-        String newSubgroup = subgroupEditText.getText().toString();
-        sharedPrefManager.setSubgroupNumber(newSubgroup);
-
+    private void changeParity(String newParity) {
+        sharedPrefManager.setParity(newParity);
     }
 
-    private void changeWeek() {
-        String newWeek = weekEditText.getText().toString();
-        // Сохранение новой недели (например, в SharedPreferences)
-        sharedPrefManager.setParity(newWeek);
-    }
+
+
 }
 

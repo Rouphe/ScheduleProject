@@ -101,5 +101,26 @@
             android:padding="12dp" />
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/login"
+        android:layout_width="150dp"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:background="@drawable/custom_filter_semcorners_item"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Войти"
+            android:fontFamily="@font/involve_bold"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:textColor="@color/navbar_white_text"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>
