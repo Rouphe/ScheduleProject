@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 public class SharedPrefManager {
     private static final String PREF_NAME = "app_prefs";
     private static final String KEY_PARITY = "ЧИСЛИТЕЛЬ";
-    private static final String KEY_SUBGROUP_NUMBER = "109.2";
+    private static final String KEY_SUBGROUP_NUMBER = "109.1";
     private static final String KEY_GROUP_NUMBER = "109";
     private static final String KEY_FIRST_TIME_USER = "first_time_user";
 
@@ -26,7 +26,7 @@ public class SharedPrefManager {
     }
 
     public boolean isFirstTimeUser() {
-        return sharedPreferences.getBoolean(KEY_FIRST_TIME_USER, true);
+        return sharedPreferences.getBoolean(KEY_FIRST_TIME_USER, false);
     }
 
     public void setParity(String parity) {
@@ -34,7 +34,7 @@ public class SharedPrefManager {
     }
 
     public String getParity() {
-        return sharedPreferences.getString(KEY_PARITY, "ЧИСЛИТЕЛЬ");
+        return sharedPreferences.getString(KEY_PARITY, "");
     }
 
     public void setSubgroupNumber(String subgroupNumber) {

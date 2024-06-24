@@ -42,7 +42,7 @@ public class FirstActivity extends AppCompatActivity {
         // Инициализация SharedPrefManager
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
-        if (!sharedPrefManager.isFirstTimeUser()) {
+        if (sharedPrefManager.isFirstTimeUser()) {
             switchToMain();
         }
 
