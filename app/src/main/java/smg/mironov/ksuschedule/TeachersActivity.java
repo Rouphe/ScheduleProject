@@ -19,13 +19,13 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Adapters.TeacherAdapter;
-import smg.mironov.ksuschedule.Models.Teacher;
+import smg.mironov.ksuschedule.Models.TeacherDto;
 
 public class TeachersActivity extends AppCompatActivity {
 
     private ListView listView;
     private TeacherAdapter adapter;
-    private List<Teacher> teacherList;
+    private List<TeacherDto> teacherList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +71,10 @@ public class TeachersActivity extends AppCompatActivity {
 
         ApiService apiService = retrofit.create(ApiService.class);
 
-        Call<List<Teacher>> call = apiService.getAllTeachers();
-        call.enqueue(new Callback<List<Teacher>>() {
+        Call<List<TeacherDto>> call = apiService.getAllTeachers();
+        call.enqueue(new Callback<List<TeacherDto>>() {
             @Override
-            public void onResponse(Call<List<Teacher>> call, Response<List<Teacher>> response) {
+            public void onResponse(Call<List<TeacherDto>> call, Response<List<TeacherDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     teacherList.clear();
                     teacherList.addAll(response.body());
@@ -86,7 +86,7 @@ public class TeachersActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Teacher>> call, Throwable t) {
+            public void onFailure(Call<List<TeacherDto>> call, Throwable t) {
                 // Логика обработки ошибки соединения
                 Toast.makeText(TeachersActivity.this, "Ошибка соединения: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }

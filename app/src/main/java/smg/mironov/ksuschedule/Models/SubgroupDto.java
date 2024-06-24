@@ -1,6 +1,6 @@
 package smg.mironov.ksuschedule.Models;
 
-public class Subgroup {
+public class SubgroupDto {
     private int id;
     private String number;
     private Group group;

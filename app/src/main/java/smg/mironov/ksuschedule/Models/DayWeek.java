@@ -7,9 +7,9 @@ public class DayWeek {
 
     private int id;
     private String parity;
-    private Subgroup subgroup;
-    private Teacher teacher;
-    private Subject subject;
+    private SubgroupDto subgroupDto;
+    private TeacherDto teacherDto;
+    private SubjectDto subjectDto;
     private String dayWeek;
     private String timeStart;
     private String timeEnd;
@@ -38,28 +38,28 @@ public class DayWeek {
         this.parity = parity;
     }
 
-    public Subgroup getSubgroup()   {
-        return subgroup;
+    public SubgroupDto getSubgroup()   {
+        return subgroupDto;
     }
 
-    public void setSubgroup(Subgroup subgroup)    {
-        this.subgroup = subgroup;
+    public void setSubgroup(SubgroupDto subgroupDto)    {
+        this.subgroupDto = subgroupDto;
     }
 
-    public Teacher getTeacher()    {
-        return teacher;
+    public TeacherDto getTeacher()    {
+        return teacherDto;
     }
 
-    public void setTeacher(Teacher teacher)    {
-        this.teacher = teacher;
+    public void setTeacher(TeacherDto teacher)    {
+        this.teacherDto = teacher;
     }
 
-    public Subject getSubject()    {
-        return subject;
+    public SubjectDto getSubject()    {
+        return subjectDto;
     }
 
-    public void setSubject(Subject subject)     {
-        this.subject = subject;
+    public void setSubject(SubjectDto subjectDto)     {
+        this.subjectDto = subjectDto;
     }
 
     public String getDayWeek()    {

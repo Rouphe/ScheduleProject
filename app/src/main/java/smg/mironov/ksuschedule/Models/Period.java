@@ -3,17 +3,17 @@ package smg.mironov.ksuschedule.Models;
 public class Period {
     private String timeStart;
     private String timeEnd;
-    private Subject subject;
-    private Teacher teacher;
+    private SubjectDto subjectDto;
+    private TeacherDto teacherDto;
     private String classroom;
 
     // Конструкторы, геттеры и сеттеры
 
-    public Period(String timeStart, String timeEnd, Subject subject, Teacher teacher, String classroom) {
+    public Period(String timeStart, String timeEnd, SubjectDto subjectDto, TeacherDto teacherDto, String classroom) {
         this.timeStart = timeStart;
         this.timeEnd = timeEnd;
-        this.subject = subject;
-        this.teacher = teacher;
+        this.subjectDto = subjectDto;
+        this.teacherDto = teacherDto;
         this.classroom = classroom;
     }
 
@@ -33,20 +33,20 @@ public class Period {
         this.timeEnd = timeEnd;
     }
 
-    public Subject getSubject() {
-        return subject;
+    public SubjectDto getSubject() {
+        return subjectDto;
     }
 
-    public void setSubject(Subject subject) {
-        this.subject = subject;
+    public void setSubject(SubjectDto subjectDto) {
+        this.subjectDto = subjectDto;
     }
 
-    public Teacher getTeacher() {
-        return teacher;
+    public TeacherDto getTeacher() {
+        return teacherDto;
     }
 
-    public void setTeacher(Teacher teacher) {
-        this.teacher = teacher;
+    public void setTeacher(TeacherDto teacherDto) {
+        this.teacherDto = teacherDto;
     }
 
     public String getClassroom() {

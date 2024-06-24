@@ -13,12 +13,12 @@ import androidx.annotation.NonNull;
 
 import java.util.List;
 
+import smg.mironov.ksuschedule.Models.TeacherDto;
 import smg.mironov.ksuschedule.R;
-import smg.mironov.ksuschedule.Models.Teacher;
 
-public class TeacherAdapter extends ArrayAdapter<Teacher> {
+public class TeacherAdapter extends ArrayAdapter<TeacherDto> {
 
-    public TeacherAdapter(Context context, List<Teacher> teachers) {
+    public TeacherAdapter(Context context, List<TeacherDto> teachers) {
         super(context, 0, teachers);
     }
 
@@ -30,7 +30,7 @@ public class TeacherAdapter extends ArrayAdapter<Teacher> {
             listItemView = LayoutInflater.from(getContext()).inflate(R.layout.item_info_teacher, parent, false);
         }
 
-        Teacher currentTeacher = getItem(post);
+        TeacherDto currentTeacher = getItem(post);
 
         TextView nameTextView = listItemView.findViewById(R.id.NameTeacher);
         nameTextView.setText(currentTeacher.getName());

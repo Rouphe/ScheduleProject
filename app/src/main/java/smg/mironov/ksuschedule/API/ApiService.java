@@ -8,19 +8,19 @@ import retrofit2.http.GET;
 import retrofit2.http.Path;
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.Models.Group;
-import smg.mironov.ksuschedule.Models.Subgroup;
-import smg.mironov.ksuschedule.Models.Teacher;
+import smg.mironov.ksuschedule.Models.SubgroupDto;
+import smg.mironov.ksuschedule.Models.TeacherDto;
 
 public interface ApiService {
 
     @GET("/teacher")
-    Call<List<Teacher>> getAllTeachers();
+    Call<List<TeacherDto>> getAllTeachers();
 
     @GET("/batches")
     Call<List<Group>> getAllGroups();
 
     @GET("/subgroup/groupNumber/{group_number}")
-    Call<List<Subgroup>> getSubgroupsByGroupNumber(@Path("group_number") int group_number);
+    Call<List<SubgroupDto>> getSubgroupsByGroupNumber(@Path("group_number") int group_number);
 
     @GET("/schedule/subgroup/number/{subgroup_number}")
     Call<List<DayWeek>> getSchedulesBySubgroupNumber(@Path("subgroup_number") String subgroup_number);

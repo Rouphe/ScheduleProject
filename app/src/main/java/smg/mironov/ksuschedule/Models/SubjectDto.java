@@ -1,17 +1,17 @@
 package smg.mironov.ksuschedule.Models;
 
-public class Teacher {
+public class SubjectDto {
+
     private int id;
     private String name;
-    private String post;
+    private String type;
 
-    public Teacher(String name, String post) {
+    //Getters and setters
 
-        this.name = name;
-        this.post = post;
-    }
-
-    //Getter and setters
+     public SubjectDto(String name, String type) {
+         this.name = name;
+         this.type = type;
+     }
     public int getId(){
         return id;
     }
@@ -28,11 +28,11 @@ public class Teacher {
         this.name = name;
     }
 
-    public String getPost(){
-        return post;
+    public String getType(){
+        return type;
     }
 
-    public void setPost(String post){
-        this.post = post;
+    public void setType(String type){
+        this.type = type;
     }
 }
