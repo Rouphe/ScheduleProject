@@ -73,7 +73,7 @@
         <EditText
             android:id="@+id/editTextGroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="6dp"
             android:layout_gravity="center_vertical"
@@ -113,7 +113,7 @@
         <EditText
             android:id="@+id/editTextSubgroup"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="6dp"
             android:layout_gravity="center_vertical"
@@ -152,7 +152,7 @@
         <EditText
             android:id="@+id/editTextWeek"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="35dp"
             android:layout_gravity="center_vertical"
             android:layout_marginEnd="6dp"
             android:fontFamily="@font/involve_medium"

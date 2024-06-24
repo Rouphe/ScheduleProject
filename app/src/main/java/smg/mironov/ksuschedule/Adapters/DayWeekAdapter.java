@@ -2,6 +2,7 @@ package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
 import android.icu.util.LocaleData;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.DayOfWeek;
@@ -44,6 +46,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         return new ScheduleViewHolder(view);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         DayWeek dayWeek = scheduleList.get(position);
