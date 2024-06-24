@@ -1,8 +1,6 @@
 package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
-import android.icu.util.LocaleData;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,32 +8,77 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
+
+import java.util.Map;
+
 
 import smg.mironov.ksuschedule.Models.DayWeek;
-import smg.mironov.ksuschedule.Models.Period;
+
 import smg.mironov.ksuschedule.R;
+
+
+import smg.mironov.ksuschedule.Utils.DaySchedule;
+
 
 public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.ScheduleViewHolder> {
     private Context context;
-    private List<DayWeek> scheduleList;
+    private List<DaySchedule> scheduleList;
+    private String filterParity = "ЧИСЛИТЕЛЬ";
 
-    //TODO: три глобальные переменные: тип недели, номер группы, номер подгруппы
-
-    public DayWeekAdapter(Context context, List<DayWeek> scheduleList) {
+    public DayWeekAdapter(Context context) {
         this.context = context;
-        this.scheduleList = scheduleList;
+        this.scheduleList = new ArrayList<>();
+    }
+
+    public void setFilterParity(String filterParity) {
+        this.filterParity = filterParity;
     }
 
     public void updateScheduleList(List<DayWeek> newScheduleList) {
-        this.scheduleList = newScheduleList;
+        Map<String, DaySchedule> dayScheduleMap = new HashMap<>();
+        Map<String, Integer> dayOfWeekOrder = new HashMap<>();
+
+        // Определяем порядок дней недели
+        dayOfWeekOrder.put("ПОНЕДЕЛЬНИК", 1);
+        dayOfWeekOrder.put("ВТОРНИК", 2);
+        dayOfWeekOrder.put("СРЕДА", 3);
+        dayOfWeekOrder.put("ЧЕТВЕРГ", 4);
+        dayOfWeekOrder.put("ПЯТНИЦА", 5);
+        dayOfWeekOrder.put("СУББОТА", 6);
+        dayOfWeekOrder.put("ВОСКРЕСЕНЬЕ", 7);
+
+        for (DayWeek dayWeek : newScheduleList) {
+            if (filterParity != null && !filterParity.equals(dayWeek.getParity()) && !"ВСЕГДА".equals(dayWeek.getParity())) {
+                continue; // Фильтруем по parity
+            }
+
+            String day = dayWeek.getDayWeek();
+            if (!dayScheduleMap.containsKey(day)) {
+                dayScheduleMap.put(day, new DaySchedule(day));
+            }
+            dayScheduleMap.get(day).addDayWeek(dayWeek);
+        }
+
+        List<DaySchedule> sortedScheduleList = new ArrayList<>(dayScheduleMap.values());
+        Collections.sort(sortedScheduleList, new Comparator<DaySchedule>() {
+            @Override
+            public int compare(DaySchedule o1, DaySchedule o2) {
+                return Integer.compare(dayOfWeekOrder.get(o1.getDayWeek()), dayOfWeekOrder.get(o2.getDayWeek()));
+            }
+        });
+
+        this.scheduleList.clear();
+        this.scheduleList.addAll(sortedScheduleList);
         notifyDataSetChanged();
     }
 
@@ -46,10 +89,9 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         return new ScheduleViewHolder(view);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-        DayWeek dayWeek = scheduleList.get(position);
+        DaySchedule daySchedule = scheduleList.get(position);
 
         // Получаем текущую дату
         LocalDate today = LocalDate.now();
@@ -67,30 +109,25 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM");
         String formattedDate = dateToShow.format(formatter);
 
-        holder.nameAndNumDay.setText(dayWeek.getDayWeek() + " | " + formattedDate);
-        holder.firstTimeStartAndEnd.setText(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd());
-        //TODO: Проблема десереализации (не получает данные для предметов и преподов) вроде решена??
-        holder.firstTypeAndNameDis.setText(dayWeek.getSubject().getType() + " | " + dayWeek.getSubject().getName());
-        holder.firstInfoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
-        holder.firstNumAudit.setText(dayWeek.getClassroom());
+        holder.nameDay.setText(daySchedule.getDayWeek());
+        holder.numDay.setText(formattedDate);
 
-        holder.additionalPeriodsLayout.removeAllViews();
+        holder.pairsLayout.removeAllViews();
 
-        for (Period period : dayWeek.getAdditionalPeriods()) {
-            View periodView = LayoutInflater.from(context).inflate(R.layout.period_item, holder.additionalPeriodsLayout, false);
-            TextView timeStartAndEnd = periodView.findViewById(R.id.timeStartAndEnd);
-            TextView typeAndNameDis = periodView.findViewById(R.id.typeAndNameDis);
-            TextView infoTeacher = periodView.findViewById(R.id.infoTeacher);
-            TextView numAudit = periodView.findViewById(R.id.numAudit);
+        for (DayWeek dayWeek : daySchedule.getDayWeeks()) {
+            View pairView = LayoutInflater.from(context).inflate(R.layout.period_item, holder.pairsLayout, false);
+            TextView timeStartAndEnd = pairView.findViewById(R.id.FirstTimeStartAndEnd);
+            TextView typeAndNameDis = pairView.findViewById(R.id.typeAndNameDis);
+            TextView infoTeacher = pairView.findViewById(R.id.infoTeacher);
+            TextView numAudit = pairView.findViewById(R.id.numAudit);
 
-            timeStartAndEnd.setText(period.getTimeStart() + " " + period.getTimeEnd());
-            typeAndNameDis.setText(period.getSubject().getType() + " | " + period.getSubject().getName());
-            infoTeacher.setText(period.getTeacher().getName() + " " + period.getTeacher().getPost());
-            numAudit.setText(period.getClassroom());
+            timeStartAndEnd.setText(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd());
+            typeAndNameDis.setText(dayWeek.getSubject().getType() + " | " + dayWeek.getSubject().getName());
+            infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
+            numAudit.setText(dayWeek.getClassroom());
 
-            holder.additionalPeriodsLayout.addView(periodView);
+            holder.pairsLayout.addView(pairView);
         }
-
     }
 
     @Override
@@ -99,21 +136,15 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
     }
 
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
-        TextView nameAndNumDay;
-        TextView firstTimeStartAndEnd;
-        TextView firstTypeAndNameDis;
-        TextView firstInfoTeacher;
-        TextView firstNumAudit;
-        LinearLayout additionalPeriodsLayout;
+        TextView nameDay;
+        TextView numDay;
+        LinearLayout pairsLayout;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
-            nameAndNumDay = itemView.findViewById(R.id.NameAndNumDay);
-            firstTimeStartAndEnd = itemView.findViewById(R.id.FirstTimeStartAndEnd);
-            firstTypeAndNameDis = itemView.findViewById(R.id.FirstTypeAndNameDis);
-            firstInfoTeacher = itemView.findViewById(R.id.FirstInfoTeacher);
-            firstNumAudit = itemView.findViewById(R.id.FirstNumAudit);
-            additionalPeriodsLayout = itemView.findViewById(R.id.additionalPeriodsLayout);
+            nameDay = itemView.findViewById(R.id.NameDay);
+            numDay = itemView.findViewById(R.id.NumDay);
+            pairsLayout = itemView.findViewById(R.id.additionalPeriodsLayout);
         }
     }
 }

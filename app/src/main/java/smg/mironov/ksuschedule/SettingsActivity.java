@@ -8,11 +8,14 @@ import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import smg.mironov.ksuschedule.Utils.SharedPrefManager;
+
 public class SettingsActivity extends AppCompatActivity {
 
     private EditText groupEditText;
     private EditText subgroupEditText;
     private EditText weekEditText;
+    private SharedPrefManager sharedPrefManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,16 +94,19 @@ public class SettingsActivity extends AppCompatActivity {
     private void changeGroup() {
         String newGroup = groupEditText.getText().toString();
         // Сохранение новой группы (например, в SharedPreferences)
+        sharedPrefManager.setGroupNumber(newGroup);
     }
 
     private void changeSubgroup() {
         String newSubgroup = subgroupEditText.getText().toString();
-        // Сохранение новой подгруппы (например, в SharedPreferences)
+        sharedPrefManager.setSubgroupNumber(newSubgroup);
+
     }
 
     private void changeWeek() {
         String newWeek = weekEditText.getText().toString();
         // Сохранение новой недели (например, в SharedPreferences)
+        sharedPrefManager.setParity(newWeek);
     }
 }
 

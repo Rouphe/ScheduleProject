@@ -34,6 +34,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
+        recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Инициализация адаптера
+        scheduleAdapter = new DayWeekAdapter(this);
+        recyclerView.setAdapter(scheduleAdapter);
+
+        // Пример данных
+        List<DayWeek> scheduleList = new ArrayList<>();
+
         // Инициализация кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
         ImageView navButton2 = findViewById(R.id.settings_icon);
@@ -53,14 +63,6 @@ public class MainActivity extends AppCompatActivity {
                 switchToScreen2();
             }
         });
-
-
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Инициализация адаптера с пустым списком
-        scheduleAdapter = new DayWeekAdapter(this, new ArrayList<>());
-        recyclerView.setAdapter(scheduleAdapter);
 
         // Получение данных с сервера
         fetchScheduleFromServer();
