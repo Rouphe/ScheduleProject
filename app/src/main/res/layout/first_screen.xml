@@ -28,7 +28,7 @@
             android:layout_marginTop="104dp"
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
-            android:text="РАСПИСАНИЕ КГУ"
+            android:text="РАСПИСАНИЕ ВУЗа"
             android:textColor="@color/black"
             android:textSize="40sp" />
     </LinearLayout>
