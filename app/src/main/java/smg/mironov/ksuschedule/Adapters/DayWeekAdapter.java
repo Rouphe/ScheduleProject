@@ -1,6 +1,7 @@
 package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import java.util.Locale;
 import java.util.Map;
 
 
@@ -106,6 +110,19 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         // Вычисляем дату начала текущей недели (понедельник)
         LocalDate startOfWeek = today.minusDays(currentDayOfWeek.getValue() - DayOfWeek.MONDAY.getValue());
 
+        // Определяем текущую неделю
+        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+        // Если parity в SharedPrefManager не совпадает с текущей неделей, показываем расписание следующей недели
+        String savedParity = sharedPrefManager.getParity();
+        if (!currentWeekParity.equals(savedParity)) {
+            startOfWeek = startOfWeek.plusWeeks(1); // Смещаем на одну неделю вперед
+            isEvenWeek = !isEvenWeek;
+            currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+            sharedPrefManager.setParity(currentWeekParity);
+        }
+
         // Добавляем количество дней, соответствующее позиции в RecyclerView
         LocalDate dateToShow = startOfWeek.plusDays(position);
 
@@ -129,6 +146,17 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             typeAndNameDis.setText(dayWeek.getSubject().getType() + " | " + dayWeek.getSubject().getName());
             infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
             numAudit.setText(dayWeek.getClassroom());
+
+            // Проверка, идет ли текущая пара
+            LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
+            LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
+
+            LocalTime now = LocalTime.now();
+            if (now.isAfter(timeStart) && now.isBefore(timeEnd)) {
+                pairView.setBackgroundColor(Color.BLUE); // Выделяем цветом текущую пару
+            } else {
+                pairView.setBackgroundColor(Color.TRANSPARENT); // Убираем выделение, если не текущая пара
+            }
 
             holder.pairsLayout.addView(pairView);
         }
