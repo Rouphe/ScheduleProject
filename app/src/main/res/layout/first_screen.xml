@@ -13,19 +13,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center_horizontal"
         android:orientation="horizontal">
-
-        <Space
-            android:layout_width="25dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/NameApp"
             android:layout_width="281dp"
             android:layout_height="106dp"
-            android:layout_marginStart="39dp"
-            android:layout_marginTop="104dp"
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
             android:text="РАСПИСАНИЕ ВУЗа"
@@ -36,19 +31,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
         android:orientation="horizontal">
-
-        <Space
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/SignIn_title"
-            android:layout_width="94dp"
-            android:layout_height="49dp"
-            android:layout_marginStart="94dp"
-            android:layout_marginTop="78dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:fontFamily="@font/involve_medium"
             android:gravity="center"
             android:text="ВХОД"
@@ -60,19 +50,14 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="50dp"
         android:orientation="horizontal">
-
-        <Space
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <EditText
             android:id="@+id/GroupNumber"
             android:layout_width="281dp"
             android:layout_height="50dp"
-            android:layout_marginStart="39dp"
-            android:layout_marginTop="78dp"
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
             android:hint="Введите группу..."
@@ -83,20 +68,15 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
         android:orientation="horizontal">
-
-        <Space
-            android:layout_width="30dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
 
         <Spinner
             android:id="@+id/SubgroupNumber"
             style="@style/spinner_style_black_arrow"
             android:layout_width="281dp"
             android:layout_height="50dp"
-            android:layout_marginStart="39dp"
-            android:layout_marginTop="12dp"
             android:gravity="left"
             android:padding="12dp" />
     </LinearLayout>
