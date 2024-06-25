@@ -6,8 +6,8 @@ import android.content.SharedPreferences;
 public class SharedPrefManager {
     private static final String PREF_NAME = "app_prefs";
     private static final String KEY_PARITY = "ЧИСЛИТЕЛЬ";
-    private static final String KEY_SUBGROUP_NUMBER = "109.1";
-    private static final String KEY_GROUP_NUMBER = "109";
+    private static final String KEY_SUBGROUP_NUMBER = "subgroup_number";
+    private static final String KEY_GROUP_NUMBER = "group_number";
     private static final String KEY_FIRST_TIME_USER = "first_time_user";
 
 

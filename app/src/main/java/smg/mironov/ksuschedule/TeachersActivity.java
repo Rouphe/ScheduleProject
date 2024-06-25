@@ -65,7 +65,7 @@ public class TeachersActivity extends AppCompatActivity {
 
     private void fetchTeachersFromServer() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://77.232.128.111:8081/") // Замените на ваш базовый URL
+                .baseUrl("http://24schedule.ru:8081/") // Замените на ваш базовый URL
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 

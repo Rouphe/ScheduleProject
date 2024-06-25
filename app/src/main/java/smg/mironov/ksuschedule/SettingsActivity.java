@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -54,8 +55,15 @@ public class SettingsActivity extends AppCompatActivity {
 
         Spinner editTextWeek = findViewById(R.id.editTextWeek);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) ;
         editTextWeek.setAdapter(spinnerAdapter);
+
+        // Устанавливаем значение Spinner из SharedPreferences
+        String savedParity = sharedPrefManager.getParity();
+        if (savedParity != null) {
+            int spinnerPosition = spinnerAdapter.getPosition(savedParity);
+            editTextWeek.setSelection(spinnerPosition);
+        }
 
 
         editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -68,6 +76,7 @@ public class SettingsActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
 
@@ -124,6 +133,7 @@ public class SettingsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     private void changeGroup() {
         String newGroup = groupEditText.getText().toString();
         // Сохранение новой группы (например, в SharedPreferences)
@@ -132,6 +142,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private void changeParity(String newParity) {
         sharedPrefManager.setParity(newParity);
+        Log.d("SettingsActivity", "Parity saved: " + newParity);
     }
 
 

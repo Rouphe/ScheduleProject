@@ -73,15 +73,10 @@ public class MainActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         subgroupSpinner.setAdapter(spinnerAdapter);
 
+
         apiService = ApiClient.getClient().create(ApiService.class);
 
-        String savedSubgroup = sharedPrefManager.getSubgroupNumber();
-        if (savedSubgroup != null) {
-            int position = spinnerAdapter.getPosition(savedSubgroup);
-            subgroupSpinner.setSelection(position);
-        }
-
-        fetchSubgroups(sharedPrefManager.getSubgroupNumber());
+        fetchSubgroups();
 
 
 
@@ -106,8 +101,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSubgroup = (String) parent.getItemAtPosition(position);
-                sharedPrefManager.setSubgroupNumber(selectedSubgroup); // Сохранение выбранной подгруппы
-                fetchScheduleFromServer(); // Вызов метода для загрузки расписания по новой подгруппе
+                changeSubgroup(selectedSubgroup); // Сохранение выбранной подгруппы
+                 // Вызов метода для загрузки расписания по новой подгруппе
+                fetchScheduleFromServer();
             }
 
             @Override
@@ -116,9 +112,41 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Получение данных с сервера
-        fetchScheduleFromServer();
+        //fetchScheduleFromServer();
     }
+    private void fetchSubgroups() {
+        String savedGroupNumber = sharedPrefManager.getGroupNumber();
+        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(savedGroupNumber);
+        call.enqueue(new Callback<List<SubgroupDto>>() {
+            @Override
+            public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<SubgroupDto> subgroups = response.body();
+                    List<String> subgroupNumbers = new ArrayList<>();
+                    for (SubgroupDto subgroup : subgroups) {
+                        subgroupNumbers.add(subgroup.getNumber());
+                    }
+                    spinnerAdapter.clear();
+                    spinnerAdapter.addAll(subgroupNumbers);
+                    spinnerAdapter.notifyDataSetChanged();
 
+                    // Установить сохраненное значение подгруппы после загрузки данных с сервера
+                    String savedSubgroup = sharedPrefManager.getSubgroupNumber();
+                    if (savedSubgroup != null) {
+                        int subgroupPosition = spinnerAdapter.getPosition(savedSubgroup);
+                        if (subgroupPosition >= 0) {
+                            subgroupSpinner.setSelection(subgroupPosition);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
+                // Handle errors
+            }
+        });
+    }
     private void fetchScheduleFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String savedSubgroupNumber = sharedPrefManager.getSubgroupNumber();
@@ -143,29 +171,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void fetchSubgroups(String groupNumber) {
-        String savedGroupNumber = sharedPrefManager.getGroupNumber();
-        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(savedGroupNumber);
-        call.enqueue(new Callback<List<SubgroupDto>>() {
-            @Override
-            public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<SubgroupDto> subgroups = response.body();
-                    List<String> subgroupNumbers = new ArrayList<>();
-                    for (SubgroupDto subgroup : subgroups) {
-                        subgroupNumbers.add(subgroup.getNumber());
-                    }
-                    spinnerAdapter.clear();
-                    spinnerAdapter.addAll(subgroupNumbers);
-                    spinnerAdapter.notifyDataSetChanged();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
-                // Handle errors
-            }
-        });
+
+    private void changeSubgroup(String subgroupNumber) {
+        sharedPrefManager.setSubgroupNumber(subgroupNumber);
+        Log.d("MainActivity", "Subgroup saved: " + subgroupNumber);
     }
 
     private void switchToScreen1() {
