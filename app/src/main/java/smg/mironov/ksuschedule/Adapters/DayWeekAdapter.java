@@ -2,12 +2,14 @@ package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -151,9 +153,12 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
 
+            LocalDate nowDate = LocalDate.now();
             LocalTime now = LocalTime.now();
             if (now.isAfter(timeStart) && now.isBefore(timeEnd)) {
-                pairView.setBackgroundColor(Color.BLUE); // Выделяем цветом текущую пару
+                int nowColor = Color.parseColor("#95ACFF");
+                //pairView.setBackground(Drawable.createFromPath("res/drawable/custom_pair_is_now.xml")); // Выделяем цветом текущую пару
+                pairView.setBackgroundResource(R.drawable.custom_pair_is_now);
             } else {
                 pairView.setBackgroundColor(Color.TRANSPARENT); // Убираем выделение, если не текущая пара
             }
