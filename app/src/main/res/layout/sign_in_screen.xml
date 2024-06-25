@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+    android:id="@+id/SignInScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#A0B4FE"
-    android:orientation="vertical"
-    tools:context=".FirstActivity">
-
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -18,7 +14,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/NameApp"
+            android:id="@+id/NameAppSignInScreen"
             android:layout_width="281dp"
             android:layout_height="106dp"
             android:fontFamily="@font/involve_bold"
@@ -36,7 +32,7 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/SignIn_title"
+            android:id="@+id/SignIn_authorization_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/involve_medium"
@@ -53,69 +49,64 @@
         android:layout_marginTop="78dp"
         android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/Role"
-            style="@style/spinner_style_black_arrow"
-            android:layout_width="281dp"
-            android:layout_height="50dp"
-            android:gravity="left"
-            android:padding="12dp" />
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
         <EditText
-            android:id="@+id/GroupNumber"
+            android:id="@+id/Login"
             android:layout_width="281dp"
             android:layout_height="50dp"
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
-            android:hint="Введите группу..."
+            android:hint="Логин..."
             android:padding="12dp" />
-
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="10dp"
         android:orientation="horizontal">
 
-        <Spinner
-            android:id="@+id/SubgroupNumber"
-            style="@style/spinner_style_black_arrow"
+        <EditText
+            android:id="@+id/Password"
             android:layout_width="281dp"
             android:layout_height="50dp"
-            android:gravity="left"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Пароль..."
             android:padding="12dp" />
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/login"
-        android:layout_width="150dp"
-        android:layout_height="40dp"
-        android:orientation="horizontal"
-        android:background="@drawable/custom_filter_semcorners_item"
-        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp">
+        android:layout_marginTop="78dp"
+        android:orientation="horizontal">
+
 
         <TextView
+            android:id="@+id/NotRegistered"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Войти"
-            android:fontFamily="@font/involve_bold"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:textColor="@color/navbar_white_text"/>
-
+            android:layout_weight="1"
+            android:text="Еще не зарегистрированы?"
+            android:fontFamily="@font/involve_regular"/>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:id="@+id/TransferToRegistration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Регистрация"
+            android:fontFamily="@font/involve_semibold"/>
+    </LinearLayout>
 
 </LinearLayout>
