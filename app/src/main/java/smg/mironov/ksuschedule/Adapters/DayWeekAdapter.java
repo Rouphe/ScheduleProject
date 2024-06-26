@@ -177,7 +177,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
 
             LocalDate localDate = LocalDate.now();
-            String date = dateToShow.format(formatter);
+            String date = localDate.format(formatter);
 
             LocalTime now = LocalTime.now();
             if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date))) {
