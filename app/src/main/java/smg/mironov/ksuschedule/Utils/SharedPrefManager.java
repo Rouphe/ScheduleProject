@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 public class SharedPrefManager {
     private static final String PREF_NAME = "app_prefs";
-    private static final String KEY_PARITY = "ЧИСЛИТЕЛЬ";
+    private static final String KEY_PARITY = "ЗНАМЕНАТЕЛЬ";
     private static final String KEY_SUBGROUP_NUMBER = "subgroup_number";
     private static final String KEY_GROUP_NUMBER = "group_number";
     private static final String KEY_FIRST_TIME_USER = "";
@@ -52,7 +52,7 @@ public class SharedPrefManager {
     }
 
     public String getParity() {
-        return sharedPreferences.getString(KEY_PARITY, "");
+        return sharedPreferences.getString(KEY_PARITY, "ЧИСЛИТЕЛЬ");
     }
 
     public void setSubgroupNumber(String subgroupNumber) {

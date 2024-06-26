@@ -58,12 +58,12 @@ public class MainActivity extends AppCompatActivity {
 
         groupNumberTextView.setText(sharedPrefManager.getGroupNumber());
         subgroupSpinner = findViewById(R.id.Subgroup);
+        parity = findViewById(R.id.weekType);
+        parity.setText(sharedPrefManager.getParity());
         if (sharedPrefManager.getRole().equals("Преподаватель")){
             subgroupSpinner.setVisibility(View.INVISIBLE);
         }
-        parity = findViewById(R.id.weekType);
 
-        parity.setText(sharedPrefManager.getParity());
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
