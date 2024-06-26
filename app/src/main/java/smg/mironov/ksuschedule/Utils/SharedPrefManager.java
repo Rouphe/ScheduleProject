@@ -8,7 +8,9 @@ public class SharedPrefManager {
     private static final String KEY_PARITY = "ЧИСЛИТЕЛЬ";
     private static final String KEY_SUBGROUP_NUMBER = "subgroup_number";
     private static final String KEY_GROUP_NUMBER = "group_number";
-    private static final String KEY_FIRST_TIME_USER = "first_time_user";
+    private static final String KEY_FIRST_TIME_USER = "";
+    private static final String KEY_ROLE = "Студент";
+    private static final String KEY_TEACHER_NAME = "Преподаватель";
 
 
     private static SharedPrefManager instance;
@@ -26,7 +28,23 @@ public class SharedPrefManager {
     }
 
     public boolean isFirstTimeUser() {
-        return sharedPreferences.getBoolean(KEY_FIRST_TIME_USER, false);
+        return sharedPreferences.getBoolean(KEY_FIRST_TIME_USER, true);
+    }
+
+    public void setTeacherName(String teacherName) {
+        sharedPreferences.edit().putString(KEY_TEACHER_NAME, teacherName).apply();
+    }
+
+    public String getTeacherName() {
+        return sharedPreferences.getString(KEY_TEACHER_NAME, "");
+    }
+
+    public void setRole(String role) {
+        sharedPreferences.edit().putString(KEY_ROLE, role).apply();
+    }
+
+    public String getRole() {
+        return  sharedPreferences.getString(KEY_ROLE, "");
     }
 
     public void setParity(String parity) {

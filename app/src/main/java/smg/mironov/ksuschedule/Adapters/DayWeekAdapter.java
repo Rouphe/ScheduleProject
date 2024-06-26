@@ -2,14 +2,12 @@ package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -23,30 +21,27 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.Objects;
 
 import smg.mironov.ksuschedule.Models.DayWeek;
-
+import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.R;
-
-
-import smg.mironov.ksuschedule.Utils.DaySchedule;
 import smg.mironov.ksuschedule.Utils.SharedPrefManager;
-
 
 public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.ScheduleViewHolder> {
     private Context context;
-    private List<DaySchedule> scheduleList;
+    private List<String> dayList;
+    private Map<String, List<DayWeek>> scheduleMap;
     private SharedPrefManager sharedPrefManager;
     private String filterParity;
 
     public DayWeekAdapter(Context context) {
         this.context = context;
-        this.scheduleList = new ArrayList<>();
-        this.sharedPrefManager = new SharedPrefManager(context); // Инициализация SharedPrefManager
+        this.dayList = new ArrayList<>();
+        this.scheduleMap = new HashMap<>();
+        this.sharedPrefManager = new SharedPrefManager(context);
         this.filterParity = sharedPrefManager.getParity();
     }
 
@@ -55,41 +50,53 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
     }
 
     public void updateScheduleList(List<DayWeek> newScheduleList) {
-        Map<String, DaySchedule> dayScheduleMap = new HashMap<>();
-        Map<String, Integer> dayOfWeekOrder = new HashMap<>();
+        scheduleMap.clear();
+        dayList.clear();
 
-        // Определяем порядок дней недели
-        dayOfWeekOrder.put("ПОНЕДЕЛЬНИК", 1);
-        dayOfWeekOrder.put("ВТОРНИК", 2);
-        dayOfWeekOrder.put("СРЕДА", 3);
-        dayOfWeekOrder.put("ЧЕТВЕРГ", 4);
-        dayOfWeekOrder.put("ПЯТНИЦА", 5);
-        dayOfWeekOrder.put("СУББОТА", 6);
-        dayOfWeekOrder.put("ВОСКРЕСЕНЬЕ", 7);
-
+        // Фильтрация по parity
         for (DayWeek dayWeek : newScheduleList) {
-            if (filterParity != null && !filterParity.equals(dayWeek.getParity()) && !"ВСЕГДА".equals(dayWeek.getParity())) {
-                continue; // Фильтруем по parity
+            if (filterParity == null || filterParity.equals(dayWeek.getParity()) || "ВСЕГДА".equals(dayWeek.getParity())) {
+                String day = dayWeek.getDayWeek();
+                if (!scheduleMap.containsKey(day)) {
+                    scheduleMap.put(day, new ArrayList<>());
+                    dayList.add(day);
+                }
+                scheduleMap.get(day).add(dayWeek);
             }
-
-            String day = dayWeek.getDayWeek();
-            if (!dayScheduleMap.containsKey(day)) {
-                dayScheduleMap.put(day, new DaySchedule(day));
-            }
-            dayScheduleMap.get(day).addDayWeek(dayWeek);
         }
 
-        List<DaySchedule> sortedScheduleList = new ArrayList<>(dayScheduleMap.values());
-        Collections.sort(sortedScheduleList, new Comparator<DaySchedule>() {
+        // Сортировка по дням недели
+        Collections.sort(dayList, new Comparator<String>() {
             @Override
-            public int compare(DaySchedule o1, DaySchedule o2) {
-                return Integer.compare(dayOfWeekOrder.get(o1.getDayWeek()), dayOfWeekOrder.get(o2.getDayWeek()));
+            public int compare(String o1, String o2) {
+                return Integer.compare(getDayOfWeekOrder(o1), getDayOfWeekOrder(o2));
             }
         });
 
-        this.scheduleList.clear();
-        this.scheduleList.addAll(sortedScheduleList);
+        // Сортировка пар внутри каждого дня по времени начала
+        for (String day : scheduleMap.keySet()) {
+            Collections.sort(scheduleMap.get(day), new Comparator<DayWeek>() {
+                @Override
+                public int compare(DayWeek o1, DayWeek o2) {
+                    return LocalTime.parse(o1.getTimeStart()).compareTo(LocalTime.parse(o2.getTimeStart()));
+                }
+            });
+        }
+
         notifyDataSetChanged();
+    }
+
+    private int getDayOfWeekOrder(String dayOfWeek) {
+        switch (dayOfWeek) {
+            case "ПОНЕДЕЛЬНИК": return 1;
+            case "ВТОРНИК": return 2;
+            case "СРЕДА": return 3;
+            case "ЧЕТВЕРГ": return 4;
+            case "ПЯТНИЦА": return 5;
+            case "СУББОТА": return 6;
+            case "ВОСКРЕСЕНЬЕ": return 7;
+            default: return 8; // В случае неизвестного дня недели
+        }
     }
 
     @NonNull
@@ -101,7 +108,8 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-        DaySchedule daySchedule = scheduleList.get(position);
+        String day = dayList.get(position);
+        List<DayWeek> daySchedule = scheduleMap.get(day);
 
         // Получаем текущую дату
         LocalDate today = LocalDate.now();
@@ -119,46 +127,58 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         // Если parity в SharedPrefManager не совпадает с текущей неделей, показываем расписание следующей недели
         String savedParity = sharedPrefManager.getParity();
         if (!currentWeekParity.equals(savedParity)) {
-            startOfWeek = startOfWeek.plusWeeks(1); // Смещаем на одну неделю вперед
+            startOfWeek = startOfWeek.plusWeeks(1);
             isEvenWeek = !isEvenWeek;
             currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
             sharedPrefManager.setParity(currentWeekParity);
         }
 
         // Добавляем количество дней, соответствующее позиции в RecyclerView
-        LocalDate dateToShow = startOfWeek.plusDays(position);
+        LocalDate dateToShow = startOfWeek.plusDays(getDayOfWeekOrder(day) - 1);
 
         // Форматируем дату в требуемый формат
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM");
         String formattedDate = dateToShow.format(formatter);
 
-        holder.nameDay.setText(daySchedule.getDayWeek());
+        holder.nameDay.setText(day);
         holder.numDay.setText(formattedDate);
 
         holder.pairsLayout.removeAllViews();
 
-        for (DayWeek dayWeek : daySchedule.getDayWeeks()) {
+        String timeStartAndEndPrevious = "";
+
+        for (DayWeek dayWeek : daySchedule) {
             View pairView = LayoutInflater.from(context).inflate(R.layout.period_item, holder.pairsLayout, false);
             TextView timeStartAndEnd = pairView.findViewById(R.id.FirstTimeStartAndEnd);
             TextView typeAndNameDis = pairView.findViewById(R.id.typeAndNameDis);
             TextView infoTeacher = pairView.findViewById(R.id.infoTeacher);
+            if (Objects.equals(sharedPrefManager.getRole(), "Преподаватель")) {
+                infoTeacher.setText(dayWeek.getSubgroup().getNumber());
+            } else {
+                infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
+            }
+
+
             TextView numAudit = pairView.findViewById(R.id.numAudit);
 
             timeStartAndEnd.setText(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd());
             typeAndNameDis.setText(dayWeek.getSubject().getType() + " | " + dayWeek.getSubject().getName());
-            infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
+
             numAudit.setText(dayWeek.getClassroom());
+
+            if (timeStartAndEndPrevious.equals(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd())){
+                continue;
+            }
+
+            timeStartAndEndPrevious = dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd();
 
             // Проверка, идет ли текущая пара
             LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
 
-            LocalDate nowDate = LocalDate.now();
             LocalTime now = LocalTime.now();
             if (now.isAfter(timeStart) && now.isBefore(timeEnd)) {
-                int nowColor = Color.parseColor("#95ACFF");
-                //pairView.setBackground(Drawable.createFromPath("res/drawable/custom_pair_is_now.xml")); // Выделяем цветом текущую пару
-                pairView.setBackgroundResource(R.drawable.custom_pair_is_now);
+                pairView.setBackgroundResource(R.drawable.custom_pair_is_now); // Выделяем цветом текущую пару
             } else {
                 pairView.setBackgroundColor(Color.TRANSPARENT); // Убираем выделение, если не текущая пара
             }
@@ -169,7 +189,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
     @Override
     public int getItemCount() {
-        return scheduleList.size();
+        return dayList.size();
     }
 
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
@@ -177,7 +197,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         TextView numDay;
         LinearLayout pairsLayout;
 
-        public ScheduleViewHolder(@NonNull View itemView) {
+        ScheduleViewHolder(View itemView) {
             super(itemView);
             nameDay = itemView.findViewById(R.id.NameDay);
             numDay = itemView.findViewById(R.id.NumDay);

@@ -2,6 +2,7 @@ package smg.mironov.ksuschedule.Models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class DayWeek {
 
@@ -18,6 +19,25 @@ public class DayWeek {
 
     public DayWeek() {
         additionalPeriods = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DayWeek dayWeek = (DayWeek) o;
+        return Objects.equals(this.dayWeek, dayWeek.dayWeek) &&
+                Objects.equals(this.timeStart, dayWeek.timeStart) &&
+                Objects.equals(this.timeEnd, dayWeek.timeEnd) &&
+                Objects.equals(this.parity, dayWeek.parity) &&
+                Objects.equals(this.subjectDto, dayWeek.subjectDto) &&
+                Objects.equals(this.teacherDto, dayWeek.teacherDto) &&
+                Objects.equals(this.classroom, dayWeek.classroom);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(dayWeek, timeStart, timeEnd, parity, subjectDto, teacherDto, classroom);
     }
 
 
@@ -102,4 +122,8 @@ public class DayWeek {
         this.additionalPeriods = additionalPeriods;
     }
 
+
+    public GroupDto getGroup() {
+        return subgroupDto.getGroup();
+    }
 }

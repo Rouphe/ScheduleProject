@@ -55,7 +55,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         Spinner editTextWeek = findViewById(R.id.editTextWeek);
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) ;
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) ;
         editTextWeek.setAdapter(spinnerAdapter);
 
         // Устанавливаем значение Spinner из SharedPreferences

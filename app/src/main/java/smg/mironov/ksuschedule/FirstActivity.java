@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,6 +34,8 @@ public class FirstActivity extends AppCompatActivity {
     private ApiService apiService;
     private SharedPrefManager sharedPrefManager;
     private LinearLayout LoginButton;
+    private Spinner studOrTeachSpinner;
+    private ArrayAdapter<String> getSpinnerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,8 +45,11 @@ public class FirstActivity extends AppCompatActivity {
         // Инициализация SharedPrefManager
         sharedPrefManager = SharedPrefManager.getInstance(this);
 
-        if (sharedPrefManager.isFirstTimeUser()) {
+        if (!sharedPrefManager.isFirstTimeUser()) {
             switchToMain();
+        }
+        else {
+            sharedPrefManager.setFirstTimeUser(false);
         }
 
 
@@ -54,6 +60,34 @@ public class FirstActivity extends AppCompatActivity {
         spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new ArrayList<>());
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         subgroupSpinner.setAdapter(spinnerAdapter);
+
+        Spinner spinner = findViewById(R.id.Role);
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"Преподаватель", "Студент"});
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(arrayAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedValue = (String) parent.getItemAtPosition(position);
+                if (Objects.equals(selectedValue, "Преподаватель")){
+                    sharedPrefManager.setRole(selectedValue);
+                    subgroupSpinner.setVisibility(View.INVISIBLE);
+                    groupNumberEditText.setHint("Введите ФИО...");
+                }
+                else {
+                    sharedPrefManager.setRole(selectedValue);
+                    subgroupSpinner.setVisibility(View.VISIBLE);
+                    groupNumberEditText.setHint("Введите номер группы...");
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
@@ -69,7 +103,14 @@ public class FirstActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 fetchSubgroups(s.toString());
-                sharedPrefManager.setGroupNumber(s.toString());
+                if (Objects.equals(sharedPrefManager.getRole(), "Преподаватель")){
+                    sharedPrefManager.setTeacherName(s.toString());
+                }
+                else {
+                    fetchSubgroups(s.toString());
+                    sharedPrefManager.setGroupNumber(s.toString());
+                }
+
             }
 
             @Override

@@ -1,5 +1,7 @@
 package smg.mironov.ksuschedule.Models;
 
+import java.util.Objects;
+
 public class GroupDto {
 
     private int id;

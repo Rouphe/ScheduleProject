@@ -17,7 +17,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,10 +48,19 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_screen);
 
         sharedPrefManager = new SharedPrefManager(this);
-
         TextView groupNumberTextView = findViewById(R.id.group_number);
+        if (Objects.equals(sharedPrefManager.getRole(), "Преподаватель")){
+            groupNumberTextView.setVisibility(View.INVISIBLE);
+            TextView teacherName = findViewById(R.id.Group);
+            teacherName.setText(sharedPrefManager.getTeacherName());
+
+        }
+
         groupNumberTextView.setText(sharedPrefManager.getGroupNumber());
         subgroupSpinner = findViewById(R.id.Subgroup);
+        if (sharedPrefManager.getRole().equals("Преподаватель")){
+            subgroupSpinner.setVisibility(View.INVISIBLE);
+        }
         parity = findViewById(R.id.weekType);
 
         parity.setText(sharedPrefManager.getParity());
@@ -150,13 +162,16 @@ public class MainActivity extends AppCompatActivity {
     private void fetchScheduleFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String savedSubgroupNumber = sharedPrefManager.getSubgroupNumber();
-        Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(savedSubgroupNumber);
-        call.enqueue(new Callback<List<DayWeek>>() {
+        Callback<List<DayWeek>> callback = new Callback<List<DayWeek>>() {
             @Override
             public void onResponse(Call<List<DayWeek>> call, Response<List<DayWeek>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<DayWeek> scheduleList = response.body();
-                    scheduleAdapter.updateScheduleList(scheduleList);
+                    // Используем Set для удаления дубликатов
+                    Set<DayWeek> uniqueScheduleSet = new HashSet<>(scheduleList);
+                    List<DayWeek> uniqueScheduleList = new ArrayList<>(uniqueScheduleSet);
+
+                    scheduleAdapter.updateScheduleList(uniqueScheduleList);
                 } else {
                     Log.e("MainActivity", "Response not successful");
                     Toast.makeText(MainActivity.this, "Не удалось загрузить данные", Toast.LENGTH_SHORT).show();
@@ -168,8 +183,19 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("MainActivity", "Error fetching schedule", t);
                 Toast.makeText(MainActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        if (Objects.equals(sharedPrefManager.getRole(), "Студент")) {
+            Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(savedSubgroupNumber);
+            call.enqueue(callback);
+        } else {
+            String savedTeacherName = sharedPrefManager.getTeacherName();
+            Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(savedTeacherName);
+            call.enqueue(callback);
+        }
     }
+
+
 
 
 
