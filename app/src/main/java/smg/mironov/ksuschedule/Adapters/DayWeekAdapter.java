@@ -177,10 +177,10 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
 
             LocalDate localDate = LocalDate.now();
-            String date = localDate.format(formatter);
+            String date1 = localDate.format(formatter);
 
             LocalTime now = LocalTime.now();
-            if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date))) {
+            if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date1))) {
                 pairView.setBackgroundResource(R.drawable.custom_pair_is_now); // Выделяем цветом текущую пару
             } else {
                 pairView.setBackgroundColor(Color.TRANSPARENT); // Убираем выделение, если не текущая пара
