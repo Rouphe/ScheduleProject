@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/registration"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#A0B4FE"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="104dp"
-        android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/NameAppRegistrationScreen"
-            android:layout_width="281dp"
-            android:layout_height="106dp"
-            android:fontFamily="@font/involve_bold"
-            android:gravity="center"
-            android:text="РАСПИСАНИЕ ВУЗа"
-            android:textColor="@color/black"
-            android:textSize="40sp" />
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="78dp"
+        android:layout_marginTop="45dp"
         android:orientation="horizontal">
 
         <TextView
@@ -42,13 +27,162 @@
             android:textSize="32sp" />
     </LinearLayout>
 
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        app:cardCornerRadius="100dp"
+        tools:ignore="MissingConstraints">
 
+        <!-- add a Image image.png in your Drawable folder -->
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/circular" />
+    </androidx.cardview.widget.CardView>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="25dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="130dp"
+            android:layout_height="99dp"
+            android:background="@drawable/custom_registr_semcorners_item"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="42dp"
+                android:layout_marginTop="15dp"
+                android:src="@drawable/student_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@font/involve_bold"
+                android:text="Студент"
+                android:textColor="#DAE2FF"
+                android:textSize="14dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="130dp"
+            android:layout_height="99dp"
+            android:layout_marginStart="21dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="42dp"
+                android:layout_marginTop="15dp"
+                android:src="@drawable/teacher_icon" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@font/involve_bold"
+                android:text="Преподаватель"
+                android:textColor="#0229B3"
+                android:textSize="14dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/surname"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Фамилия..."
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/name"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Имя..."
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/mid_name"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Отчество..."
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/group_number_for_reg"
+            android:layout_width="281dp"
+            android:layout_height="50dp"
+            android:background="@drawable/custom_white_semcorners_item"
+            android:fontFamily="@font/involve_regular"
+            android:hint="Номер группы..."
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
         android:orientation="horizontal">
 
         <EditText
@@ -63,12 +197,11 @@
     </LinearLayout>
 
 
-
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:orientation="horizontal">
 
         <EditText
@@ -81,42 +214,24 @@
             android:padding="12dp" />
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="12dp"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/RepeatPassword"
+        <TextView
             android:layout_width="281dp"
             android:layout_height="50dp"
-            android:background="@drawable/custom_white_semcorners_item"
-            android:fontFamily="@font/involve_regular"
-            android:hint="Повторите пароль..."
-            android:padding="12dp" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
-        android:orientation="horizontal"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/custom_filter_semcorners_item"
+            android:background="@drawable/custom_registr_semcorners_item"
+            android:fontFamily="@font/involve_bold"
+            android:gravity="center"
             android:text="Зарегистрироваться"
-            android:fontFamily="@font/involve_semibold"
             android:textColor="@color/navbar_white_text"
-            android:textSize="16sp"
-            android:paddingVertical="6dp"
-            android:paddingHorizontal="6dp">
-        </TextView>
+            android:textSize="14sp" />
+
     </LinearLayout>
 
 </LinearLayout>
