@@ -55,7 +55,7 @@
             android:layout_height="50dp"
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
-            android:hint="Логин..."
+            android:hint="E-mail..."
             android:padding="12dp" />
     </LinearLayout>
 
