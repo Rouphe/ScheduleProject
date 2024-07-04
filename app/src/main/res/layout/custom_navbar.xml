@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="55dp"
         android:orientation="horizontal"
         android:gravity="center_horizontal">
 
@@ -73,17 +73,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_gravity="center_vertical"
             android:gravity="center_horizontal">
 
 
 
             <ImageButton
-                android:id="@+id/settings_icon"
+                android:id="@+id/profile_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@+id/home_button"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/settings" />
+                android:src="@drawable/person" />
             <TextView
                 android:id="@+id/settings"
                 android:layout_width="wrap_content"
@@ -91,7 +92,7 @@
                 android:layout_below="@id/settings_button"
                 android:layout_toEndOf="@+id/home"
                 android:fontFamily="@font/involve_regular"
-                android:text="Настройки"
+                android:text="Профиль"
                 android:textColor="@color/navbar_white_text"
                 android:textSize="10sp" />
 

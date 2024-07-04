@@ -130,7 +130,7 @@
             android:layout_height="30dp"
             android:gravity="center"
             android:fontFamily="@font/involve_bold"
-            android:text="Сохранить всё"
+            android:text="Сохранить"
             android:textColor="@color/white"
             android:textSize="20sp" />
     </LinearLayout>
