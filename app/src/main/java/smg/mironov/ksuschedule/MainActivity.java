@@ -1,6 +1,7 @@
 package smg.mironov.ksuschedule;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,7 +31,9 @@ import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.Models.SubgroupDto;
+import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.SharedPrefManager;
+import smg.mironov.ksuschedule.Utils.UserData;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private ApiService apiService;
     private ArrayAdapter<String> spinnerAdapter;
     private TextView parity;
+    User user = UserData.getInstance().getUser();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,19 +52,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_screen);
 
         sharedPrefManager = new SharedPrefManager(this);
+        user = loadUserData();
+
+        if (user == null) {
+            Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+
         TextView groupNumberTextView = findViewById(R.id.group_number);
-        if (Objects.equals(sharedPrefManager.getRole(), "Преподаватель")){
+        if (Objects.equals(user.getRole(), "TEACHER")){
             groupNumberTextView.setVisibility(View.INVISIBLE);
             TextView teacherName = findViewById(R.id.Group);
-            teacherName.setText(sharedPrefManager.getTeacherName());
+            teacherName.setText(user.getLastName() + " " + user.getFirstName());
 
         }
 
-        groupNumberTextView.setText(sharedPrefManager.getGroupNumber());
+        groupNumberTextView.setText(user.getGroup_number());
         subgroupSpinner = findViewById(R.id.Subgroup);
         parity = findViewById(R.id.weekType);
         parity.setText(sharedPrefManager.getParity());
-        if (sharedPrefManager.getRole().equals("Преподаватель")){
+        if (user.getRole().equals("TEACHER")){
             subgroupSpinner.setVisibility(View.INVISIBLE);
         }
 
@@ -78,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Инициализация кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
-        ImageView navButton2 = findViewById(R.id.settings_icon);
+        ImageView navButton2 = findViewById(R.id.profile_icon);
 
         subgroupSpinner = findViewById(R.id.Subgroup);
         spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item, new ArrayList<>());
@@ -126,8 +139,27 @@ public class MainActivity extends AppCompatActivity {
         // Получение данных с сервера
         //fetchScheduleFromServer();
     }
+
+    private User loadUserData() {
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String id = preferences.getString("user_id", null);
+        String lastName = preferences.getString("user_lastName", null);
+        String firstName = preferences.getString("user_firstName", null);
+        String middleName = preferences.getString("user_middleName", null);
+        String email = preferences.getString("user_email", null);
+        String role = preferences.getString("user_role", null);
+        String groupNumber = preferences.getString("user_groupNumber", null);
+        String subgroupNumber = preferences.getString("user_subgroupNumber", null);
+        String password = preferences.getString("user_password", null);
+
+        if (id == null || lastName == null || email == null || role == null) {
+            return null;
+        }
+
+        return new User(firstName, lastName, middleName, email, password, groupNumber, subgroupNumber, role);
+    }
     private void fetchSubgroups() {
-        String savedGroupNumber = sharedPrefManager.getGroupNumber();
+        String savedGroupNumber = user.getGroup_number();
         Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(savedGroupNumber);
         call.enqueue(new Callback<List<SubgroupDto>>() {
             @Override
@@ -143,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                     spinnerAdapter.notifyDataSetChanged();
 
                     // Установить сохраненное значение подгруппы после загрузки данных с сервера
-                    String savedSubgroup = sharedPrefManager.getSubgroupNumber();
+                    String savedSubgroup = user.getSubgroup_number();
                     if (savedSubgroup != null) {
                         int subgroupPosition = spinnerAdapter.getPosition(savedSubgroup);
                         if (subgroupPosition >= 0) {
@@ -161,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void fetchScheduleFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        String savedSubgroupNumber = sharedPrefManager.getSubgroupNumber();
+        String savedSubgroupNumber = user.getSubgroup_number();
         Callback<List<DayWeek>> callback = new Callback<List<DayWeek>>() {
             @Override
             public void onResponse(Call<List<DayWeek>> call, Response<List<DayWeek>> response) {
@@ -185,12 +217,11 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        if (Objects.equals(sharedPrefManager.getRole(), "Студент")) {
+        if (Objects.equals(user.getRole(), "STUDENT")) {
             Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(savedSubgroupNumber);
             call.enqueue(callback);
         } else {
-            String savedTeacherName = sharedPrefManager.getTeacherName();
-            Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(savedTeacherName);
+            Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(user.getLastName() + " " + user.getFirstName().charAt(0) + "." + user.getMiddleName().charAt(0) + ".");
             call.enqueue(callback);
         }
     }
@@ -200,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void changeSubgroup(String subgroupNumber) {
-        sharedPrefManager.setSubgroupNumber(subgroupNumber);
+        user.setSubgroup_number(subgroupNumber);
         Log.d("MainActivity", "Subgroup saved: " + subgroupNumber);
     }
 

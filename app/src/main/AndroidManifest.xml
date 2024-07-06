@@ -16,7 +16,10 @@
         android:theme="@style/Theme.KSUSchedule"
         tools:targetApi="31"
         android:usesCleartextTraffic="true">
-        <activity android:name=".FirstActivity"
+        <activity android:name=".RegistrationActivity"
+            android:exported="true">
+        </activity>
+        <activity android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

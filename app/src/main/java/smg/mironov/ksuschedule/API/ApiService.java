@@ -4,14 +4,29 @@ package smg.mironov.ksuschedule.API;
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
+import smg.mironov.ksuschedule.Models.User;
+import smg.mironov.ksuschedule.Utils.AuthRequest;
+import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 
 public interface ApiService {
+
+    @POST("/api/v1/auth/register")
+    Call<RegistrationResponse> register(@Body User user);
+
+    @POST("api/v1/auth/authenticate")
+    Call<RegistrationResponse> login(@Body AuthRequest user);
+
+    @GET("/api/v1/user")
+    Call<User> getUser(@Query("email") String email);
 
     @GET("/teacher")
     Call<List<TeacherDto>> getAllTeachers();
