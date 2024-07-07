@@ -1,5 +1,6 @@
 package smg.mironov.ksuschedule;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -46,10 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private TextView parity;
     User user = UserData.getInstance().getUser();
 
+    private String token;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        token = "Bearer " + preferences.getString("auth_token", null);
 
         sharedPrefManager = new SharedPrefManager(this);
         user = loadUserData();
@@ -142,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
 
     private User loadUserData() {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String id = preferences.getString("user_id", null);
+        Long id = preferences.getLong("user_id", 1);
         String lastName = preferences.getString("user_lastName", null);
         String firstName = preferences.getString("user_firstName", null);
         String middleName = preferences.getString("user_middleName", null);
@@ -152,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         String subgroupNumber = preferences.getString("user_subgroupNumber", null);
         String password = preferences.getString("user_password", null);
 
-        if (id == null || lastName == null || email == null || role == null) {
+        if (lastName == null || email == null || role == null) {
             return null;
         }
 
@@ -160,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void fetchSubgroups() {
         String savedGroupNumber = user.getGroup_number();
-        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(savedGroupNumber);
+        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(token, savedGroupNumber);
         call.enqueue(new Callback<List<SubgroupDto>>() {
             @Override
             public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
@@ -194,18 +200,22 @@ public class MainActivity extends AppCompatActivity {
     private void fetchScheduleFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String savedSubgroupNumber = user.getSubgroup_number();
+        String role = user.getRole();
+
+        Log.d("MainActivity", "Fetching schedule for role: " + role);
+
         Callback<List<DayWeek>> callback = new Callback<List<DayWeek>>() {
             @Override
             public void onResponse(Call<List<DayWeek>> call, Response<List<DayWeek>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<DayWeek> scheduleList = response.body();
-                    // Используем Set для удаления дубликатов
                     Set<DayWeek> uniqueScheduleSet = new HashSet<>(scheduleList);
                     List<DayWeek> uniqueScheduleList = new ArrayList<>(uniqueScheduleSet);
 
                     scheduleAdapter.updateScheduleList(uniqueScheduleList);
+                    Log.d("MainActivity", "Schedule loaded successfully");
                 } else {
-                    Log.e("MainActivity", "Response not successful");
+                    Log.e("MainActivity", "Response not successful: " + response.code());
                     Toast.makeText(MainActivity.this, "Не удалось загрузить данные", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -218,10 +228,12 @@ public class MainActivity extends AppCompatActivity {
         };
 
         if (Objects.equals(user.getRole(), "STUDENT")) {
-            Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(savedSubgroupNumber);
+            Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(token, savedSubgroupNumber);
             call.enqueue(callback);
         } else {
-            Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(user.getLastName() + " " + user.getFirstName().charAt(0) + "." + user.getMiddleName().charAt(0) + ".");
+            String teacherName = user.getLastName() + " " + user.getFirstName().charAt(0) + "." + user.getMiddleName().charAt(0) + ".";
+            Log.d("MainActivity", "Fetching schedule for teacher: " + teacherName);
+            Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(token, teacherName);
             call.enqueue(callback);
         }
     }
@@ -245,7 +257,7 @@ public class MainActivity extends AppCompatActivity {
     private void switchToScreen2() {
         // Логика переключения на второй экран
         // Например, запуск новой активности:
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 }

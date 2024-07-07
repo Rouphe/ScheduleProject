@@ -41,7 +41,7 @@ public class TeachersActivity extends AppCompatActivity {
 
         // Инициализация кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.home_icon);
-        ImageView navButton2 = findViewById(R.id.settings_icon);
+        ImageView navButton2 = findViewById(R.id.profile_icon);
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,7 +65,7 @@ public class TeachersActivity extends AppCompatActivity {
 
     private void fetchTeachersFromServer() {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://24schedule.ru:8081/") // Замените на ваш базовый URL
+                .baseUrl("http://192.168.0.15:8081/") // Замените на ваш базовый URL
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -104,7 +104,7 @@ public class TeachersActivity extends AppCompatActivity {
     private void switchToScreen2() {
         // Логика переключения на второй экран
         // Например, запуск новой активности:
-        Intent intent = new Intent(this, SettingsActivity.class);
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 }

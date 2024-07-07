@@ -1,5 +1,6 @@
 package smg.mironov.ksuschedule;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -33,10 +34,14 @@ public class LoginActivity extends AppCompatActivity {
     private EditText emailEdiText, passwordEditText;
     private TextView loginButton, toRegistration;
 
+    private String token;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in_screen);
+
+
 
         // Проверка токена
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -50,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+
 
         emailEdiText = findViewById(R.id.Login);
         passwordEditText = findViewById(R.id.Password);
@@ -133,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void getUserByEmail(String email) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<User> call = apiService.getUser(email);
+        Call<User> call = apiService.getUser(token, email);
 
         call.enqueue(new Callback<User>() {
             @Override
@@ -200,7 +207,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loadUserData() {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String userId = preferences.getString("user_id", null);
+        Long userId = preferences.getLong("user_id", 0);
         String userLastName = preferences.getString("user_lastName", null);
         String userFirstName = preferences.getString("user_firstName", null);
         String userMiddleName = preferences.getString("user_middleName", null);

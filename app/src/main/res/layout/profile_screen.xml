@@ -128,6 +128,7 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="5dp">
                 <TextView
+                    android:id="@+id/group_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="группа"
@@ -135,6 +136,7 @@
                     android:fontFamily="@font/involve_regular"
                     android:textSize="14sp"/>
                 <TextView
+                    android:id="@+id/userGroupNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="100"
@@ -144,68 +146,79 @@
                     android:layout_marginStart="3dp"/>
             </LinearLayout>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Направление подготовки:"
-                android:textColor="@color/navbar_white_text"
-                android:fontFamily="@font/involve_regular"
-                android:textSize="11sp"
-                android:visibility="gone"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="09.03.01 Информатика и вычислительная техника"
-                android:textColor="@color/navbar_white_text"
-                android:fontFamily="@font/involve_regular"
-                android:textSize="11sp"
-                android:gravity="center_horizontal"
-                android:visibility="gone"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Профиль:"
-                android:textColor="@color/navbar_white_text"
-                android:fontFamily="@font/involve_regular"
-                android:textSize="11sp"
-                android:layout_marginTop="3dp"
-                android:visibility="gone"/>
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Автоматизированные системы обработки информации"
-                android:textColor="@color/navbar_white_text"
-                android:fontFamily="@font/involve_regular"
-                android:textSize="11sp"
-                android:gravity="center_horizontal"
-                android:visibility="gone"/>
-
             <LinearLayout
+                android:id="@+id/additional_info_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/custom_edit_button_profile_item"
-                android:layout_marginTop="10dp"
-                android:layout_marginBottom="10dp"
-                android:paddingHorizontal="6dp"
-                android:paddingVertical="3dp"
-                android:visibility="gone">
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="Edit Icon"
-                    android:src="@drawable/editwhite"/>
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center_horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Редактировать"
+                    android:text="Направление подготовки:"
                     android:textColor="@color/navbar_white_text"
                     android:fontFamily="@font/involve_regular"
-                    android:textSize="11sp"/>
+                    android:textSize="11sp" />
+                <TextView
+                    android:id="@+id/userGroupDirection"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="09.03.01 Информатика и вычислительная техника"
+                    android:textColor="@color/navbar_white_text"
+                    android:fontFamily="@font/involve_regular"
+                    android:textSize="11sp"
+                    android:gravity="center_horizontal" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Профиль:"
+                    android:textColor="@color/navbar_white_text"
+                    android:fontFamily="@font/involve_regular"
+                    android:textSize="11sp"
+                    android:layout_marginTop="3dp" />
+                <TextView
+                    android:id="@+id/userGroupProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Автоматизированные системы обработки информации"
+                    android:textColor="@color/navbar_white_text"
+                    android:fontFamily="@font/involve_regular"
+                    android:textSize="11sp"
+                    android:gravity="center_horizontal" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/custom_edit_button_profile_item"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:paddingHorizontal="6dp"
+                    android:paddingVertical="3dp">
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="Edit Icon"
+                        android:src="@drawable/editwhite"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Редактировать"
+                        android:textColor="@color/navbar_white_text"
+                        android:fontFamily="@font/involve_regular"
+                        android:textSize="11sp"/>
+                </LinearLayout>
+
             </LinearLayout>
 
+
+
             <ImageView
+                android:id="@+id/chevron_down"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"

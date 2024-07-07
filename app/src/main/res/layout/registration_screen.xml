@@ -31,23 +31,7 @@
                 android:textSize="32sp" />
         </LinearLayout>
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="25dp"
-            app:cardCornerRadius="100dp"
-            tools:ignore="MissingConstraints">
 
-            <!-- add a Image image.png in your Drawable folder -->
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/circular" />
-        </androidx.cardview.widget.CardView>
 
 
         <LinearLayout
@@ -74,6 +58,7 @@
                     android:src="@drawable/student_icon" />
 
                 <TextView
+                    android:id="@+id/studentRoleTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
@@ -102,6 +87,7 @@
                     android:src="@drawable/teacher_icon" />
 
                 <TextView
+                    android:id="@+id/teacherRoleTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"

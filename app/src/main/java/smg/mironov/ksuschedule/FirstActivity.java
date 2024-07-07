@@ -1,6 +1,8 @@
 package smg.mironov.ksuschedule;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -36,11 +38,16 @@ public class FirstActivity extends AppCompatActivity {
     private LinearLayout LoginButton;
     private Spinner studOrTeachSpinner;
     private ArrayAdapter<String> getSpinnerAdapter;
+    SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+    private String token;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.first_screen);
+
+        String yourToken = sharedPreferences.getString("auth_token", null);
+        token = "Bearer " + yourToken;
 
         // Инициализация SharedPrefManager
         sharedPrefManager = SharedPrefManager.getInstance(this);
@@ -146,7 +153,7 @@ public class FirstActivity extends AppCompatActivity {
     }
 
     private void fetchSubgroups(String groupNumber) {
-        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(groupNumber);
+        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(token, groupNumber);
         call.enqueue(new Callback<List<SubgroupDto>>() {
             @Override
             public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
