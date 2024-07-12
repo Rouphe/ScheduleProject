@@ -113,6 +113,9 @@ public class RegistrationActivity extends AppCompatActivity {
             studentRoleBg.setBackgroundResource(R.drawable.custom_registr_semcorners_item);
             studentRoleTitle.setTextColor(Color.parseColor("#DAE2FF"));
 
+            groupNumberEditText.setVisibility(View.VISIBLE);
+            subgroupNumberEditText.setVisibility(View.VISIBLE);
+
             teacherRole.setColorFilter(Color.parseColor("#0229B3"));
             teacherRoleBg.setBackgroundResource(R.drawable.custom_white_semcorners_item);
             teacherRoleTitle.setTextColor(Color.parseColor("#0229B3"));
@@ -120,6 +123,9 @@ public class RegistrationActivity extends AppCompatActivity {
             teacherRole.setColorFilter(Color.parseColor("#DAE2FF"));
             teacherRoleBg.setBackgroundResource(R.drawable.custom_registr_semcorners_item);
             teacherRoleTitle.setTextColor(Color.parseColor("#DAE2FF"));
+
+            groupNumberEditText.setVisibility(View.GONE);
+            subgroupNumberEditText.setVisibility(View.GONE);
 
             studentRole.setColorFilter(Color.parseColor("#0229B3")); // Reset icon color
             studentRoleBg.setBackgroundResource(R.drawable.custom_white_semcorners_item);
@@ -135,13 +141,11 @@ public class RegistrationActivity extends AppCompatActivity {
         String surname = surnameEditText.getText().toString();
         String name = nameEditText.getText().toString();
         String midName = midNameEditText.getText().toString();
-        String groupNumber = groupNumberEditText.getText().toString();
-        String subgroupNumber = subgroupNumberEditText.getText().toString();
         String email = emailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
 
         if (TextUtils.isEmpty(surname) || TextUtils.isEmpty(name) || TextUtils.isEmpty(midName) ||
-                TextUtils.isEmpty(groupNumber) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
+                TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
             Toast.makeText(this, "Все поля обязательны для заполнения", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -151,7 +155,16 @@ public class RegistrationActivity extends AppCompatActivity {
             return;
         }
 
-        User user = new User(name, surname, midName, email, password, groupNumber, subgroupNumber, selectedRole);
+        // Создаем пользователя в зависимости от выбранной роли
+        User user;
+        if ("STUDENT".equals(selectedRole)) {
+            String groupNumber = groupNumberEditText.getText().toString();
+            String subgroupNumber = subgroupNumberEditText.getText().toString();
+            user = new User(name, surname, midName, email, password, groupNumber, subgroupNumber, selectedRole);
+        } else {
+            user = new User(name, surname, midName, email, password, null, null, selectedRole);
+        }
+
         sendRegistrationRequest(user);
     }
 

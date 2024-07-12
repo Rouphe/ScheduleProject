@@ -4,6 +4,7 @@ package smg.mironov.ksuschedule.API;
 import java.util.List;
 
 import okhttp3.MultipartBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -11,6 +12,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
@@ -30,15 +32,49 @@ public interface ApiService {
     @POST("api/v1/auth/authenticate")
     Call<RegistrationResponse> login(@Body AuthRequest user);
 
-    @Multipart
-    @POST("/upload/{userId}")
-    Call<String> uploadPhoto(
-            @Path("userId") Long userId,
-            @Part MultipartBody.Part file
-    );
+
 
     @GET("/api/v1/user")
     Call<User> getUser(@Header("Authorization") String token, @Query("email") String email);
+
+    @GET("/api/v1/user/teacher/{id}")
+    Call<User> getTeacherUserByTeacherId(@Header("Authorization") String token, @Path("id") int teacherId);
+
+    @PUT("/api/v1/user/update/student/{email}")
+    Call<User> updateStudent(@Header("Authorization") String token,
+                             @Path("email") String email,
+                             @Query("lastName") String lastName,
+                             @Query("firstName") String firstName,
+                             @Query("middleName") String middleName);
+
+    @PUT("/api/v1/user/update/teacher/{email}")
+    Call<User> updateTeacher(@Header("Authorization") String token,
+                             @Path("email") String email,
+                             @Query("lastName") String lastName,
+                             @Query("firstName") String firstName,
+                             @Query("middleName") String middleName,
+                             @Query("info") String info
+                             );
+
+    @Multipart
+    @POST("/api/photos/upload/{email}")
+    Call<ResponseBody> uploadProfileImage(
+            @Header("Authorization") String token,
+            @Path("email") String email,
+            @Part MultipartBody.Part image
+    );
+
+    @GET("/api/photos/download/email")
+    Call <ResponseBody> getProfileImage ( @Header("Authorization") String token,
+                                          @Query("email") String email
+    );
+
+
+    @GET("/api/photos/download/id")
+    Call<ResponseBody> getTeacherPhoto (
+            @Header("Authorization") String token,
+            @Query("id") int id
+    );
 
     @GET("/teacher")
     Call<List<TeacherDto>> getAllTeachers();
@@ -48,6 +84,9 @@ public interface ApiService {
 
     @GET("/teacher/name/{name}")
     Call <TeacherDto> getTeacherByName (@Header("Authorization") String token, @Path("name") String name);
+
+    @GET("/teacher/id/{id}")
+    Call <TeacherDto> getTeacherById (@Header("Authorization") String token, @Path("id") int id);
 
     @GET("/batches/number/{number}")
     Call <GroupDto> getGroupByNumber(@Header("Authorization") String token, @Path("number") String group_number);

@@ -24,15 +24,17 @@ public class User {
 
     private Photo photo;
 
-    public User (
-                 String firstName,
-                 String lastName,
-                 String middleName,
-                 String email,
-                 String password,
-                 String group_number,
-                 String subgroup_number,
-                 String role){
+    private int teacherId;
+
+    public User(
+            String firstName,
+            String lastName,
+            String middleName,
+            String email,
+            String password,
+            String group_number,
+            String subgroup_number,
+            String role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.middleName = middleName;
@@ -41,6 +43,44 @@ public class User {
         this.group_number = group_number;
         this.subgroup_number = subgroup_number;
         this.role = role;
+    }
+
+    public User(String firstName, String lastName, String middleName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+    }
+
+    public User(String firstName, String lastName, String middleName, String info) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.info = info;
+    }
+
+    public User(long userId, String firstName, String lastName, String middleName, String userEmail, String userPassword, String userGroupNumber, String userSubgroupNumber, String userRole) {
+        this.id = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.email = userEmail;
+        this.password = userPassword;
+        this.group_number = userGroupNumber;
+        this.subgroup_number = userSubgroupNumber;
+        this.role = userRole;
+    }
+
+    public User(long userId, String firstName, String lastName, String middleName, String userEmail, String userPassword, String userGroupNumber, String userSubgroupNumber, String info, String userRole) {
+        this.id = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.email = userEmail;
+        this.password = userPassword;
+        this.group_number = userGroupNumber;
+        this.subgroup_number = userSubgroupNumber;
+        this.role = userRole;
+        this.info = info;
     }
 
     public void UserAuth(String email, String password) {
@@ -53,15 +93,15 @@ public class User {
         return id;
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public String getFirstName(){
+    public String getFirstName() {
         return firstName;
     }
 
-    public void setFirstName(String firstName){
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -73,7 +113,7 @@ public class User {
         this.lastName = lastName;
     }
 
-    public String getMiddleName(){
+    public String getMiddleName() {
         return middleName;
     }
 
@@ -101,7 +141,7 @@ public class User {
         return group_number;
     }
 
-    public void setGroup_number(String group_number){
+    public void setGroup_number(String group_number) {
         this.group_number = group_number;
     }
 
@@ -109,7 +149,7 @@ public class User {
         return subgroup_number;
     }
 
-    public void setSubgroup_number (String subgroup_number) {
+    public void setSubgroup_number(String subgroup_number) {
         this.subgroup_number = subgroup_number;
     }
 
@@ -137,7 +177,9 @@ public class User {
         this.photo = photo;
     }
 
-
+    public int getTeacherId() {
+        return teacherId;
+    }
 
 
 }

@@ -29,6 +29,9 @@
         <activity android:name=".RegistrationActivity"
             android:exported="true">
         </activity>
+        <activity android:name=".EditProfileActivity"
+            android:exported="true">
+        </activity>
         <activity android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>

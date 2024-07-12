@@ -3,31 +3,22 @@ package smg.mironov.ksuschedule;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import smg.mironov.ksuschedule.Utils.SharedPrefManager;
 
 public class SettingsActivity extends AppCompatActivity {
 
     private EditText groupEditText;
-    private EditText subgroupEditText;
-    private SharedPrefManager sharedPrefManager;
+    private SharedPreferences sharedPreferences;
     private TextView saveButton;
     private ArrayAdapter<String> spinnerAdapter;
 
@@ -35,7 +26,8 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_screen);
-        sharedPrefManager = new SharedPrefManager(this);
+
+        sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
 
         // Инициализация элементов интерфейса
         groupEditText = findViewById(R.id.editTextGroup);
@@ -43,59 +35,29 @@ public class SettingsActivity extends AppCompatActivity {
 
         ImageView editGroupIcon = findViewById(R.id.imageViewGroupEdit);
 
-        // Настройка кнопок навигационной панели
-        ImageView navButton1 = findViewById(R.id.teachers_icon);
-        ImageView navButton2 = findViewById(R.id.home_icon);
 
-        groupEditText.setText(sharedPrefManager.getGroupNumber());
-
-
-
-
+        groupEditText.setText(sharedPreferences.getString("user_groupNumber", ""));
 
         Spinner editTextWeek = findViewById(R.id.editTextWeek);
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
-//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) ;
+        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
         editTextWeek.setAdapter(spinnerAdapter);
 
         // Устанавливаем значение Spinner из SharedPreferences
-        String savedParity = sharedPrefManager.getParity();
+        String savedParity = sharedPreferences.getString("user_parity", null);
         if (savedParity != null) {
             int spinnerPosition = spinnerAdapter.getPosition(savedParity);
             editTextWeek.setSelection(spinnerPosition);
         }
-
 
         editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedValue = (String) parent.getItemAtPosition(position);
                 changeParity(selectedValue);
-
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-
-
-
-        navButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Логика переключения на первый экран
-                switchToScreen1();
-            }
-        });
-
-        navButton2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Логика переключения на второй экран
-                switchToScreen2();
             }
         });
 
@@ -103,7 +65,6 @@ public class SettingsActivity extends AppCompatActivity {
         editGroupIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Логика смены группы
                 changeGroup();
             }
         });
@@ -112,40 +73,29 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 changeGroup();
+                back();
             }
         });
-
-
     }
 
-
-    private void switchToScreen1() {
-        // Логика переключения на первый экран
-        // Например, запуск новой активности:
-        Intent intent = new Intent(this, TeachersActivity.class);
+    private void back() {
+        Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
-
-    private void switchToScreen2() {
-        // Логика переключения на второй экран
-        // Например, запуск новой активности:
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
-    }
-
 
     private void changeGroup() {
         String newGroup = groupEditText.getText().toString();
-        // Сохранение новой группы (например, в SharedPreferences)
-        sharedPrefManager.setGroupNumber(newGroup);
+        // Сохранение новой группы в SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("user_groupNumber", newGroup);
+        editor.apply();
     }
 
     private void changeParity(String newParity) {
-        sharedPrefManager.setParity(newParity);
+        // Сохранение нового значения parity в SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("user_parity", newParity);
+        editor.apply();
         Log.d("SettingsActivity", "Parity saved: " + newParity);
     }
-
-
-
 }
-

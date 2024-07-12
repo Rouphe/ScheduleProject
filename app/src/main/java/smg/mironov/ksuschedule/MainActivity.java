@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private ApiService apiService;
     private ArrayAdapter<String> spinnerAdapter;
     private TextView parity;
-    User user = UserData.getInstance().getUser();
+    private User user;
 
     private String token;
 
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
         groupNumberTextView.setText(user.getGroup_number());
         subgroupSpinner = findViewById(R.id.Subgroup);
         parity = findViewById(R.id.weekType);
-        parity.setText(sharedPrefManager.getParity());
+        parity.setText(preferences.getString("user_parity", null));
         if (user.getRole().equals("TEACHER")){
             subgroupSpinner.setVisibility(View.INVISIBLE);
         }
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // Получение данных с сервера
-        //fetchScheduleFromServer();
+        fetchScheduleFromServer();
     }
 
     private User loadUserData() {
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         if (Objects.equals(user.getRole(), "STUDENT")) {
             Call<List<DayWeek>> call = apiService.getSchedulesBySubgroupNumber(token, savedSubgroupNumber);
             call.enqueue(callback);
-        } else {
+        } else if (Objects.equals(user.getRole(), "TEACHER")) {
             String teacherName = user.getLastName() + " " + user.getFirstName().charAt(0) + "." + user.getMiddleName().charAt(0) + ".";
             Log.d("MainActivity", "Fetching schedule for teacher: " + teacherName);
             Call<List<DayWeek>> call = apiService.getSchedulesByTeacherName(token, teacherName);

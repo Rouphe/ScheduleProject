@@ -40,20 +40,37 @@
             android:id="@+id/cardView"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            app:cardCornerRadius="100dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
             android:layout_gravity="center_horizontal"
-            tools:ignore="MissingConstraints">
+            app:cardCornerRadius="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints"
+            tools:layout_editor_absoluteY="16dp">
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/profilePhoto"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:scaleType="centerCrop"
                 android:src="@drawable/circular" />
         </androidx.cardview.widget.CardView>
+
+        <ImageView
+            android:id="@+id/addPhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:background="@drawable/custom_edit_button_profile_item"
+            android:padding="3dp"
+            android:src="@drawable/add_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/cardView"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="80dp"
+            tools:ignore="MissingConstraints">
+
+        </ImageView>
 
         <LinearLayout
             android:id="@+id/logout_container"
@@ -85,136 +102,147 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/cardView"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/cardView">
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/userLastname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_bold"
                     android:text="Фамилия"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_bold"
-                    android:textSize="24sp"/>
+                    android:textSize="24sp" />
+
                 <TextView
                     android:id="@+id/userFirstName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Имя"
-                    android:textColor="@color/navbar_white_text"
                     android:layout_marginStart="5dp"
                     android:fontFamily="@font/involve_bold"
-                    android:textSize="24sp"/>
+                    android:text="Имя"
+                    android:textColor="@color/navbar_white_text"
+                    android:textSize="24sp" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/userMiddleName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Отчество"
-                android:textColor="@color/navbar_white_text"
                 android:layout_marginStart="5dp"
                 android:fontFamily="@font/involve_bold"
-                android:textSize="24sp"/>
+                android:text="Отчество"
+                android:textColor="@color/navbar_white_text"
+                android:textSize="24sp" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="5dp">
+                android:layout_marginBottom="5dp"
+                android:orientation="horizontal">
+
                 <TextView
                     android:id="@+id/group_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_regular"
                     android:text="группа"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
+
                 <TextView
                     android:id="@+id/userGroupNumber"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="3dp"
+                    android:fontFamily="@font/involve_regular"
                     android:text="100"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
-                    android:textSize="14sp"
-                    android:layout_marginStart="3dp"/>
+                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/additional_info_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center_horizontal">
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_regular"
                     android:text="Направление подготовки:"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
                     android:textSize="11sp" />
+
                 <TextView
                     android:id="@+id/userGroupDirection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_regular"
+                    android:gravity="center_horizontal"
                     android:text="09.03.01 Информатика и вычислительная техника"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
-                    android:textSize="11sp"
-                    android:gravity="center_horizontal" />
+                    android:textSize="11sp" />
+
                 <TextView
+                    android:id="@+id/userGroupProfileTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:fontFamily="@font/involve_regular"
                     android:text="Профиль:"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
-                    android:textSize="11sp"
-                    android:layout_marginTop="3dp" />
+                    android:textSize="11sp" />
+
                 <TextView
                     android:id="@+id/userGroupProfile"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/involve_regular"
+                    android:gravity="center_horizontal"
                     android:text="Автоматизированные системы обработки информации"
                     android:textColor="@color/navbar_white_text"
-                    android:fontFamily="@font/involve_regular"
-                    android:textSize="11sp"
-                    android:gravity="center_horizontal" />
+                    android:textSize="11sp" />
 
                 <LinearLayout
+                    android:id="@+id/editButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/custom_edit_button_profile_item"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="10dp"
+                    android:background="@drawable/custom_edit_button_profile_item"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
                     android:paddingHorizontal="6dp"
                     android:paddingVertical="3dp">
+
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:contentDescription="Edit Icon"
-                        android:src="@drawable/editwhite"/>
+                        android:src="@drawable/editwhite" />
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:fontFamily="@font/involve_regular"
                         android:text="Редактировать"
                         android:textColor="@color/navbar_white_text"
-                        android:fontFamily="@font/involve_regular"
-                        android:textSize="11sp"/>
+                        android:textSize="11sp" />
                 </LinearLayout>
 
             </LinearLayout>
-
 
 
             <ImageView
@@ -222,8 +250,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/chevron_down_white">
-            </ImageView>
+                android:src="@drawable/chevron_down_white"></ImageView>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 

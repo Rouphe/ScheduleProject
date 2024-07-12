@@ -1,6 +1,7 @@
 package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,15 +35,15 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
     private Context context;
     private List<String> dayList;
     private Map<String, List<DayWeek>> scheduleMap;
-    private SharedPrefManager sharedPrefManager;
+    private SharedPreferences sharedPreferences;
     private String filterParity;
 
     public DayWeekAdapter(Context context) {
         this.context = context;
         this.dayList = new ArrayList<>();
         this.scheduleMap = new HashMap<>();
-        this.sharedPrefManager = new SharedPrefManager(context);
-        this.filterParity = sharedPrefManager.getParity();
+        this.sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        this.filterParity = sharedPreferences.getString("user_parity", "");
     }
 
     public void setFilterParity(String filterParity) {
@@ -124,13 +125,19 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
         String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
 
+        this.filterParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+        // Save parity to SharedPreferences
+        sharedPreferences.edit().putString("user_parity", filterParity).apply();
+
+
         // Если parity в SharedPrefManager не совпадает с текущей неделей, показываем расписание следующей недели
-        String savedParity = sharedPrefManager.getParity();
+        String savedParity = sharedPreferences.getString("parity", "");
         if (!currentWeekParity.equals(savedParity)) {
             startOfWeek = startOfWeek.plusWeeks(1);
             isEvenWeek = !isEvenWeek;
             currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
-            sharedPrefManager.setParity(currentWeekParity);
+            sharedPreferences.edit().putString("parity", currentWeekParity).apply();
         }
 
         // Добавляем количество дней, соответствующее позиции в RecyclerView
@@ -152,7 +159,10 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             TextView timeStartAndEnd = pairView.findViewById(R.id.FirstTimeStartAndEnd);
             TextView typeAndNameDis = pairView.findViewById(R.id.typeAndNameDis);
             TextView infoTeacher = pairView.findViewById(R.id.infoTeacher);
-            if (Objects.equals(sharedPrefManager.getRole(), "Преподаватель")) {
+
+            String role = sharedPreferences.getString("user_role", "");
+
+            if (Objects.equals(role, "TEACHER")) {
                 infoTeacher.setText(dayWeek.getSubgroup().getNumber());
             } else {
                 infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
