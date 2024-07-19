@@ -220,7 +220,8 @@
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
             android:hint="Пароль..."
-            android:padding="12dp" />
+            android:padding="12dp"
+            android:inputType="textPassword"/>
     </LinearLayout>
 
 

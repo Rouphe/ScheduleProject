@@ -104,7 +104,9 @@
             android:fontFamily="@font/involve_regular"
             android:text="Факультет:"
             android:textColor="#0229B3"
-            android:textSize="11sp" />
+            android:textSize="11sp"
+            android:gravity="center"
+            android:textAlignment="center"/>
 
         <TextView
             android:id="@+id/userGroupDirection"

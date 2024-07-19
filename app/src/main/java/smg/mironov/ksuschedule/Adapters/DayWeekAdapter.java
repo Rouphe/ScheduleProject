@@ -27,10 +27,16 @@ import java.util.Map;
 import java.util.Objects;
 
 import smg.mironov.ksuschedule.Models.DayWeek;
-import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.R;
-import smg.mironov.ksuschedule.Utils.SharedPrefManager;
 
+/**
+ * Адаптер для отображения расписания занятий по дням недели.
+ *
+ * @version 1.0
+ * @autor
+ * Егор Гришанов
+ * Александр Миронов
+ */
 public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.ScheduleViewHolder> {
     private Context context;
     private List<String> dayList;
@@ -38,23 +44,58 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
     private SharedPreferences sharedPreferences;
     private String filterParity;
 
+    /**
+     * Конструктор для создания объекта {@link DayWeekAdapter}.
+     *
+     * @param context контекст
+     */
     public DayWeekAdapter(Context context) {
         this.context = context;
         this.dayList = new ArrayList<>();
         this.scheduleMap = new HashMap<>();
         this.sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        this.filterParity = sharedPreferences.getString("user_parity", "");
+        this.filterParity = sharedPreferences.getString("parity", getParityForCurrentWeek());
     }
 
+    /**
+     * Определяет четность текущей недели.
+     *
+     * @return "ЧИСЛИТЕЛЬ" если четная неделя, иначе "ЗНАМЕНАТЕЛЬ"
+     */
+    private String getParityForCurrentWeek() {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+        return isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+    }
+
+    /**
+     * Устанавливает фильтр для четности недели.
+     *
+     * @param filterParity фильтр четности недели
+     */
     public void setFilterParity(String filterParity) {
         this.filterParity = filterParity;
     }
 
+    /**
+     * Обновляет список расписания занятий.
+     *
+     * @param newScheduleList новый список расписания
+     */
     public void updateScheduleList(List<DayWeek> newScheduleList) {
         scheduleMap.clear();
         dayList.clear();
 
-        // Фильтрация по parity
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("parity", currentWeekParity);
+        editor.apply();
+
         for (DayWeek dayWeek : newScheduleList) {
             if (filterParity == null || filterParity.equals(dayWeek.getParity()) || "ВСЕГДА".equals(dayWeek.getParity())) {
                 String day = dayWeek.getDayWeek();
@@ -66,7 +107,6 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             }
         }
 
-        // Сортировка по дням недели
         Collections.sort(dayList, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -74,7 +114,6 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             }
         });
 
-        // Сортировка пар внутри каждого дня по времени начала
         for (String day : scheduleMap.keySet()) {
             Collections.sort(scheduleMap.get(day), new Comparator<DayWeek>() {
                 @Override
@@ -87,6 +126,12 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         notifyDataSetChanged();
     }
 
+    /**
+     * Возвращает порядок дней недели для сортировки.
+     *
+     * @param dayOfWeek день недели
+     * @return порядок дня недели
+     */
     private int getDayOfWeekOrder(String dayOfWeek) {
         switch (dayOfWeek) {
             case "ПОНЕДЕЛЬНИК": return 1;
@@ -96,7 +141,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             case "ПЯТНИЦА": return 5;
             case "СУББОТА": return 6;
             case "ВОСКРЕСЕНЬЕ": return 7;
-            default: return 8; // В случае неизвестного дня недели
+            default: return 8;
         }
     }
 
@@ -112,27 +157,17 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         String day = dayList.get(position);
         List<DayWeek> daySchedule = scheduleMap.get(day);
 
-        // Получаем текущую дату
         LocalDate today = LocalDate.now();
-
-        // Получаем день недели для текущей даты
         DayOfWeek currentDayOfWeek = today.getDayOfWeek();
-
-        // Вычисляем дату начала текущей недели (понедельник)
         LocalDate startOfWeek = today.minusDays(currentDayOfWeek.getValue() - DayOfWeek.MONDAY.getValue());
-
-        // Определяем текущую неделю
         boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
         String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
 
-        this.filterParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("parity", currentWeekParity);
+        editor.apply();
 
-        // Save parity to SharedPreferences
-        sharedPreferences.edit().putString("user_parity", filterParity).apply();
-
-
-        // Если parity в SharedPrefManager не совпадает с текущей неделей, показываем расписание следующей недели
-        String savedParity = sharedPreferences.getString("parity", "");
+        String savedParity = sharedPreferences.getString("parity", "ЧИСЛИТЕЛЬ");
         if (!currentWeekParity.equals(savedParity)) {
             startOfWeek = startOfWeek.plusWeeks(1);
             isEvenWeek = !isEvenWeek;
@@ -140,10 +175,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             sharedPreferences.edit().putString("parity", currentWeekParity).apply();
         }
 
-        // Добавляем количество дней, соответствующее позиции в RecyclerView
         LocalDate dateToShow = startOfWeek.plusDays(getDayOfWeekOrder(day) - 1);
-
-        // Форматируем дату в требуемый формат
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM");
         String formattedDate = dateToShow.format(formatter);
 
@@ -168,7 +200,6 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
                 infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
             }
 
-
             TextView numAudit = pairView.findViewById(R.id.numAudit);
 
             timeStartAndEnd.setText(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd());
@@ -176,13 +207,12 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
             numAudit.setText(dayWeek.getClassroom());
 
-            if (timeStartAndEndPrevious.equals(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd())){
+            if (timeStartAndEndPrevious.equals(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd())) {
                 continue;
             }
 
             timeStartAndEndPrevious = dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd();
 
-            // Проверка, идет ли текущая пара
             LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
             LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
 
@@ -191,9 +221,9 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
             LocalTime now = LocalTime.now();
             if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date1))) {
-                pairView.setBackgroundResource(R.drawable.custom_pair_is_now); // Выделяем цветом текущую пару
+                pairView.setBackgroundResource(R.drawable.custom_pair_is_now);
             } else {
-                pairView.setBackgroundColor(Color.TRANSPARENT); // Убираем выделение, если не текущая пара
+                pairView.setBackgroundColor(Color.TRANSPARENT);
             }
 
             holder.pairsLayout.addView(pairView);
@@ -205,6 +235,9 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         return dayList.size();
     }
 
+    /**
+     * Внутренний класс для хранения ссылок на представления элементов расписания.
+     */
     static class ScheduleViewHolder extends RecyclerView.ViewHolder {
         TextView nameDay;
         TextView numDay;
@@ -216,5 +249,14 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             numDay = itemView.findViewById(R.id.NumDay);
             pairsLayout = itemView.findViewById(R.id.additionalPeriodsLayout);
         }
+    }
+
+    /**
+     * Очищает расписание.
+     */
+    public void clearSchedule() {
+        scheduleMap.clear();
+        dayList.clear();
+        notifyDataSetChanged();
     }
 }

@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Base64;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,21 +30,40 @@ import smg.mironov.ksuschedule.Utils.AuthRequest;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 import smg.mironov.ksuschedule.Utils.UserData;
 
-// TODO: баг при регистрации -> входе в этот же аккаунт
-
+/**
+ * Класс LoginActivity отвечает за процесс входа в приложение.
+ * Он проверяет учетные данные пользователя, сохраняет токен аутентификации и получает данные пользователя.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText emailEdiText, passwordEditText;
-    private TextView loginButton, toRegistration;
+    /** Поле для ввода email */
+    private EditText emailEdiText;
+    /** Поле для ввода пароля */
+    private EditText passwordEditText;
+    /** Кнопка входа */
+    private TextView loginButton;
+    /** Ссылка на регистрацию */
+    private TextView toRegistration;
+    /** Чекбокс для отображения пароля */
+    private CheckBox showPasswordCheckbox;
+    /** Чекбокс для запоминания пользователя */
+    private CheckBox rememberMeCheckbox;
 
+    /** Токен аутентификации */
     private String token;
 
+    /**
+     * Метод вызывается при первом создании активности.
+     * @param savedInstanceState Если активность пересоздается, этот параметр содержит данные, сохраненные в предыдущем состоянии.
+     */
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in_screen);
-
-
 
         // Проверка токена
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -56,13 +78,31 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-
-
         emailEdiText = findViewById(R.id.Login);
         passwordEditText = findViewById(R.id.Password);
+        showPasswordCheckbox = findViewById(R.id.show_password);
+        rememberMeCheckbox = findViewById(R.id.remember_me);
 
         loginButton = findViewById(R.id.login_button_text);
         toRegistration = findViewById(R.id.TransferToRegistration);
+
+        showPasswordCheckbox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                passwordEditText.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+            } else {
+                passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            }
+        });
+
+        // Восстановление сохраненных данных для входа
+        boolean rememberMe = preferences.getBoolean("remember_me", false);
+        rememberMeCheckbox.setChecked(rememberMe);
+        if (rememberMe) {
+            String savedEmail = preferences.getString("saved_email", "");
+            String savedPassword = preferences.getString("saved_password", "");
+            emailEdiText.setText(savedEmail);
+            passwordEditText.setText(savedPassword);
+        }
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,6 +121,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для обработки нажатия кнопки входа.
+     * Проверяет корректность введенных данных и отправляет запрос на сервер для аутентификации.
+     */
     private void login() {
         String email = emailEdiText.getText().toString();
         String password = passwordEditText.getText().toString();
@@ -97,10 +141,12 @@ public class LoginActivity extends AppCompatActivity {
 
         AuthRequest authRequest = new AuthRequest(email, password);
         sendAuthResponse(authRequest);
-
     }
 
-
+    /**
+     * Метод для отправки запроса на аутентификацию.
+     * @param authRequest объект с данными для аутентификации.
+     */
     private void sendAuthResponse(AuthRequest authRequest) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<RegistrationResponse> call = apiService.login(authRequest);
@@ -110,21 +156,25 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<RegistrationResponse> call, Response<RegistrationResponse> response) {
                 if (response.isSuccessful()) {
                     RegistrationResponse registrationResponse = response.body();
-                    //Toast.makeText(RegistrationActivity.this, registrationResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
                     // Сохранение токена в SharedPreferences
                     assert registrationResponse != null;
-                    String token = registrationResponse.getToken();
+                    token = registrationResponse.getToken();
                     SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("auth_token", token);
+                    if (rememberMeCheckbox.isChecked()) {
+                        editor.putBoolean("remember_me", true);
+                        editor.putString("saved_email", authRequest.getEmail());
+                        editor.putString("saved_password", authRequest.getPassword());
+                    } else {
+                        editor.putBoolean("remember_me", false);
+                        editor.remove("saved_email");
+                        editor.remove("saved_password");
+                    }
                     editor.apply();
 
                     getUserByEmail(authRequest.getEmail());
-                    // Переход на другую активность
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent);
-                    finish();
                 } else {
                     Toast.makeText(LoginActivity.this, "Ошибка входа", Toast.LENGTH_SHORT).show();
                 }
@@ -137,7 +187,10 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Метод для получения данных пользователя по email.
+     * @param email email пользователя.
+     */
     private void getUserByEmail(String email) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<User> call = apiService.getUser(token, email);
@@ -147,15 +200,17 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    if (user != null) {
+                    saveUserData(user);
 
-                        // Сохранение данных пользователя в SharedPreferences
-                        saveUserData(user);
-
-                        // Дополнительные действия с полученными данными пользователя
-                    } else {
-                        Toast.makeText(LoginActivity.this, "Данные пользователя не получены", Toast.LENGTH_SHORT).show();
-                    }
+                    // Переход на другую активность с задержкой
+                    new android.os.Handler().postDelayed(
+                            () -> {
+                                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                startActivity(intent);
+                                finish();
+                            },
+                            500
+                    );
                 } else {
                     Toast.makeText(LoginActivity.this, "Ошибка получения данных пользователя", Toast.LENGTH_SHORT).show();
                 }
@@ -168,6 +223,11 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для проверки валидности токена.
+     * @param token токен для проверки.
+     * @return возвращает true, если токен действителен, иначе false.
+     */
     private boolean isTokenValid(String token) {
         try {
             String[] parts = token.split("\\."); // Разделение токена на части
@@ -186,10 +246,12 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
             return false;
         }
-
-
     }
 
+    /**
+     * Метод для сохранения данных пользователя в SharedPreferences.
+     * @param user объект с данными пользователя.
+     */
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -202,35 +264,29 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("user_groupNumber", user.getGroup_number());
         editor.putString("user_subgroupNumber", user.getSubgroup_number());
         editor.putString("user_role", user.getRole());
+        editor.putString("user_info", user.getInfo());
         editor.apply();
     }
 
+    /**
+     * Метод для загрузки данных пользователя из SharedPreferences.
+     */
     private void loadUserData() {
-        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         Long userId = preferences.getLong("user_id", 0);
         String userLastName = preferences.getString("user_lastName", null);
         String userFirstName = preferences.getString("user_firstName", null);
-        String userMiddleName = preferences.getString("user_middleName", null);
+        String userMiddleName = preferences.getString("user_middle_name", null);
         String userEmail = preferences.getString("user_email", null);
         String userPassword = preferences.getString("user_password", null);
-        String userGroupNumber = preferences.getString("user_groupNumber", null);
-        String userSubgroupNumber = preferences.getString("user_subgroupNumber", null);
+        String userGroupNumber = preferences.getString("user_group_number", null);
+        String userSubgroupNumber = preferences.getString("user_subgroup_number", null);
         String userRole = preferences.getString("user_role", null);
 
         if (userLastName != null && userFirstName != null && userMiddleName != null &&
-            userEmail != null && userPassword != null && userGroupNumber != null &&
-            userSubgroupNumber != null && userRole != null) {
+                userEmail != null && userPassword != null && userGroupNumber != null &&
+                userSubgroupNumber != null && userRole != null) {
             User user = new User(userFirstName, userLastName, userMiddleName, userEmail, userPassword, userGroupNumber, userSubgroupNumber, userRole);
-            user.setLastName(userLastName);
-            user.setFirstName(userFirstName);
-            user.setMiddleName(userMiddleName);
-            user.setEmail(userEmail);
-            user.setPassword(userPassword);
-            user.setGroup_number(userGroupNumber);
-            user.setSubgroup_number(userSubgroupNumber);
-            user.setRole(userRole);
-            // Установите другие поля, если они есть
-
             UserData.getInstance().setUser(user);
         }
     }

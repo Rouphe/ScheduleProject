@@ -20,7 +20,7 @@
 
         <!-- add a Image image.png in your Drawable folder -->
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/teacherImage"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
@@ -63,5 +63,7 @@
         android:layout_marginStart="88dp"
         android:layout_marginTop="17dp"
         android:src="@drawable/blue_arrow_right" />
+
+
 
 </LinearLayout>

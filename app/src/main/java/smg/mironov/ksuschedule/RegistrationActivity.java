@@ -15,8 +15,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -46,13 +49,48 @@ import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 import smg.mironov.ksuschedule.Utils.UserData;
 
+/**
+ * Класс {@link RegistrationActivity} отвечает за процесс регистрации пользователя.
+ * Он позволяет пользователю выбрать роль, ввести личные данные и отправить их на сервер для регистрации.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class RegistrationActivity extends AppCompatActivity {
 
-    private EditText surnameEditText, nameEditText, midNameEditText, groupNumberEditText, subgroupNumberEditText, emailEditText, passwordEditText;
-    private TextView registerButton, studentRoleTitle, teacherRoleTitle;
-    private ImageView studentRole, teacherRole;
+    /** Поле для ввода фамилии */
+    private EditText surnameEditText;
+    /** Поле для ввода имени */
+    private EditText nameEditText;
+    /** Поле для ввода отчества */
+    private EditText midNameEditText;
+    /** Поле для ввода номера группы */
+    private EditText groupNumberEditText;
+    /** Поле для ввода номера подгруппы */
+    private EditText subgroupNumberEditText;
+    /** Поле для ввода email */
+    private EditText emailEditText;
+    /** Поле для ввода пароля */
+    private EditText passwordEditText;
+    /** Кнопка регистрации */
+    private TextView registerButton;
+    /** Заголовок для роли студента */
+    private TextView studentRoleTitle;
+    /** Заголовок для роли преподавателя */
+    private TextView teacherRoleTitle;
+    /** Иконка для роли студента */
+    private ImageView studentRole;
+    /** Иконка для роли преподавателя */
+    private ImageView teacherRole;
+    /** Выбранная роль */
     private String selectedRole = "STUDENT";
-    private LinearLayout studentRoleBg, teacherRoleBg;
+    /** Фон для роли студента */
+    private LinearLayout studentRoleBg;
+    /** Фон для роли преподавателя */
+    private LinearLayout teacherRoleBg;
+    /** Чекбокс для отображения пароля */
+    private CheckBox showPasswordCheckbox;
 
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
@@ -74,9 +112,6 @@ public class RegistrationActivity extends AppCompatActivity {
         teacherRoleBg = findViewById(R.id.teacher);
         teacherRoleTitle = findViewById(R.id.teacherRoleTitle);
         studentRoleTitle = findViewById(R.id.studentRoleTitle);
-
-
-
 
         studentRole.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,12 +136,11 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
-
-
-
+    /**
+     * Метод для обновления отображения выбранной роли.
+     */
     private void updateRoleSelection() {
         if ("STUDENT".equals(selectedRole)) {
             studentRole.setColorFilter(Color.parseColor("#DAE2FF"));
@@ -127,16 +161,16 @@ public class RegistrationActivity extends AppCompatActivity {
             groupNumberEditText.setVisibility(View.GONE);
             subgroupNumberEditText.setVisibility(View.GONE);
 
-            studentRole.setColorFilter(Color.parseColor("#0229B3")); // Reset icon color
+            studentRole.setColorFilter(Color.parseColor("#0229B3")); // Сброс цвета иконки
             studentRoleBg.setBackgroundResource(R.drawable.custom_white_semcorners_item);
             studentRoleTitle.setTextColor(Color.parseColor("#0229B3"));
         }
     }
 
-
-
-
-
+    /**
+     * Метод для обработки нажатия кнопки регистрации.
+     * Проверяет корректность введенных данных и отправляет запрос на сервер для регистрации.
+     */
     private void registerUser() {
         String surname = surnameEditText.getText().toString();
         String name = nameEditText.getText().toString();
@@ -168,6 +202,10 @@ public class RegistrationActivity extends AppCompatActivity {
         sendRegistrationRequest(user);
     }
 
+    /**
+     * Метод для отправки запроса на регистрацию пользователя.
+     * @param user объект {@link User} с данными пользователя.
+     */
     private void sendRegistrationRequest(User user) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<RegistrationResponse> call = apiService.register(user);
@@ -177,7 +215,6 @@ public class RegistrationActivity extends AppCompatActivity {
             public void onResponse(Call<RegistrationResponse> call, Response<RegistrationResponse> response) {
                 if (response.isSuccessful()) {
                     RegistrationResponse registrationResponse = response.body();
-                    //Toast.makeText(RegistrationActivity.this, registrationResponse.getMessage(), Toast.LENGTH_SHORT).show();
 
                     // Сохранение токена в SharedPreferences
                     assert registrationResponse != null;
@@ -205,6 +242,10 @@ public class RegistrationActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для сохранения данных пользователя в {@link SharedPreferences}.
+     * @param user объект {@link User} с данными пользователя.
+     */
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();

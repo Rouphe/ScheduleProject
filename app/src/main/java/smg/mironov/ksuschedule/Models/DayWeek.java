@@ -4,19 +4,40 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Класс {@link DayWeek} представляет расписание на определенный день недели.
+ * <p>Содержит информацию о парности недели, подгруппе, преподавателе, предмете, времени начала и окончания занятия, аудитории и дополнительных периодах.</p>
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class DayWeek {
 
+    /** Идентификатор дня недели */
     private int id;
+    /** Парность недели */
     private String parity;
+    /** Объект подгруппы */
     private SubgroupDto subgroupDto;
+    /** Объект преподавателя */
     private TeacherDto teacherDto;
+    /** Объект предмета */
     private SubjectDto subjectDto;
+    /** День недели */
     private String dayWeek;
+    /** Время начала занятия */
     private String timeStart;
+    /** Время окончания занятия */
     private String timeEnd;
+    /** Аудитория */
     private String classroom;
+    /** Список дополнительных периодов */
     private List<Period> additionalPeriods;
 
+    /**
+     * Конструктор по умолчанию.
+     */
     public DayWeek() {
         additionalPeriods = new ArrayList<>();
     }
@@ -40,89 +61,193 @@ public class DayWeek {
         return Objects.hash(dayWeek, timeStart, timeEnd, parity, subjectDto, teacherDto, classroom);
     }
 
+    // Getters and Setters
 
-    //Getters and Setters
+    /**
+     * Возвращает идентификатор дня недели.
+     *
+     * @return идентификатор дня недели
+     */
     public int getId() {
         return id;
     }
 
-    public void setId(int id)  {
+    /**
+     * Устанавливает идентификатор дня недели.
+     *
+     * @param id идентификатор дня недели
+     */
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getParity()  {
+    /**
+     * Возвращает парность недели.
+     *
+     * @return парность недели
+     */
+    public String getParity() {
         return parity;
     }
 
-    public void setParity(String parity)   {
+    /**
+     * Устанавливает парность недели.
+     *
+     * @param parity парность недели
+     */
+    public void setParity(String parity) {
         this.parity = parity;
     }
 
-    public SubgroupDto getSubgroup()   {
+    /**
+     * Возвращает объект подгруппы.
+     *
+     * @return объект подгруппы
+     */
+    public SubgroupDto getSubgroup() {
         return subgroupDto;
     }
 
-    public void setSubgroup(SubgroupDto subgroupDto)    {
+    /**
+     * Устанавливает объект подгруппы.
+     *
+     * @param subgroupDto объект подгруппы
+     */
+    public void setSubgroup(SubgroupDto subgroupDto) {
         this.subgroupDto = subgroupDto;
     }
 
-    public TeacherDto getTeacher()    {
+    /**
+     * Возвращает объект преподавателя.
+     *
+     * @return объект преподавателя
+     */
+    public TeacherDto getTeacher() {
         return teacherDto;
     }
 
-    public void setTeacher(TeacherDto teacher)    {
+    /**
+     * Устанавливает объект преподавателя.
+     *
+     * @param teacher объект преподавателя
+     */
+    public void setTeacher(TeacherDto teacher) {
         this.teacherDto = teacher;
     }
 
-    public SubjectDto getSubject()    {
+    /**
+     * Возвращает объект предмета.
+     *
+     * @return объект предмета
+     */
+    public SubjectDto getSubject() {
         return subjectDto;
     }
 
-    public void setSubject(SubjectDto subjectDto)     {
+    /**
+     * Устанавливает объект предмета.
+     *
+     * @param subjectDto объект предмета
+     */
+    public void setSubject(SubjectDto subjectDto) {
         this.subjectDto = subjectDto;
     }
 
-    public String getDayWeek()    {
+    /**
+     * Возвращает день недели.
+     *
+     * @return день недели
+     */
+    public String getDayWeek() {
         return dayWeek;
     }
 
-    public void setDayWeek(String dayWeek)      {
+    /**
+     * Устанавливает день недели.
+     *
+     * @param dayWeek день недели
+     */
+    public void setDayWeek(String dayWeek) {
         this.dayWeek = dayWeek;
     }
 
-    public String getTimeStart()     {
+    /**
+     * Возвращает время начала занятия.
+     *
+     * @return время начала занятия
+     */
+    public String getTimeStart() {
         return timeStart;
     }
 
-    public void setTimeStart(String timeStart)      {
+    /**
+     * Устанавливает время начала занятия.
+     *
+     * @param timeStart время начала занятия
+     */
+    public void setTimeStart(String timeStart) {
         this.timeStart = timeStart;
     }
 
-    public String getTimeEnd()      {
+    /**
+     * Возвращает время окончания занятия.
+     *
+     * @return время окончания занятия
+     */
+    public String getTimeEnd() {
         return timeEnd;
     }
 
-    public void setTimeEnd(String timeEnd)       {
+    /**
+     * Устанавливает время окончания занятия.
+     *
+     * @param timeEnd время окончания занятия
+     */
+    public void setTimeEnd(String timeEnd) {
         this.timeEnd = timeEnd;
     }
 
-    public String getClassroom()     {
+    /**
+     * Возвращает аудиторию.
+     *
+     * @return аудитория
+     */
+    public String getClassroom() {
         return classroom;
     }
 
-    public void setClassroom(String classroom)     {
+    /**
+     * Устанавливает аудиторию.
+     *
+     * @param classroom аудитория
+     */
+    public void setClassroom(String classroom) {
         this.classroom = classroom;
     }
 
+    /**
+     * Возвращает список дополнительных периодов.
+     *
+     * @return список дополнительных периодов
+     */
     public List<Period> getAdditionalPeriods() {
         return additionalPeriods;
     }
 
+    /**
+     * Устанавливает список дополнительных периодов.
+     *
+     * @param additionalPeriods список дополнительных периодов
+     */
     public void setAdditionalPeriods(List<Period> additionalPeriods) {
         this.additionalPeriods = additionalPeriods;
     }
 
-
+    /**
+     * Возвращает объект группы, связанный с подгруппой.
+     *
+     * @return объект группы
+     */
     public GroupDto getGroup() {
         return subgroupDto.getGroup();
     }

@@ -1,6 +1,5 @@
 package smg.mironov.ksuschedule.API;
 
-
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -9,7 +8,6 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
-import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -24,22 +22,63 @@ import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.AuthRequest;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 
+/**
+ * Интерфейс для определения методов API.
+ *
+ * @version 1.0
+ * @authors Егор Гришанов
+ * Александр Миронов
+ */
 public interface ApiService {
 
+    /**
+     * Регистрация пользователя.
+     *
+     * @param user объект пользователя
+     * @return объект {@link Call} с {@link RegistrationResponse}
+     */
     @POST("/api/v1/auth/register")
     Call<RegistrationResponse> register(@Body User user);
 
+    /**
+     * Аутентификация пользователя.
+     *
+     * @param user объект запроса аутентификации
+     * @return объект {@link Call} с {@link RegistrationResponse}
+     */
     @POST("api/v1/auth/authenticate")
     Call<RegistrationResponse> login(@Body AuthRequest user);
 
-
-
+    /**
+     * Получение данных пользователя по email.
+     *
+     * @param token токен авторизации
+     * @param email email пользователя
+     * @return объект {@link Call} с {@link User}
+     */
     @GET("/api/v1/user")
     Call<User> getUser(@Header("Authorization") String token, @Query("email") String email);
 
+    /**
+     * Получение данных преподавателя по ID.
+     *
+     * @param token     токен авторизации
+     * @param teacherId ID преподавателя
+     * @return объект {@link Call} с {@link User}
+     */
     @GET("/api/v1/user/teacher/{id}")
     Call<User> getTeacherUserByTeacherId(@Header("Authorization") String token, @Path("id") int teacherId);
 
+    /**
+     * Обновление данных студента.
+     *
+     * @param token      токен авторизации
+     * @param email      email пользователя
+     * @param lastName   фамилия пользователя
+     * @param firstName  имя пользователя
+     * @param middleName отчество пользователя
+     * @return объект {@link Call} с {@link User}
+     */
     @PUT("/api/v1/user/update/student/{email}")
     Call<User> updateStudent(@Header("Authorization") String token,
                              @Path("email") String email,
@@ -47,15 +86,33 @@ public interface ApiService {
                              @Query("firstName") String firstName,
                              @Query("middleName") String middleName);
 
+    /**
+     * Обновление данных преподавателя.
+     *
+     * @param token      токен авторизации
+     * @param email      email пользователя
+     * @param lastName   фамилия пользователя
+     * @param firstName  имя пользователя
+     * @param middleName отчество пользователя
+     * @param info       информация о пользователе
+     * @return объект {@link Call} с {@link User}
+     */
     @PUT("/api/v1/user/update/teacher/{email}")
     Call<User> updateTeacher(@Header("Authorization") String token,
                              @Path("email") String email,
                              @Query("lastName") String lastName,
                              @Query("firstName") String firstName,
                              @Query("middleName") String middleName,
-                             @Query("info") String info
-                             );
+                             @Query("info") String info);
 
+    /**
+     * Загрузка изображения профиля.
+     *
+     * @param token токен авторизации
+     * @param email email пользователя
+     * @param image изображение профиля
+     * @return объект {@link Call} с {@link ResponseBody}
+     */
     @Multipart
     @POST("/api/photos/upload/{email}")
     Call<ResponseBody> uploadProfileImage(
@@ -64,60 +121,160 @@ public interface ApiService {
             @Part MultipartBody.Part image
     );
 
+    /**
+     * Получение изображения профиля по email.
+     *
+     * @param token токен авторизации
+     * @param email email пользователя
+     * @return объект {@link Call} с {@link ResponseBody}
+     */
     @GET("/api/photos/download/email")
-    Call <ResponseBody> getProfileImage ( @Header("Authorization") String token,
-                                          @Query("email") String email
-    );
+    Call<ResponseBody> getProfileImage(@Header("Authorization") String token,
+                                       @Query("email") String email);
 
-
+    /**
+     * Получение изображения профиля по ID.
+     *
+     * @param token токен авторизации
+     * @param id    ID пользователя
+     * @return объект {@link Call} с {@link ResponseBody}
+     */
     @GET("/api/photos/download/id")
-    Call<ResponseBody> getTeacherPhoto (
+    Call<ResponseBody> getUserTeacherPhoto(
             @Header("Authorization") String token,
             @Query("id") int id
     );
 
+    /**
+     * Получение фотографии преподавателя по ID.
+     *
+     * @param token     токен авторизации
+     * @param teacherId ID преподавателя
+     * @return объект {@link Call} с {@link ResponseBody}
+     */
+    @GET("/api/photos/download/teacher/{id}")
+    Call<ResponseBody> getTeacherPhoto(@Header("Authorization") String token, @Path("id") int teacherId);
+
+    /**
+     * Получение всех преподавателей.
+     *
+     * @return объект {@link Call} с списком {@link TeacherDto}
+     */
     @GET("/teacher")
     Call<List<TeacherDto>> getAllTeachers();
 
+    /**
+     * Получение всех групп.
+     *
+     * @return объект {@link Call} с списком {@link GroupDto}
+     */
     @GET("/batches")
     Call<List<GroupDto>> getAllGroups();
 
+    /**
+     * Получение данных о преподавателе по имени.
+     *
+     * @param name имя преподавателя
+     * @return объект {@link Call} с {@link TeacherDto}
+     */
     @GET("/teacher/name/{name}")
-    Call <TeacherDto> getTeacherByName (@Header("Authorization") String token, @Path("name") String name);
+    Call<TeacherDto> getTeacherByName(@Path("name") String name);
 
+    /**
+     * Получение данных о преподавателе по ID.
+     *
+     * @param token токен авторизации
+     * @param id    ID преподавателя
+     * @return объект {@link Call} с {@link TeacherDto}
+     */
     @GET("/teacher/id/{id}")
-    Call <TeacherDto> getTeacherById (@Header("Authorization") String token, @Path("id") int id);
+    Call<TeacherDto> getTeacherById(@Header("Authorization") String token, @Path("id") int id);
 
+    /**
+     * Получение данных о группе по номеру.
+     *
+     * @param token        токен авторизации
+     * @param group_number номер группы
+     * @return объект {@link Call} с {@link GroupDto}
+     */
     @GET("/batches/number/{number}")
-    Call <GroupDto> getGroupByNumber(@Header("Authorization") String token, @Path("number") String group_number);
+    Call<GroupDto> getGroupByNumber(@Header("Authorization") String token, @Path("number") String group_number);
 
+    /**
+     * Получение подгрупп по номеру группы.
+     *
+     * @param token        токен авторизации
+     * @param group_number номер группы
+     * @return объект {@link Call} с списком {@link SubgroupDto}
+     */
     @GET("/subgroup/groupNumber/{group_number}")
     Call<List<SubgroupDto>> getSubgroupsByGroupNumber(@Header("Authorization") String token, @Path("group_number") String group_number);
 
+    /**
+     * Получение расписания по номеру подгруппы.
+     *
+     * @param token           токен авторизации
+     * @param subgroup_number номер подгруппы
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/api/v1/schedule/subgroup/number/{subgroup_number}")
     Call<List<DayWeek>> getSchedulesBySubgroupNumber(@Header("Authorization") String token, @Path("subgroup_number") String subgroup_number);
 
+    /**
+     * Получение расписания по имени преподавателя.
+     *
+     * @param token        токен авторизации
+     * @param teacher_name имя преподавателя
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/api/v1/schedule/teacher/name/{teacher_name}")
     Call<List<DayWeek>> getSchedulesByTeacherName(@Header("Authorization") String token, @Path("teacher_name") String teacher_name);
 
+    /**
+     * Получение расписания по четности недели.
+     *
+     * @param parity четность недели
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/schedule/parity/{parity}")
     Call<List<DayWeek>> getSchedulesByParity(@Path("parity") String parity);
 
+    /**
+     * Получение расписания по имени предмета.
+     *
+     * @param subject_name имя предмета
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/schedule/subject/{subject_name}")
     Call<List<DayWeek>> getSchedulesBySubjectName(@Path("subject_name") String subject_name);
 
+    /**
+     * Получение расписания по номеру подгруппы и типу занятия.
+     *
+     * @param subgroup_number номер подгруппы
+     * @param type            тип занятия
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/schedule/filter/subgroup_number{subgroup_number}/type/{type}")
-    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndType (@Path("subgroup_number") String subgroup_number, @Path("type") String type);
+    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndType(@Path("subgroup_number") String subgroup_number, @Path("type") String type);
 
+    /**
+     * Получение расписания по номеру подгруппы и имени преподавателя.
+     *
+     * @param subgroup_number номер подгруппы
+     * @param teacher_name    имя преподавателя
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/schedule/filter/subgroup_number{subgroup_number}/teacher_name/{teacher_name}")
-    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndTeacherName (@Path("subgroup_number") String subgroup_number, @Path("teacher_name") String teacher_name);
+    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndTeacherName(@Path("subgroup_number") String subgroup_number, @Path("teacher_name") String teacher_name);
 
+    /**
+     * Получение расписания по номеру подгруппы и имени предмета.
+     *
+     * @param subgroup_number номер подгруппы
+     * @param subject_view    имя предмета
+     * @return объект {@link Call} с списком {@link DayWeek}
+     */
     @GET("/schedule/filter/subgroup_number/{subgroup_number}/subject_name/{subject_name}")
-    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndSubjectName (@Path("subgroup_number") String subgroup_number, @Path("subject_name") String subject_view);
-
-
-
-
-
+    Call<List<DayWeek>> getSchedulesBySubgroupNumberAndSubjectName(@Path("subgroup_number") String subgroup_number, @Path("subject_name") String subject_view);
 }
-

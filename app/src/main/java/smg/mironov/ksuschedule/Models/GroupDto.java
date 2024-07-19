@@ -2,44 +2,95 @@ package smg.mironov.ksuschedule.Models;
 
 import java.util.Objects;
 
+/**
+ * Класс {@link GroupDto} представляет данные группы.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class GroupDto {
 
+    /** Идентификатор группы */
     private int id;
+    /** Номер группы */
     private String number;
+    /** Направление группы */
     private String direction;
+    /** Профиль группы */
     private String profile;
 
-    //Getters and setters
+    // Getters and Setters
 
-    public int getId(){
+    /**
+     * Возвращает идентификатор группы.
+     *
+     * @return идентификатор группы
+     */
+    public int getId() {
         return id;
     }
 
-    public void setId(int id){
+    /**
+     * Устанавливает идентификатор группы.
+     *
+     * @param id идентификатор группы
+     */
+    public void setId(int id) {
         this.id = id;
     }
 
-    public String getNumber(){
+    /**
+     * Возвращает номер группы.
+     *
+     * @return номер группы
+     */
+    public String getNumber() {
         return number;
     }
 
-    public void setNumber(String number){
+    /**
+     * Устанавливает номер группы.
+     *
+     * @param number номер группы
+     */
+    public void setNumber(String number) {
         this.number = number;
     }
 
-    public String getDirection(){
+    /**
+     * Возвращает направление группы.
+     *
+     * @return направление группы
+     */
+    public String getDirection() {
         return direction;
     }
 
-    public void setDirection(String direction){
+    /**
+     * Устанавливает направление группы.
+     *
+     * @param direction направление группы
+     */
+    public void setDirection(String direction) {
         this.direction = direction;
     }
 
-    public String getProfile(){
+    /**
+     * Возвращает профиль группы.
+     *
+     * @return профиль группы
+     */
+    public String getProfile() {
         return profile;
     }
 
-    public void setProfile(){
+    /**
+     * Устанавливает профиль группы.
+     *
+     * @param profile профиль группы
+     */
+    public void setProfile(String profile) {
         this.profile = profile;
     }
 }

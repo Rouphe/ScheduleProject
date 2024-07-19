@@ -9,18 +9,31 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-
+/**
+ * Класс {@link SettingsActivity} отвечает за экран настроек приложения, позволяющий пользователю изменить группу и четность недели.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class SettingsActivity extends AppCompatActivity {
 
+    /** Поле для ввода номера группы */
     private EditText groupEditText;
+    /** Объект для работы с SharedPreferences */
     private SharedPreferences sharedPreferences;
+    /** Кнопка для сохранения изменений */
     private TextView saveButton;
+    /** Адаптер для Spinner */
     private ArrayAdapter<String> spinnerAdapter;
+    /** Контейнер для редактирования группы */
+    private LinearLayout groupEditContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,12 +42,17 @@ public class SettingsActivity extends AppCompatActivity {
 
         sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
 
+        groupEditContainer = findViewById(R.id.editGroupContainer);
+
+        if (sharedPreferences.getString("user_role", null).equals("TEACHER")) {
+            groupEditContainer.setVisibility(View.GONE);
+        }
+
         // Инициализация элементов интерфейса
         groupEditText = findViewById(R.id.editTextGroup);
         saveButton = findViewById(R.id.SaveAll);
 
         ImageView editGroupIcon = findViewById(R.id.imageViewGroupEdit);
-
 
         groupEditText.setText(sharedPreferences.getString("user_groupNumber", ""));
 
@@ -43,7 +61,7 @@ public class SettingsActivity extends AppCompatActivity {
         editTextWeek.setAdapter(spinnerAdapter);
 
         // Устанавливаем значение Spinner из SharedPreferences
-        String savedParity = sharedPreferences.getString("user_parity", null);
+        String savedParity = sharedPreferences.getString("parity", null);
         if (savedParity != null) {
             int spinnerPosition = spinnerAdapter.getPosition(savedParity);
             editTextWeek.setSelection(spinnerPosition);
@@ -78,11 +96,17 @@ public class SettingsActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для перехода назад на экран профиля.
+     */
     private void back() {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Метод для изменения номера группы.
+     */
     private void changeGroup() {
         String newGroup = groupEditText.getText().toString();
         // Сохранение новой группы в SharedPreferences
@@ -91,10 +115,14 @@ public class SettingsActivity extends AppCompatActivity {
         editor.apply();
     }
 
+    /**
+     * Метод для изменения четности недели.
+     * @param newParity новое значение четности недели.
+     */
     private void changeParity(String newParity) {
         // Сохранение нового значения parity в SharedPreferences
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("user_parity", newParity);
+        editor.putString("parity", newParity);
         editor.apply();
         Log.d("SettingsActivity", "Parity saved: " + newParity);
     }

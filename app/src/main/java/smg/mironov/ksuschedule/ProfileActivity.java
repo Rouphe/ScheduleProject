@@ -1,6 +1,7 @@
 package smg.mironov.ksuschedule;
 
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
@@ -11,6 +12,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -21,7 +24,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,25 +40,71 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import smg.mironov.ksuschedule.API.ApiClient;
 import smg.mironov.ksuschedule.API.ApiService;
+import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
 import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
 
+/**
+ * Класс {@link ProfileActivity} отвечает за отображение и редактирование профиля пользователя.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class ProfileActivity extends AppCompatActivity {
 
-    private TextView userLastname, userFirstName, userMiddleName, userGroupNumber, userGroupDirection, userGroupProfile, userGroupProfileTitle;
+    /** Текстовое поле для фамилии пользователя */
+    private TextView userLastname;
+    /** Текстовое поле для имени пользователя */
+    private TextView userFirstName;
+    /** Текстовое поле для отчества пользователя */
+    private TextView userMiddleName;
+    /** Текстовое поле для номера группы пользователя */
+    private TextView userGroupNumber;
+    /** Текстовое поле для направления группы */
+    private TextView userGroupDirection;
+    /** Текстовое поле для профиля группы */
+    private TextView userGroupProfile;
+    /** Заголовок для профиля группы */
+    private TextView userGroupProfileTitle;
+    /** Заголовок для направления группы */
+    private TextView userGroupDirectionTitle;
+    /** Контейнер для дополнительной информации */
     private View additionalInfoContainer;
-    private ImageView chevronDown, logoutButton, settingsButton, profilePhoto, addPhotoButton;
+    /** Иконка для сворачивания и разворачивания контейнера */
+    private ImageView chevronDown;
+    /** Кнопка для выхода из профиля */
+    private ImageView logoutButton;
+    /** Кнопка для перехода к настройкам */
+    private ImageView settingsButton;
+    /** Фото профиля пользователя */
+    private ImageView profilePhoto;
+    /** Кнопка для добавления фото */
+    private ImageView addPhotoButton;
+    /** Верхняя часть профиля */
     private ConstraintLayout profileCap;
+    /** Оригинальная высота верхней части профиля */
     private int originalHeight;
+    /** Кнопка для редактирования профиля */
     private LinearLayout editButton;
 
+    /** Токен аутентификации */
     private String token;
+    /** Email пользователя */
     private String userEmail;
 
+    /** Флаг для проверки, развернут ли контейнер */
     private boolean isExpanded = false;
 
+    /** Константа для запроса выбора изображения */
     private static final int PICK_IMAGE_REQUEST = 1;
+    /** Обработчик жестов */
+    private GestureDetector gestureDetector;
 
+    /** Адаптер для расписания */
+    private DayWeekAdapter adapter;
+
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +117,6 @@ public class ProfileActivity extends AppCompatActivity {
         // Настройка кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
         ImageView navButton2 = findViewById(R.id.home_icon);
-
 
         userLastname = findViewById(R.id.userLastname);
         userFirstName = findViewById(R.id.userFirstName);
@@ -87,9 +134,18 @@ public class ProfileActivity extends AppCompatActivity {
         profileCap = findViewById(R.id.profile_cap);
         chevronDown = findViewById(R.id.chevron_down);
         editButton = findViewById(R.id.editButton);
+        userGroupDirectionTitle = findViewById(R.id.userGroupDirectionTitle);
 
         loadUserData();
 
+        // Настройка жестов для profileCap
+        gestureDetector = new GestureDetector(this, new SwipeGestureListener());
+        profileCap.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return gestureDetector.onTouchEvent(event);
+            }
+        });
 
         // Назначаем обработчик на кнопку изменения фото
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
@@ -149,14 +205,19 @@ public class ProfileActivity extends AppCompatActivity {
                 switchToEdit();
             }
         });
-
     }
 
+    /**
+     * Метод для переключения на экран редактирования профиля.
+     */
     private void switchToEdit() {
         Intent intent = new Intent(this, EditProfileActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Метод для анимации разворачивания и сворачивания контейнера дополнительной информации.
+     */
     private void toggleAnimation() {
         ValueAnimator valueAnimator;
         if (isExpanded) {
@@ -179,7 +240,9 @@ public class ProfileActivity extends AppCompatActivity {
         isExpanded = !isExpanded;
     }
 
-    // Метод для открытия галереи для выбора изображения
+    /**
+     * Метод для открытия галереи для выбора изображения.
+     */
     private void openGallery() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -187,48 +250,81 @@ public class ProfileActivity extends AppCompatActivity {
         startActivityForResult(Intent.createChooser(intent, "Выберите фото профиля"), PICK_IMAGE_REQUEST);
     }
 
+    /**
+     * Метод для переключения на экран настроек.
+     */
     private void switchToSettings() {
         Intent intent = new Intent(this, SettingsActivity.class);
-
         startActivity(intent);
     }
 
+    /**
+     * Метод для выхода из профиля и удаления данных пользователя.
+     */
     private void logout() {
+        // Очистить фото профиля из внутренней памяти
+        deleteProfileImage();
+
+        // Очистить SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
 
-        // Удаление фото профиля
-        deleteProfileImage();
-
-        Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        // Очистить расписание в MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        //intent.putExtra("clear_schedule", true);
         startActivity(intent);
+
+        // Перейти к экрану входа
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
         finish();
     }
 
+    /**
+     * Метод для удаления фото профиля из внутренней памяти.
+     */
     private void deleteProfileImage() {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("profile_images", Context.MODE_PRIVATE);
         File path = new File(directory, "profile_photo.jpg");
         if (path.exists()) {
-            path.delete();
+            if (path.delete()) {
+                // Успешно удалено
+                Toast.makeText(this, "Фото профиля удалено", Toast.LENGTH_SHORT).show();
+            } else {
+                // Не удалось удалить
+                Toast.makeText(this, "Не удалось удалить фото профиля", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Файл не существует
+            Toast.makeText(this, "Фото профиля не найдено", Toast.LENGTH_SHORT).show();
         }
     }
 
-
+    /**
+     * Метод для переключения на экран преподавателей.
+     */
     private void switchToTeachersScreen() {
         // Логика переключения на экран преподавателей
         Intent intent = new Intent(this, TeachersActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Метод для переключения на главный экран.
+     */
     private void switchToMain() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Метод для получения реального пути к изображению из URI.
+     * @param contentUri URI изображения.
+     * @return строка с реальным путем к изображению.
+     */
     private String getRealPathFromURI(Uri contentUri) {
         String[] proj = {MediaStore.Images.Media.DATA};
         Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
@@ -240,8 +336,12 @@ public class ProfileActivity extends AppCompatActivity {
         return result;
     }
 
-
-    // Метод для обработки выбора изображения из галереи
+    /**
+     * Метод для обработки выбора изображения из галереи.
+     * @param requestCode код запроса.
+     * @param resultCode код результата.
+     * @param data данные с результатом.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -260,7 +360,9 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Метод для загрузки данных пользователя из {@link SharedPreferences}.
+     */
     private void loadUserData() {
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
 
@@ -285,14 +387,19 @@ public class ProfileActivity extends AppCompatActivity {
         if (role.equals("STUDENT")) {
             userGroupNumber.setText(groupNumber);
             fetchGroupInfo(groupNumber);
-            editButton.setVisibility(View.GONE);
         } else {
+            userGroupProfile.setVisibility(View.GONE);
+            userGroupProfileTitle.setVisibility(View.GONE);
+            userGroupDirection.setVisibility(View.GONE);
             userGroupNumber.setVisibility(View.INVISIBLE);
+            userGroupDirectionTitle.setText(sharedPreferences.getString("user_info", "Информация не найдена"));
             fetchTeacherInfo(lastName + " " + firstName.charAt(0) + "." + middleName.charAt(0) + ".");
         }
     }
 
-
+    /**
+     * Метод для переключения видимости контейнера дополнительной информации.
+     */
     private void toggleAdditionalInfo() {
         if (additionalInfoContainer.getVisibility() == View.GONE) {
             additionalInfoContainer.setVisibility(View.VISIBLE);
@@ -303,6 +410,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Метод для получения информации о группе с сервера.
+     * @param groupNumber номер группы.
+     */
     private void fetchGroupInfo(String groupNumber) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<GroupDto> call = apiService.getGroupByNumber(token, groupNumber);
@@ -311,8 +422,8 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<GroupDto> call, Response<GroupDto> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    refreshTokenIfNeeded(response);
                     GroupDto groupDto = response.body();
-
 
                     if (groupDto.getProfile() == null) {
                         userGroupProfile.setVisibility(View.GONE);
@@ -326,7 +437,6 @@ public class ProfileActivity extends AppCompatActivity {
                     }
 
                     userGroupDirection.setText(groupDto.getDirection());
-
                 }
             }
 
@@ -337,18 +447,23 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для получения информации о преподавателе с сервера.
+     * @param name имя преподавателя.
+     */
     private void fetchTeacherInfo(String name) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<TeacherDto> call = apiService.getTeacherByName(token, name);
+        Call<TeacherDto> call = apiService.getTeacherByName(name);
 
         call.enqueue(new Callback<TeacherDto>() {
             @Override
             public void onResponse(Call<TeacherDto> call, Response<TeacherDto> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    refreshTokenIfNeeded(response);
                     TeacherDto teacherDto = response.body();
 
                     TextView groupLabel = findViewById(R.id.group_label);
-                    groupLabel.setText("Должность");
+                    groupLabel.setText("Должность:");
                     userGroupNumber.setText(teacherDto.getPost());
                     userGroupNumber.setVisibility(View.VISIBLE);
                 }
@@ -356,12 +471,15 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<TeacherDto> call, Throwable t) {
-
+                Toast.makeText(ProfileActivity.this, "Ошибка загрузки информации о преподавателе", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    // Метод для отправки изображения на сервер
+    /**
+     * Метод для отправки изображения профиля на сервер.
+     * @param imageUri URI изображения.
+     */
     private void uploadImageToServer(Uri imageUri) {
         String filePath = getRealPathFromURI(imageUri);
         if (filePath == null) {
@@ -380,6 +498,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    refreshTokenIfNeeded(response);
                     Toast.makeText(ProfileActivity.this, "Фото профиля успешно обновлено", Toast.LENGTH_SHORT).show();
                     try {
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
@@ -399,6 +518,9 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для получения изображения профиля с сервера.
+     */
     private void fetchProfileImageFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<ResponseBody> call = apiService.getProfileImage(token, userEmail); // предполагается, что API предоставляет такой метод
@@ -407,6 +529,7 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    refreshTokenIfNeeded(response);
                     Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
                     profilePhoto.setImageBitmap(bitmap);
                     saveImageToInternalStorage(bitmap);
@@ -422,6 +545,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Метод для сохранения изображения профиля во внутреннее хранилище.
+     * @param bitmap изображение профиля.
+     */
     private void saveImageToInternalStorage(Bitmap bitmap) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("profile_images", Context.MODE_PRIVATE);
@@ -444,6 +571,10 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Метод для загрузки изображения профиля из внутреннего хранилища.
+     * @return объект {@link Bitmap} с изображением профиля.
+     */
     private Bitmap loadImageFromInternalStorage() {
         try {
             ContextWrapper cw = new ContextWrapper(getApplicationContext());
@@ -456,5 +587,52 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Метод для обновления токена аутентификации, если это необходимо.
+     * @param response объект {@link Response}, содержащий ответ сервера.
+     */
+    private void refreshTokenIfNeeded(Response<?> response) {
+        // Проверка, есть ли новый токен в заголовке ответа
+        String newToken = response.headers().get("Authorization");
+        if (newToken != null && newToken.startsWith("Bearer ")) {
+            SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("auth_token", newToken.substring(7)); // Сохраняем новый токен без префикса "Bearer "
+            editor.apply();
+        }
+    }
 
+    /**
+     * Класс {@link SwipeGestureListener} для обработки жестов свайпа.
+     */
+    private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
+
+        private static final int SWIPE_THRESHOLD = 100;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float diffY = e2.getY() - e1.getY();
+            float diffX = e2.getX() - e1.getX();
+            if (Math.abs(diffY) > Math.abs(diffX)) {
+                if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
+                    if (diffY > 0) {
+                        // Swipe down
+                        if (!isExpanded) {
+                            toggleAdditionalInfo();
+                            toggleAnimation();
+                        }
+                    } else {
+                        // Swipe up
+                        if (isExpanded) {
+                            toggleAdditionalInfo();
+                            toggleAnimation();
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 }

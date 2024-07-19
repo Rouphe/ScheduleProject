@@ -18,6 +18,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -33,20 +36,33 @@ import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.User;
-import smg.mironov.ksuschedule.Utils.SharedPrefManager;
-import smg.mironov.ksuschedule.Utils.UserData;
 
+
+/**
+ * Класс {@link MainActivity} отвечает за главный экран приложения, где отображается расписание пользователя.
+ *
+ * @author Егор Гришанов, Алекснадр Миронов
+ *
+ * @version 1.0
+ */
 public class MainActivity extends AppCompatActivity {
 
+    /** RecyclerView для отображения расписания */
     private RecyclerView recyclerView;
+    /** Адаптер для RecyclerView */
     private DayWeekAdapter scheduleAdapter;
-    private SharedPrefManager sharedPrefManager;
+    /** Spinner для выбора подгруппы */
     private Spinner subgroupSpinner;
+    /** Экземпляр {@link ApiService} для выполнения сетевых запросов */
     private ApiService apiService;
+    /** Адаптер для Spinner */
     private ArrayAdapter<String> spinnerAdapter;
+    /** TextView для отображения четности недели */
     private TextView parity;
+    /** Объект {@link User} для хранения данных пользователя */
     private User user;
 
+    /** Токен аутентификации */
     private String token;
 
     @Override
@@ -57,7 +73,6 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         token = "Bearer " + preferences.getString("auth_token", null);
 
-        sharedPrefManager = new SharedPrefManager(this);
         user = loadUserData();
 
         if (user == null) {
@@ -66,23 +81,25 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-
         TextView groupNumberTextView = findViewById(R.id.group_number);
-        if (Objects.equals(user.getRole(), "TEACHER")){
+        if (Objects.equals(user.getRole(), "TEACHER")) {
             groupNumberTextView.setVisibility(View.INVISIBLE);
             TextView teacherName = findViewById(R.id.Group);
             teacherName.setText(user.getLastName() + " " + user.getFirstName());
-
         }
 
         groupNumberTextView.setText(user.getGroup_number());
         subgroupSpinner = findViewById(R.id.Subgroup);
         parity = findViewById(R.id.weekType);
-        parity.setText(preferences.getString("user_parity", null));
-        if (user.getRole().equals("TEACHER")){
+
+        // Извлечение и установка четности недели в TextView
+        SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String currentParity = updatedPreferences.getString("parity", "Нет данных");
+        parity.setText(currentParity);
+
+        if (user.getRole().equals("TEACHER")) {
             subgroupSpinner.setVisibility(View.INVISIBLE);
         }
-
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,10 +107,6 @@ public class MainActivity extends AppCompatActivity {
         // Инициализация адаптера
         scheduleAdapter = new DayWeekAdapter(this);
         recyclerView.setAdapter(scheduleAdapter);
-
-
-        // Пример данных
-        List<DayWeek> scheduleList = new ArrayList<>();
 
         // Инициализация кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
@@ -104,12 +117,9 @@ public class MainActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         subgroupSpinner.setAdapter(spinnerAdapter);
 
-
         apiService = ApiClient.getClient().create(ApiService.class);
 
         fetchSubgroups();
-
-
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,13 +137,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         subgroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSubgroup = (String) parent.getItemAtPosition(position);
                 changeSubgroup(selectedSubgroup); // Сохранение выбранной подгруппы
-                 // Вызов метода для загрузки расписания по новой подгруппе
+                // Вызов метода для загрузки расписания по новой подгруппе
                 fetchScheduleFromServer();
             }
 
@@ -146,9 +155,12 @@ public class MainActivity extends AppCompatActivity {
         fetchScheduleFromServer();
     }
 
+    /**
+     * Метод для загрузки данных пользователя из {@link SharedPreferences}.
+     * @return объект {@link User} с данными пользователя.
+     */
     private User loadUserData() {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        Long id = preferences.getLong("user_id", 1);
         String lastName = preferences.getString("user_lastName", null);
         String firstName = preferences.getString("user_firstName", null);
         String middleName = preferences.getString("user_middleName", null);
@@ -164,6 +176,10 @@ public class MainActivity extends AppCompatActivity {
 
         return new User(firstName, lastName, middleName, email, password, groupNumber, subgroupNumber, role);
     }
+
+    /**
+     * Метод для получения подгрупп с сервера.
+     */
     private void fetchSubgroups() {
         String savedGroupNumber = user.getGroup_number();
         Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(token, savedGroupNumber);
@@ -171,6 +187,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    refreshTokenIfNeeded(response);
+
                     List<SubgroupDto> subgroups = response.body();
                     List<String> subgroupNumbers = new ArrayList<>();
                     for (SubgroupDto subgroup : subgroups) {
@@ -193,10 +211,17 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
-                // Handle errors
+                SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                if (!(Objects.equals(preferences.getString("user_role", null), "TEACHER"))){
+                    Toast.makeText(MainActivity.this, "Ошибка при получении подгрупп: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
+
+    /**
+     * Метод для получения расписания с сервера.
+     */
     private void fetchScheduleFromServer() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String savedSubgroupNumber = user.getSubgroup_number();
@@ -208,6 +233,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<DayWeek>> call, Response<List<DayWeek>> response) {
                 if (response.isSuccessful() && response.body() != null) {
+                    refreshTokenIfNeeded(response);
                     List<DayWeek> scheduleList = response.body();
                     Set<DayWeek> uniqueScheduleSet = new HashSet<>(scheduleList);
                     List<DayWeek> uniqueScheduleList = new ArrayList<>(uniqueScheduleSet);
@@ -238,26 +264,45 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
-
+    /**
+     * Метод для изменения подгруппы пользователя.
+     * @param subgroupNumber номер новой подгруппы.
+     */
     private void changeSubgroup(String subgroupNumber) {
         user.setSubgroup_number(subgroupNumber);
         Log.d("MainActivity", "Subgroup saved: " + subgroupNumber);
     }
 
+    /**
+     * Метод для переключения на первый экран.
+     */
     private void switchToScreen1() {
         // Логика переключения на первый экран
-        // Например, запуск новой активности:
         Intent intent = new Intent(this, TeachersActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Метод для переключения на второй экран.
+     */
     private void switchToScreen2() {
         // Логика переключения на второй экран
-        // Например, запуск новой активности:
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
+    }
+
+    /**
+     * Метод для обновления токена аутентификации, если это необходимо.
+     * @param response объект {@link Response}, содержащий ответ сервера.
+     */
+    private void refreshTokenIfNeeded(Response<?> response) {
+        // Проверка, есть ли новый токен в заголовке ответа
+        String newToken = response.headers().get("Authorization");
+        if (newToken != null && newToken.startsWith("Bearer ")) {
+            SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("auth_token", newToken.substring(7)); // Сохраняем новый токен без префикса "Bearer "
+            editor.apply();
+        }
     }
 }
