@@ -160,7 +160,7 @@ public interface ApiService {
      *
      * @return объект {@link Call} с списком {@link TeacherDto}
      */
-    @GET("/teacher")
+    @GET("/api/v1/teacher")
     Call<List<TeacherDto>> getAllTeachers();
 
     /**
@@ -177,7 +177,7 @@ public interface ApiService {
      * @param name имя преподавателя
      * @return объект {@link Call} с {@link TeacherDto}
      */
-    @GET("/teacher/name/{name}")
+    @GET("/api/v1/teacher/name/{name}")
     Call<TeacherDto> getTeacherByName(@Path("name") String name);
 
     /**
@@ -187,7 +187,7 @@ public interface ApiService {
      * @param id    ID преподавателя
      * @return объект {@link Call} с {@link TeacherDto}
      */
-    @GET("/teacher/id/{id}")
+    @GET("/api/v1/teacher/id/{id}")
     Call<TeacherDto> getTeacherById(@Header("Authorization") String token, @Path("id") int id);
 
     /**
@@ -207,7 +207,7 @@ public interface ApiService {
      * @param group_number номер группы
      * @return объект {@link Call} с списком {@link SubgroupDto}
      */
-    @GET("/subgroup/groupNumber/{group_number}")
+    @GET("/api/v1/subgroup/groupNumber/{group_number}")
     Call<List<SubgroupDto>> getSubgroupsByGroupNumber(@Header("Authorization") String token, @Path("group_number") String group_number);
 
     /**

@@ -68,6 +68,8 @@ public class LoginActivity extends AppCompatActivity {
         // Проверка токена
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String token = preferences.getString("auth_token", null);
+        String email = preferences.getString("saved_email", null);
+        String password = preferences.getString("saved_password", null);
         if (token != null && isTokenValid(token)) {
             loadUserData();
 
@@ -76,6 +78,10 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
             return;
+        } else if (email != null && password != null) {
+            // Попытка автоматического входа
+            AuthRequest authRequest = new AuthRequest(email, password);
+            sendAuthResponse(authRequest);
         }
 
         emailEdiText = findViewById(R.id.Login);
@@ -165,12 +171,12 @@ public class LoginActivity extends AppCompatActivity {
                     editor.putString("auth_token", token);
                     if (rememberMeCheckbox.isChecked()) {
                         editor.putBoolean("remember_me", true);
-                        editor.putString("saved_email", authRequest.getEmail());
-                        editor.putString("saved_password", authRequest.getPassword());
+                        editor.putString("user_email", authRequest.getEmail());
+                        editor.putString("user_password", authRequest.getPassword());
                     } else {
                         editor.putBoolean("remember_me", false);
-                        editor.remove("saved_email");
-                        editor.remove("saved_password");
+                        editor.remove("user_email");
+                        editor.remove("user_password");
                     }
                     editor.apply();
 
@@ -186,6 +192,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
 
     /**
      * Метод для получения данных пользователя по email.

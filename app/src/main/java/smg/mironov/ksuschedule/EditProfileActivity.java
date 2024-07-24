@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,17 +68,21 @@ public class EditProfileActivity extends AppCompatActivity {
         teachersFaculty = findViewById(R.id.teachersFacultyEdit);
         String userInfo = preferences.getString("user_info", null);
 
-        String faculty = extractInfo(userInfo, "Факультет:");
-        String department = extractInfo(userInfo, "Кафедра:");
-        String addInfo = extractInfo(userInfo, "Дополнительная информация:");
+        if (Objects.equals(preferences.getString("user_role", null), "TEACHER")){
+            String faculty = extractInfo(userInfo, "Факультет:");
+            String department = extractInfo(userInfo, "Кафедра:");
+            String addInfo = extractInfo(userInfo, "Дополнительная информация:");
 
-        teachersFaculty.setText(faculty);
+            teachersFaculty.setText(faculty);
 
-        teachersDepartment = findViewById(R.id.teacherDepartmentEdit);
-        teachersDepartment.setText(department);
+            teachersDepartment = findViewById(R.id.teacherDepartmentEdit);
+            teachersDepartment.setText(department);
 
-        teachersInfo = findViewById(R.id.teachersInfoEdit);
-        teachersInfo.setText(addInfo);
+            teachersInfo = findViewById(R.id.teachersInfoEdit);
+            teachersInfo.setText(addInfo);
+        }
+
+
 
         saveButton = findViewById(R.id.saveButtonText);
         actual_information = findViewById(R.id.actual_information);
@@ -99,11 +104,19 @@ public class EditProfileActivity extends AppCompatActivity {
         String firstName = userFirstName.getText().toString();
         String lastName = userLastName.getText().toString();
         String middleName = userMiddleName.getText().toString();
-        String faculty = teachersFaculty.getText().toString();
-        String department = teachersDepartment.getText().toString();
-        String info = teachersInfo.getText().toString();
+        String faculty = "";
+        String department = "";
+        String info = "";
+
 
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+
+        if (Objects.equals(sharedPreferences.getString("user_role", null), "TEACHER")){
+            faculty = teachersFaculty.getText().toString();
+            department = teachersDepartment.getText().toString();
+            info = teachersInfo.getText().toString();
+        }
+
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         String informationConstruct = "Факультет: \n" + faculty + "\n" + "Кафедра: \n" + department + "\n" + "Дополнительная информация: \n" + info;
@@ -160,7 +173,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
         String lastName = sharedPreferences.getString("user_lastName", "Фамилия");
         String firstName = sharedPreferences.getString("user_firstName", "Имя");
-        String middleName = sharedPreferences.getString("user_middle_name", "Отчество");
+        String middleName = sharedPreferences.getString("user_middleName", "Отчество");
         String role = sharedPreferences.getString("user_role", "STUDENT");
 
         userLastName.setText(lastName);

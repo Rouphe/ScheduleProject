@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -147,6 +148,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
+
+
         // Назначаем обработчик на кнопку изменения фото
         addPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +165,7 @@ public class ProfileActivity extends AppCompatActivity {
                 toggleAnimation();
             }
         });
+
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,6 +223,7 @@ public class ProfileActivity extends AppCompatActivity {
      * Метод для анимации разворачивания и сворачивания контейнера дополнительной информации.
      */
     private void toggleAnimation() {
+        Log.d("ProfileActivity", "Animating profileCap, isExpanded: " + isExpanded);
         ValueAnimator valueAnimator;
         if (isExpanded) {
             valueAnimator = ValueAnimator.ofInt(profileCap.getHeight(), originalHeight);
@@ -239,6 +244,8 @@ public class ProfileActivity extends AppCompatActivity {
         valueAnimator.start();
         isExpanded = !isExpanded;
     }
+
+
 
     /**
      * Метод для открытия галереи для выбора изображения.
@@ -534,7 +541,7 @@ public class ProfileActivity extends AppCompatActivity {
                     profilePhoto.setImageBitmap(bitmap);
                     saveImageToInternalStorage(bitmap);
                 } else {
-                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки фото профиля", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ProfileActivity.this, "Ошибка загрузки фото профиля", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -607,8 +614,8 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private class SwipeGestureListener extends GestureDetector.SimpleOnGestureListener {
 
-        private static final int SWIPE_THRESHOLD = 100;
-        private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+        private static final int SWIPE_THRESHOLD = 300;
+        private static final int SWIPE_VELOCITY_THRESHOLD = 300;
 
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -618,12 +625,14 @@ public class ProfileActivity extends AppCompatActivity {
                 if (Math.abs(diffY) > SWIPE_THRESHOLD && Math.abs(velocityY) > SWIPE_VELOCITY_THRESHOLD) {
                     if (diffY > 0) {
                         // Swipe down
+                        Log.d("SwipeGestureListener", "Swipe down detected");
                         if (!isExpanded) {
                             toggleAdditionalInfo();
                             toggleAnimation();
                         }
                     } else {
                         // Swipe up
+                        Log.d("SwipeGestureListener", "Swipe up detected");
                         if (isExpanded) {
                             toggleAdditionalInfo();
                             toggleAnimation();
@@ -634,5 +643,17 @@ public class ProfileActivity extends AppCompatActivity {
             }
             return false;
         }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            Log.d("SwipeGestureListener", "onScroll detected: distanceY = " + distanceY);
+            return true;
+        }
     }
+
 }
