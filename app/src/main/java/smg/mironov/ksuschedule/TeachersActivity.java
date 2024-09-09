@@ -110,6 +110,16 @@ public class TeachersActivity extends AppCompatActivity {
         fetchTeachersFromServer();
     }
 
+    private PopupWindow popupWindow;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (popupWindow != null && popupWindow.isShowing()) {
+            popupWindow.dismiss();
+        }
+    }
+
     /**
      * Метод для получения информации о пользователе по идентификатору преподавателя.
      *
@@ -167,7 +177,7 @@ public class TeachersActivity extends AppCompatActivity {
 
         fetchTeacherPhotoFromServer(user.getTeacherId(), popupPhoto, profileImageView);
 
-        final PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         popupWindow.setOutsideTouchable(true);
 
@@ -176,14 +186,11 @@ public class TeachersActivity extends AppCompatActivity {
         popupWindow.showAtLocation(profileImageView, Gravity.CENTER, 0, 0);
 
         ImageView closeButton = popupView.findViewById(R.id.closeButton);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                popupWindow.dismiss();
-                profileImageView.setEnabled(true);
-                profileImageView.setVisibility(View.VISIBLE);
-                removeDimBackground();
-            }
+        closeButton.setOnClickListener(v -> {
+            popupWindow.dismiss();
+            profileImageView.setEnabled(true);
+            profileImageView.setVisibility(View.VISIBLE);
+            removeDimBackground();
         });
     }
 
@@ -231,24 +238,29 @@ public class TeachersActivity extends AppCompatActivity {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    refreshTokenIfNeeded(response);
-                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                    popupPhoto.setImageBitmap(bitmap);
-                    profileImageView.setImageBitmap(bitmap);
-                    adapter.updateTeacherPhoto(userId, bitmap);
-                    saveImageToInternalStorage(bitmap, userId);
-                } else {
-                    Toast.makeText(TeachersActivity.this, "Ошибка загрузки фото преподавателя", Toast.LENGTH_SHORT).show();
+                if (!isDestroyed()) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        refreshTokenIfNeeded(response);
+                        Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                        popupPhoto.setImageBitmap(bitmap);
+                        profileImageView.setImageBitmap(bitmap);
+                        adapter.updateTeacherPhoto(userId, bitmap);
+                        saveImageToInternalStorage(bitmap, userId);
+                    } else {
+                        Toast.makeText(TeachersActivity.this, "Ошибка загрузки фото преподавателя", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Toast.makeText(TeachersActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                if (!isDestroyed()) {
+                    Toast.makeText(TeachersActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
+
 
     /**
      * Метод для получения преподавателя по его идентификатору.
@@ -283,7 +295,7 @@ public class TeachersActivity extends AppCompatActivity {
      * Метод для получения списка преподавателей с сервера.
      */
     private void fetchTeachersFromServer() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://77.232.128.111:8081/")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://77.232.128.111:80/")
                 .addConverterFactory(GsonConverterFactory.create()).build();
 
         ApiService apiService = retrofit.create(ApiService.class);

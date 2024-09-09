@@ -92,9 +92,9 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
         String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
 
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("parity", currentWeekParity);
-        editor.apply();
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("parity", currentWeekParity);
+//        editor.apply();
 
         for (DayWeek dayWeek : newScheduleList) {
             if (filterParity == null || filterParity.equals(dayWeek.getParity()) || "ВСЕГДА".equals(dayWeek.getParity())) {

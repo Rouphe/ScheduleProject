@@ -2,6 +2,7 @@ package smg.mironov.ksuschedule;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,9 +12,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 /**
  * Класс {@link SettingsActivity} отвечает за экран настроек приложения, позволяющий пользователю изменить группу и четность недели.
@@ -57,7 +60,7 @@ public class SettingsActivity extends AppCompatActivity {
         groupEditText.setText(sharedPreferences.getString("user_groupNumber", ""));
 
         Spinner editTextWeek = findViewById(R.id.editTextWeek);
-        spinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item_settings, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
         editTextWeek.setAdapter(spinnerAdapter);
 
         // Устанавливаем значение Spinner из SharedPreferences
@@ -66,6 +69,29 @@ public class SettingsActivity extends AppCompatActivity {
             int spinnerPosition = spinnerAdapter.getPosition(savedParity);
             editTextWeek.setSelection(spinnerPosition);
         }
+
+        Switch themeSwitch = findViewById(R.id.themeSwitch);
+
+        // Получаем SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Установка начального состояния переключателя
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        themeSwitch.setChecked(currentNightMode == Configuration.UI_MODE_NIGHT_YES);
+
+        themeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                editor.putBoolean("dark_mode", true);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                editor.putBoolean("dark_mode", false);
+            }
+            editor.apply(); // Сохраняем выбор пользователя
+        });
+
+
 
         editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -95,6 +121,8 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * Метод для перехода назад на экран профиля.

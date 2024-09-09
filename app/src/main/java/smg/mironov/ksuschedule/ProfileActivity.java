@@ -268,14 +268,34 @@ public class ProfileActivity extends AppCompatActivity {
     /**
      * Метод для выхода из профиля и удаления данных пользователя.
      */
+    /**
+     * Метод для выхода из профиля и удаления данных пользователя,
+     * оставляя логин и пароль для автозаполнения при следующем входе.
+     */
     private void logout() {
         // Очистить фото профиля из внутренней памяти
         deleteProfileImage();
 
-        // Очистить SharedPreferences
+        // Получить доступ к SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Сохраняем логин и пароль
+        boolean darkMode = sharedPreferences.getBoolean("dark_mode", false);
+        String savedEmail = sharedPreferences.getString("saved_email", null);
+        String savedPassword = sharedPreferences.getString("saved_password", null);
+
+        // Очищаем все данные, кроме логина и пароля
         editor.clear();
+
+        // Восстанавливаем логин и пароль
+        if (savedEmail != null && savedPassword != null) {
+            editor.putString("saved_email", savedEmail);
+            editor.putString("saved_password", savedPassword);
+            editor.putBoolean("remember_me", true);
+            editor.putBoolean("dark_mode", false);
+        }
+
         editor.apply();
 
         // Очистить расписание в MainActivity
@@ -289,6 +309,7 @@ public class ProfileActivity extends AppCompatActivity {
         finish();
     }
 
+
     /**
      * Метод для удаления фото профиля из внутренней памяти.
      */
@@ -296,18 +317,6 @@ public class ProfileActivity extends AppCompatActivity {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("profile_images", Context.MODE_PRIVATE);
         File path = new File(directory, "profile_photo.jpg");
-        if (path.exists()) {
-            if (path.delete()) {
-                // Успешно удалено
-                Toast.makeText(this, "Фото профиля удалено", Toast.LENGTH_SHORT).show();
-            } else {
-                // Не удалось удалить
-                Toast.makeText(this, "Не удалось удалить фото профиля", Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            // Файл не существует
-            Toast.makeText(this, "Фото профиля не найдено", Toast.LENGTH_SHORT).show();
-        }
     }
 
     /**

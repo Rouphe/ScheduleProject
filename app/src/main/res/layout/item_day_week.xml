@@ -21,7 +21,7 @@
             android:layout_marginTop="7dp"
             android:fontFamily="@font/involve_medium"
             android:text="Среда"
-            android:textColor="#3A3E4D"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="16dp" />
 
         <TextView
@@ -32,7 +32,7 @@
             android:layout_marginTop="7dp"
             android:fontFamily="@font/involve_medium"
             android:text="|"
-            android:textColor="#3A3E4D"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="16dp" />
 
         <TextView
@@ -43,7 +43,7 @@
             android:layout_marginTop="7dp"
             android:fontFamily="@font/involve_medium"
             android:text="12.10"
-            android:textColor="#3A3E4D"
+            android:textColor="?attr/colorOnBackground"
             android:textSize="16dp" />
     </LinearLayout>
 

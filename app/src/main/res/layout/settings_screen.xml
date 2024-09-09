@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/backgroundColor">
+
+
 
 
 
@@ -21,7 +24,8 @@
             android:layout_marginTop="37dp"
             android:fontFamily="@font/involve_bold"
             android:text="Расписание ВУЗа"
-            android:textSize="24sp" />
+            android:textSize="24sp"
+            android:textColor="?attr/colorOnBackground"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -30,7 +34,8 @@
             android:text="v.0.0.1"
             android:textSize="14sp"
             android:layout_marginTop="40dp"
-            android:layout_marginLeft="6dp"/>
+            android:layout_marginLeft="6dp"
+            android:textColor="?attr/colorBackgroundFloating"/>
 
     </LinearLayout>
 
@@ -42,7 +47,11 @@
         android:textSize="20sp"
         android:layout_marginTop="24dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="8dp"/>
+        android:layout_marginBottom="8dp"
+        android:textColor="?attr/colorOnBackground"/>
+
+    <!-- Плашка для переключения темы -->
+
 
     <LinearLayout
         android:id="@+id/editGroupContainer"
@@ -50,7 +59,8 @@
         android:layout_height="53dp"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="8dp"
-        android:background="@drawable/custom_blue_semcorners_item">
+        android:background="@drawable/custom_blue_semcorners_item"
+        android:layout_marginTop="24dp">
 
 
         <TextView
@@ -61,7 +71,8 @@
             android:layout_marginTop="17dp"
             android:fontFamily="@font/involve_medium"
             android:text="Сменить группу"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"/>
 
         <ImageView
             android:id="@+id/imageViewGroupEdit"
@@ -81,7 +92,8 @@
             android:layout_gravity="center_vertical"
             android:fontFamily="@font/involve_medium"
             android:text="113"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"/>
 
 
     </LinearLayout>
@@ -90,7 +102,8 @@
         android:layout_width="328dp"
         android:layout_height="53dp"
         android:layout_gravity="center_horizontal"
-        android:background="@drawable/custom_blue_semcorners_item">
+        android:background="@drawable/custom_blue_semcorners_item"
+        android:layout_marginTop="10dp">
 
         <TextView
             android:id="@+id/change_week"
@@ -100,7 +113,8 @@
             android:layout_marginTop="17dp"
             android:fontFamily="@font/involve_medium"
             android:text="Сменить неделю"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:textColor="?attr/colorOnBackground"/>
 
 
         <Spinner
@@ -116,10 +130,35 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/involve_medium"
+            android:text="Темная тема"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="16sp" />
+
+        <Switch
+            android:id="@+id/themeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/save_settings"
         android:layout_width="210dp"
         android:layout_height="45dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/custom_filter_semcorners_item"
         android:gravity="center"
         android:layout_gravity="center_horizontal"
@@ -132,10 +171,9 @@
             android:gravity="center"
             android:fontFamily="@font/involve_bold"
             android:text="Сохранить"
-            android:textColor="@color/white"
+            android:textColor="@color/textOnPrimary"
             android:textSize="20sp" />
     </LinearLayout>
-
 
 
 </LinearLayout>

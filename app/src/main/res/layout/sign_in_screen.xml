@@ -3,7 +3,7 @@
     android:id="@+id/SignInScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A0B4FE"
+    android:background="@color/colorPairIsNow"
     android:orientation="vertical">
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
             android:text="РАСПИСАНИЕ ВУЗа"
-            android:textColor="@color/black"
+            android:textColor="@color/text"
             android:textSize="40sp" />
     </LinearLayout>
 
@@ -38,7 +38,7 @@
             android:fontFamily="@font/involve_medium"
             android:gravity="center"
             android:text="ВХОД"
-            android:textColor="@color/black"
+            android:textColor="@color/text"
             android:textSize="32sp" />
     </LinearLayout>
 
@@ -91,7 +91,8 @@
             android:text="Показать пароль"
             android:fontFamily="@font/involve_regular"
             android:textSize="12dp"
-            android:padding="6dp" />
+            android:padding="6dp"
+            android:textColor="@color/textSecondary"/>
 
         <CheckBox
             android:id="@+id/remember_me"
@@ -99,7 +100,8 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/involve_regular"
             android:textSize="12dp"
-            android:text="Запомнить меня" />
+            android:text="Запомнить меня"
+            android:textColor="@color/textSecondary"/>
     </LinearLayout>
 
     <LinearLayout
@@ -118,7 +120,7 @@
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
             android:text="Войти"
-            android:textColor="@color/navbar_white_text"
+            android:textColor="@color/textOnPrimary"
             android:textSize="18sp" />
     </LinearLayout>
 
@@ -126,7 +128,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="45dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <TextView
@@ -135,14 +137,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Еще не зарегистрированы?"
-            android:fontFamily="@font/involve_regular" />
+            android:fontFamily="@font/involve_regular"
+            android:textColor="@color/textSecondary"/>
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/TransferToRegistration"
@@ -150,7 +153,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Зарегистрироваться"
-            android:fontFamily="@font/involve_semibold" />
+            android:fontFamily="@font/involve_semibold"
+            android:textColor="@color/text"/>
+
+        <TextView
+            android:id="@+id/toReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Забыли пароль?"
+            android:layout_gravity="center_horizontal"
+            android:fontFamily="@font/involve_semibold"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/text"/>
     </LinearLayout>
+
+
+
 
 </LinearLayout>

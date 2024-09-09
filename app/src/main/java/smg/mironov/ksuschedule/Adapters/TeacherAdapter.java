@@ -15,6 +15,7 @@ import java.util.List;
 
 import smg.mironov.ksuschedule.Models.TeacherDto;
 import smg.mironov.ksuschedule.R;
+import smg.mironov.ksuschedule.TeachersActivity;
 import smg.mironov.ksuschedule.Utils.LoadImageTask;
 
 /**
@@ -51,7 +52,6 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> {
         ImageView getInfo;
     }
 
-    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
@@ -73,22 +73,23 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> {
             viewHolder.nameTextView.setText(currentTeacher.getName());
             viewHolder.positionTextView.setText(currentTeacher.getPost());
 
-            // Загрузка изображения профиля
-            new LoadImageTask(currentTeacher.getId(), viewHolder.profileImageView, this).execute();
+            // Перед загрузкой изображения проверяем, не уничтожена ли активность
+            if (getContext() instanceof TeachersActivity && !((TeachersActivity) getContext()).isDestroyed()) {
+                // Загрузка изображения профиля
+                new LoadImageTask(currentTeacher.getId(), viewHolder.profileImageView, this).execute();
+            }
 
             // Обработка клика на элемент списка
-            viewHolder.getInfo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (clickListener != null) {
-                        clickListener.onItemClick(currentTeacher.getId(), viewHolder.profileImageView);
-                    }
+            viewHolder.getInfo.setOnClickListener(v -> {
+                if (clickListener != null) {
+                    clickListener.onItemClick(currentTeacher.getId(), viewHolder.profileImageView);
                 }
             });
         }
 
         return convertView;
     }
+
 
     /**
      * Обновляет фото преподавателя в списке.

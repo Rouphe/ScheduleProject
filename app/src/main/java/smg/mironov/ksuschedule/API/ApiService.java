@@ -20,6 +20,7 @@ import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
 import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.AuthRequest;
+import smg.mironov.ksuschedule.Utils.PasswordResetRequest;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 
 /**
@@ -46,8 +47,17 @@ public interface ApiService {
      * @param user объект запроса аутентификации
      * @return объект {@link Call} с {@link RegistrationResponse}
      */
-    @POST("api/v1/auth/authenticate")
+    @POST("/api/v1/auth/authenticate")
     Call<RegistrationResponse> login(@Body AuthRequest user);
+
+    /**
+     * Запрос на сброс пароля
+     *
+     * @param resetRequest
+     * @return
+     */
+    @POST("/password-reset/request")
+    Call<Void> requestPasswordReset(@Body PasswordResetRequest resetRequest);
 
     /**
      * Получение данных пользователя по email.

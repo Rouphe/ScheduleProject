@@ -1,9 +1,28 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.KSUSchedule" parent="Theme.Material3.Light.NoActionBar">
+    <style name="Dark.Theme.KSUSchedule" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
         <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/colorPrimary_dark</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryDarker</item>
+        <item name="colorContainer">@color/colorSecondary_dark</item>
+        <item name="colorAccent">@color/colorPairsTeacher</item>
+        <item name="backgroundColor">@color/bg_dark</item>
+        <item name="colorOnContainer">@color/inputs</item>
+        <item name="colorControlNormal">@color/colorPairIsNow</item>
+        <item name="colorOnBackground">@color/text_dark</item>
+        <item name="colorBackgroundFloating">@color/textSecondary_dark</item>
+        <item name="colorButtonNormal">@color/text_dark</item>
+        <item name="colorSecondaryContainer">@color/colorSecondary_dark</item>
+        <!-- Отключаем верхнюю панель действия (ActionBar) -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!-- Делаем статус-бар прозрачным -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- Убираем верхнюю полосу у окон -->
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="Theme.KSUSchedule" parent="Base.Theme.KSUSchedule" />
+    <style name="Theme.KSUSchedule" parent="Dark.Theme.KSUSchedule" />
 </resources>

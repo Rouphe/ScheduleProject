@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,8 +16,11 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import org.json.JSONObject;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -65,21 +69,45 @@ public class MainActivity extends AppCompatActivity {
     /** Токен аутентификации */
     private String token;
 
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        // Получаем SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+
+        // Проверяем, какая тема была выбрана
+        boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
 
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         token = "Bearer " + preferences.getString("auth_token", null);
 
+        SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String currentParity = updatedPreferences.getString("parity", "Нет данных");
+
         user = loadUserData();
 
-        if (user == null) {
+        if (user == null && !isTokenValid(token)) {
             Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
             finish();
             return;
         }
+
+        parity = findViewById(R.id.weekType);
+
+        saveCurrentParity();
+
+        updateParityUI();
+
 
         TextView groupNumberTextView = findViewById(R.id.group_number);
         if (Objects.equals(user.getRole(), "TEACHER")) {
@@ -90,12 +118,10 @@ public class MainActivity extends AppCompatActivity {
 
         groupNumberTextView.setText(user.getGroup_number());
         subgroupSpinner = findViewById(R.id.Subgroup);
-        parity = findViewById(R.id.weekType);
+
 
         // Извлечение и установка четности недели в TextView
-        SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String currentParity = updatedPreferences.getString("parity", "Нет данных");
-        parity.setText(currentParity);
+        //parity.setText(currentParity);
 
         if (user.getRole().equals("TEACHER")) {
             subgroupSpinner.setVisibility(View.INVISIBLE);
@@ -153,6 +179,31 @@ public class MainActivity extends AppCompatActivity {
 
         // Получение данных с сервера
         fetchScheduleFromServer();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Обновляем UI с учетом текущего значения parity
+        updateParityUI();
+    }
+
+    private void saveCurrentParity() {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("parity", currentWeekParity);
+        editor.apply();
+    }
+
+    private void updateParityUI() {
+        SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        String currentParity = updatedPreferences.getString("parity", "Нет данных");
+        parity.setText(currentParity);
     }
 
     /**
@@ -241,8 +292,10 @@ public class MainActivity extends AppCompatActivity {
                     scheduleAdapter.updateScheduleList(uniqueScheduleList);
                     Log.d("MainActivity", "Schedule loaded successfully");
                 } else {
-                    Log.e("MainActivity", "Response not successful: " + response.code());
-                    Toast.makeText(MainActivity.this, "Не удалось загрузить данные", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.putExtra("from_main_activity", true);
+                    startActivity(intent);
+                    finish();
                 }
             }
 
@@ -303,6 +356,31 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString("auth_token", newToken.substring(7)); // Сохраняем новый токен без префикса "Bearer "
             editor.apply();
+        }
+    }
+
+    /**
+     * Метод для проверки валидности токена.
+     * @param token токен для проверки.
+     * @return возвращает true, если токен действителен, иначе false.
+     */
+    private boolean isTokenValid(String token) {
+        try {
+            String[] parts = token.split("\\."); // Разделение токена на части
+            if (parts.length != 3) {
+                return false;
+            }
+
+            String payload = new String(Base64.decode(parts[1], Base64.DEFAULT));
+            JSONObject jsonObject = new JSONObject(payload);
+            long exp = jsonObject.getLong("exp");
+
+            // Проверка срока действия
+            long currentTime = System.currentTimeMillis() / 1000;
+            return exp > currentTime;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

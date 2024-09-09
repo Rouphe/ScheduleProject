@@ -41,7 +41,8 @@
             android:layout_marginTop="15dp"
             android:fontFamily="@font/involve_regular"
             android:text="Имя Фамилия Отчество"
-            android:textSize="13dp" />
+            android:textSize="13dp"
+            android:textColor="?attr/colorOnBackground"/>
 
 
 
@@ -53,7 +54,8 @@
             android:layout_marginTop="0dp"
             android:fontFamily="@font/involve_regular"
             android:text="Должность, кафедра"
-            android:textSize="10sp" />
+            android:textSize="10sp"
+            android:textColor="?attr/colorBackgroundFloating"/>
     </LinearLayout>
 
     <ImageView

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="?attr/backgroundColor">
 
     <TextView
         android:id="@+id/textView"
@@ -15,6 +16,7 @@
         android:layout_marginEnd="16dp"
         android:fontFamily="@font/involve_semibold"
         android:text="Состав преподавателей"
+        android:textColor="?attr/colorOnBackground"
         android:textSize="24sp" />
 
     <ListView
@@ -27,7 +29,8 @@
         android:layout_marginBottom="16dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="8.0sp"
-        tools:listitem="@layout/item_info_teacher" />
+        tools:listitem="@layout/item_info_teacher"
+        android:scrollbars="none"/>
 
 
     <Space

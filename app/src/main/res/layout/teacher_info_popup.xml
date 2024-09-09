@@ -68,6 +68,7 @@
         android:text="Отчество"
         android:textColor="#0229B3"
         android:textSize="24sp"
+        android:layout_marginTop="3dp"
         android:layout_gravity="center_horizontal"/>
 
     <LinearLayout

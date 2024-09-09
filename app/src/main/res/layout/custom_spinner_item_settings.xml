@@ -5,4 +5,7 @@
     android:singleLine="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textColor="@color/textOnPrimary" />
+    android:paddingHorizontal="2dp"
+    android:paddingVertical="4dp"
+    android:background="?attr/colorContainer"
+    android:textColor="?attr/colorOnBackground" />

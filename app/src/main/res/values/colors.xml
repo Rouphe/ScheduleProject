@@ -2,6 +2,24 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="navbar_blue_bg">#5278FF</color>
+    <color name="navbar_blue_bg">#2757FF</color>
     <color name="navbar_white_text">#C0CEFF</color>
+    <color name="colorPrimary">#2757FF</color>
+    <color name="colorPrimaryDark">#0229B3</color>
+    <color name="colorSecondary">#C0CEFF</color>
+    <color name="inputs">#D9D9D9</color>
+    <color name="colorPairIsNow">#95ACFF</color>
+    <color name="colorPairsTeacher">#262933</color>
+    <color name="bg">#DAE2FF</color>
+    <color name="colorPrimaryDarker">#001D82</color>
+    <color name="text">#FF000000</color>
+    <color name="textSecondary">#3A3E4D</color>
+    <color name="textOnPrimary">#D9D9D9</color>
+
+    <!-- Темная тема -->
+    <color name="bg_dark">#000A2D</color>
+    <color name="colorPrimary_dark">#001D82</color>
+    <color name="text_dark">#C0CEFF</color>
+    <color name="colorSecondary_dark">#001355</color>
+    <color name="textSecondary_dark">#A0B4FE</color>
 </resources>

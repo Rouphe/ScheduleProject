@@ -5,7 +5,7 @@
     android:id="@+id/registration"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#A0B4FE"
+    android:background="@color/colorPairIsNow"
     android:orientation="vertical"
     android:gravity="center_vertical">
 
@@ -24,7 +24,7 @@
             android:fontFamily="@font/involve_medium"
             android:gravity="center"
             android:text="РЕГИСТРАЦИЯ"
-            android:textColor="@color/black"
+            android:textColor="@color/text"
             android:textSize="32sp" />
     </LinearLayout>
 
@@ -59,7 +59,7 @@
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/involve_bold"
                 android:text="Студент"
-                android:textColor="#DAE2FF"
+                android:textColor="@color/textOnPrimary"
                 android:textSize="14dp" />
 
         </LinearLayout>
@@ -88,7 +88,7 @@
                 android:layout_gravity="center_horizontal"
                 android:fontFamily="@font/involve_bold"
                 android:text="Преподаватель"
-                android:textColor="#0229B3"
+                android:textColor="@color/colorPrimaryDark"
                 android:textSize="14dp" />
 
         </LinearLayout>
@@ -181,7 +181,7 @@
             android:layout_height="50dp"
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
-            android:hint="Номер подгруппы..."
+            android:hint="Номер подгруппы... (100.1)"
             android:padding="12dp" />
 
     </LinearLayout>
@@ -242,7 +242,7 @@
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
             android:text="Зарегистрироваться"
-            android:textColor="@color/navbar_white_text"
+            android:textColor="@color/textOnPrimary"
             android:textSize="14sp" />
 
     </LinearLayout>
