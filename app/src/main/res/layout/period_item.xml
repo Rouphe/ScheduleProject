@@ -29,12 +29,13 @@
 
     <LinearLayout
         android:layout_width="1dp"
-        android:layout_height="47dp"
+        android:layout_height="match_parent"
         android:background="?attr/colorBackgroundFloating"
         android:layout_gravity="center_horizontal"
         android:gravity="center_horizontal"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="3dp">
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="4dp">
     </LinearLayout>
 
     <LinearLayout
@@ -51,7 +52,8 @@
             android:text="Лекция | Дискретная математика"
             android:textSize="16dp"
             android:textColor="?attr/colorOnBackground"
-            android:fontFamily="@font/involve_medium" />
+            android:fontFamily="@font/involve_medium"
+            android:paddingRight="10dp"/>
 
         <TextView
             android:id="@+id/infoTeacher"

@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.io.File;
@@ -419,10 +420,10 @@ public class ProfileActivity extends AppCompatActivity {
     private void toggleAdditionalInfo() {
         if (additionalInfoContainer.getVisibility() == View.GONE) {
             additionalInfoContainer.setVisibility(View.VISIBLE);
-            chevronDown.setImageResource(R.drawable.chevron_up);
+            chevronDown.setImageResource(R.drawable.chevron_up_borders);
         } else {
             additionalInfoContainer.setVisibility(View.GONE);
-            chevronDown.setImageResource(R.drawable.chevron_down_white);
+            chevronDown.setImageResource(R.drawable.chewron_down_white_borders);
         }
     }
 

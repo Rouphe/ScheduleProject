@@ -257,9 +257,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:src="@drawable/chevron_down_white"></ImageView>
+                android:src="@drawable/chewron_down_white_borders">
+            </ImageView>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_new_features_soon"
+        android:layout_gravity="center_horizontal"
+        android:orientation="vertical"
+        android:layout_marginTop="15dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Скоро здесь что-то появится..."
+            android:fontFamily="@font/involve_medium"
+            android:textSize="16dp"
+            android:textColor="?attr/colorButtonNormal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="40dp">
+        </TextView>
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/wrench"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginVertical="8dp">
+        </ImageView>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Новые функции в разработке :)"
+            android:fontFamily="@font/involve_regular"
+            android:textSize="13dp"
+            android:textColor="?attr/colorButtonNormal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp">
+        </TextView>
+    </LinearLayout>
 
     <Space
         android:layout_width="wrap_content"

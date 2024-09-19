@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.time.DayOfWeek;
@@ -221,7 +222,13 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
             LocalTime now = LocalTime.now();
             if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date1))) {
-                pairView.setBackgroundResource(R.drawable.custom_pair_is_now);
+                // Проверяем, какая тема была выбрана
+                boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", false);
+                if (isDarkMode) {
+                    pairView.setBackgroundColor(Color.parseColor("#022293"));
+                } else {
+                    pairView.setBackgroundColor(Color.parseColor("#95ACFF"));
+                }
             } else {
                 pairView.setBackgroundColor(Color.TRANSPARENT);
             }

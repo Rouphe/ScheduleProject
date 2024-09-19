@@ -295,7 +295,7 @@ public class TeachersActivity extends AppCompatActivity {
      * Метод для получения списка преподавателей с сервера.
      */
     private void fetchTeachersFromServer() {
-        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://77.232.128.111:80/")
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("http://24schedule.ru:80/")
                 .addConverterFactory(GsonConverterFactory.create()).build();
 
         ApiService apiService = retrofit.create(ApiService.class);

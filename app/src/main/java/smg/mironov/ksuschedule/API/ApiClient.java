@@ -19,7 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Александр Миронов
  */
 public class ApiClient {
-    private static final String BASE_URL = "http://77.232.128.111:80/";
+    private static final String BASE_URL = "http://24schedule.ru:80";
     private static Retrofit retrofit;
 
 

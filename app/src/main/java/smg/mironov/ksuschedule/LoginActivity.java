@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
@@ -16,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONObject;
 
@@ -27,7 +29,9 @@ import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Utils.AuthRequest;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 import smg.mironov.ksuschedule.Models.User;
+import smg.mironov.ksuschedule.Utils.SimpleTextWatcher;
 import smg.mironov.ksuschedule.Utils.UserData;
+import smg.mironov.ksuschedule.ViewModel.LoginViewModel;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -45,6 +49,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in_screen);
+
+
+
 
         // Инициализация элементов
         emailEditText = findViewById(R.id.Login);
@@ -93,16 +100,38 @@ public class LoginActivity extends AppCompatActivity {
         toRegistration.setOnClickListener(v -> {
             Intent intentToRegister = new Intent(LoginActivity.this, RegistrationActivity.class);
             startActivity(intentToRegister);
-            finish();
+            // Убрать finish() здесь
         });
 
         // Переход к сбросу пароля
         toReset.setOnClickListener(v -> {
             Intent intentToReset = new Intent(LoginActivity.this, ResetPasswordActivity.class);
             startActivity(intentToReset);
-            finish();
+            // Убрать finish() здесь
         });
+
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Сохранение данных пользователя
+        outState.putString("email", emailEditText.getText().toString());
+        outState.putString("password", passwordEditText.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Восстановление данных пользователя
+        if (savedInstanceState != null) {
+            String savedEmail = savedInstanceState.getString("email");
+            String savedPassword = savedInstanceState.getString("password");
+            emailEditText.setText(savedEmail);
+            passwordEditText.setText(savedPassword);
+        }
+    }
+
 
 
     private void login() {
@@ -240,10 +269,16 @@ public class LoginActivity extends AppCompatActivity {
             long exp = jsonObject.getLong("exp");
 
             long currentTime = System.currentTimeMillis() / 1000;
-            return exp > currentTime;
+            if (exp <= currentTime) {
+                // Если токен истек, показываем сообщение и возвращаем false
+                Toast.makeText(this, "Срок действия токена истек. Пожалуйста, выполните вход заново.", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
 }

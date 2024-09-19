@@ -69,17 +69,20 @@ public class EditProfileActivity extends AppCompatActivity {
         String userInfo = preferences.getString("user_info", null);
 
         if (Objects.equals(preferences.getString("user_role", null), "TEACHER")){
-            String faculty = extractInfo(userInfo, "Факультет:");
-            String department = extractInfo(userInfo, "Кафедра:");
-            String addInfo = extractInfo(userInfo, "Дополнительная информация:");
 
-            teachersFaculty.setText(faculty);
+            if(userInfo != null) {
+                String faculty = extractInfo(userInfo, "Факультет:");
+                String department = extractInfo(userInfo, "Кафедра:");
+                String addInfo = extractInfo(userInfo, "Дополнительная информация:");
 
-            teachersDepartment = findViewById(R.id.teacherDepartmentEdit);
-            teachersDepartment.setText(department);
+                teachersFaculty.setText(faculty);
 
-            teachersInfo = findViewById(R.id.teachersInfoEdit);
-            teachersInfo.setText(addInfo);
+                teachersDepartment = findViewById(R.id.teacherDepartmentEdit);
+                teachersDepartment.setText(department);
+
+                teachersInfo = findViewById(R.id.teachersInfoEdit);
+                teachersInfo.setText(addInfo);
+            }
         }
 
 
@@ -112,9 +115,13 @@ public class EditProfileActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
 
         if (Objects.equals(sharedPreferences.getString("user_role", null), "TEACHER")){
-            faculty = teachersFaculty.getText().toString();
-            department = teachersDepartment.getText().toString();
-            info = teachersInfo.getText().toString();
+
+            if (faculty != null && department != null && info != null){
+                faculty = teachersFaculty.getText().toString();
+                department = teachersDepartment.getText().toString();
+                info = teachersInfo.getText().toString();
+            }
+
         }
 
         SharedPreferences.Editor editor = sharedPreferences.edit();

@@ -16,12 +16,13 @@
         <item name="colorButtonNormal">@color/text_dark</item>
         <item name="colorSecondaryContainer">@color/colorSecondary_dark</item>
         <!-- Отключаем верхнюю панель действия (ActionBar) -->
-        <item name="windowActionBar">false</item>
+        <!-- <item name="windowActionBar">false</item> -->
         <item name="windowNoTitle">true</item>
         <!-- Делаем статус-бар прозрачным -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
+        <!-- <item name="android:statusBarColor">@android:color/transparent</item> -->
         <!-- Убираем верхнюю полосу у окон -->
-        <item name="android:windowTranslucentStatus">true</item>
+        <!-- <item name="android:windowTranslucentStatus">true</item> -->
+        <item name="android:windowFullscreen">true</item>
     </style>
 
     <style name="Theme.KSUSchedule" parent="Dark.Theme.KSUSchedule" />

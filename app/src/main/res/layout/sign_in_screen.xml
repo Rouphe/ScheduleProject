@@ -19,7 +19,7 @@
             android:layout_height="106dp"
             android:fontFamily="@font/involve_bold"
             android:gravity="center"
-            android:text="РАСПИСАНИЕ ВУЗа"
+            android:text="РАСПИСАНИЕ КГУ"
             android:textColor="@color/text"
             android:textSize="40sp" />
     </LinearLayout>

@@ -95,6 +95,35 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/server_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal"
+        android:visibility="gone"
+        android:layout_marginTop="60dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/server_error"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ошибка соединения с сервером"
+            android:textColor="?attr/colorButtonNormal"
+            android:fontFamily="@font/involve_medium"
+            android:textSize="14sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Попробуйте зайти позже"
+            android:textColor="?attr/colorButtonNormal"
+            android:fontFamily="@font/involve_regular"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

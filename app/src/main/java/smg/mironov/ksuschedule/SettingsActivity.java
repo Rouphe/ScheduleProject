@@ -82,14 +82,18 @@ public class SettingsActivity extends AppCompatActivity {
 
         themeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 editor.putBoolean("dark_mode", true);
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
             } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 editor.putBoolean("dark_mode", false);
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
             }
-            editor.apply(); // Сохраняем выбор пользователя
+            editor.apply();
+
+            // Перезапуск активности для применения темы
+            recreate();
         });
+
 
 
 

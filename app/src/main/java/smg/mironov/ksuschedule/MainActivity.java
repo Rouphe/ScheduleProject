@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
     /** Токен аутентификации */
     private String token;
 
+    private LinearLayout serverError;
+
 
 
     @Override
@@ -98,13 +101,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
-            finish();
+            //finish();
             return;
         }
 
         parity = findViewById(R.id.weekType);
 
-        saveCurrentParity();
+        //saveCurrentParity();
 
         updateParityUI();
 
@@ -138,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
         ImageView navButton1 = findViewById(R.id.teachers_icon);
         ImageView navButton2 = findViewById(R.id.profile_icon);
 
+
+
         subgroupSpinner = findViewById(R.id.Subgroup);
         spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item, new ArrayList<>());
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -145,7 +150,8 @@ public class MainActivity extends AppCompatActivity {
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
-        fetchSubgroups();
+        if (user.getRole().equals("STUDENT"))
+            fetchSubgroups();
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -182,23 +188,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        // Ваш код, который будет выполнен при перезапуске активности
+        Log.d("MainActivity", "Activity was restarted");
+    }
+
+
+    @Override
     protected void onResume() {
         super.onResume();
         // Обновляем UI с учетом текущего значения parity
         updateParityUI();
     }
 
-    private void saveCurrentParity() {
-        LocalDate today = LocalDate.now();
-        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
-        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
-        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
-
-        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("parity", currentWeekParity);
-        editor.apply();
-    }
+//    private void saveCurrentParity() {
+//        LocalDate today = LocalDate.now();
+//        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+//        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+//        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+//
+//        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("parity", currentWeekParity);
+//        editor.apply();
+//    }
 
     private void updateParityUI() {
         SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
@@ -258,6 +272,12 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }
+                else {
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.putExtra("from_main_activity", true);
+                    startActivity(intent);
+                    //finish();
+                }
             }
 
             @Override
@@ -265,6 +285,10 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                 if (!(Objects.equals(preferences.getString("user_role", null), "TEACHER"))){
                     Toast.makeText(MainActivity.this, "Ошибка при получении подгрупп: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.putExtra("from_main_activity", true);
+                    startActivity(intent);
+                    //finish();
                 }
             }
         });
@@ -292,10 +316,13 @@ public class MainActivity extends AppCompatActivity {
                     scheduleAdapter.updateScheduleList(uniqueScheduleList);
                     Log.d("MainActivity", "Schedule loaded successfully");
                 } else {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    intent.putExtra("from_main_activity", true);
-                    startActivity(intent);
-                    finish();
+//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//                    intent.putExtra("from_main_activity", true);
+//                    startActivity(intent);
+                    //finish();
+                    serverError = findViewById(R.id.server_error);
+                    serverError.setVisibility(View.VISIBLE);
+
                 }
             }
 
@@ -303,6 +330,10 @@ public class MainActivity extends AppCompatActivity {
             public void onFailure(Call<List<DayWeek>> call, Throwable t) {
                 Log.e("MainActivity", "Error fetching schedule", t);
                 Toast.makeText(MainActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.putExtra("from_main_activity", true);
+                startActivity(intent);
+                //finish();
             }
         };
 

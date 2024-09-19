@@ -56,7 +56,7 @@ public interface ApiService {
      * @param resetRequest
      * @return
      */
-    @POST("/password-reset/request")
+    @POST("/api/password-reset/request")
     Call<Void> requestPasswordReset(@Body PasswordResetRequest resetRequest);
 
     /**
