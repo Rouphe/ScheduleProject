@@ -249,6 +249,7 @@ public class RegistrationActivity extends AppCompatActivity {
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
+        editor.putLong("user_id", user.getId());
         editor.putString("user_lastName", user.getLastName());
         editor.putString("user_firstName", user.getFirstName());
         editor.putString("user_middleName", user.getMiddleName());

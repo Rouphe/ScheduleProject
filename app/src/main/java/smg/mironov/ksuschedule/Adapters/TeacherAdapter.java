@@ -9,8 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-
 import java.util.List;
 
 import smg.mironov.ksuschedule.Models.TeacherDto;
@@ -97,7 +95,7 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> {
      * @param teacherId идентификатор преподавателя
      * @param bitmap    изображение преподавателя
      */
-    public void updateTeacherPhoto(int teacherId, Bitmap bitmap) {
+    public void updateTeacherPhoto(Long teacherId, Bitmap bitmap) {
         for (int i = 0; i < getCount(); i++) {
             TeacherDto teacher = getItem(i);
             if (teacher != null && teacher.getId() == teacherId) {

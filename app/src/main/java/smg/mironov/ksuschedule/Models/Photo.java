@@ -15,20 +15,17 @@ public class Photo {
     private Long id;
     /** URL фотографии */
     private String url;
-    /** Объект пользователя */
-    private User user;
+
 
     /**
      * Конструктор для создания объекта {@link Photo}.
      *
      * @param id идентификатор фотографии
      * @param url URL фотографии
-     * @param user объект пользователя
      */
-    public Photo(Long id, String url, User user) {
+    public Photo(Long id, String url) {
         this.id = id;
         this.url = url;
-        this.user = user;
     }
 
     /**
@@ -67,21 +64,4 @@ public class Photo {
         this.url = url;
     }
 
-    /**
-     * Возвращает объект пользователя.
-     *
-     * @return объект пользователя
-     */
-    public User getUser() {
-        return user;
-    }
-
-    /**
-     * Устанавливает объект пользователя.
-     *
-     * @param user объект пользователя
-     */
-    public void setUser(User user) {
-        this.user = user;
-    }
 }

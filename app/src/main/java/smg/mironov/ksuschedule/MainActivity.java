@@ -213,10 +213,14 @@ public class MainActivity extends AppCompatActivity {
 //        editor.putString("parity", currentWeekParity);
 //        editor.apply();
 //    }
+    LocalDate today = LocalDate.now();
+    LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+    boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+    String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
 
     private void updateParityUI() {
         SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        String currentParity = updatedPreferences.getString("parity", "Нет данных");
+        String currentParity = updatedPreferences.getString("parity", currentWeekParity);
         parity.setText(currentParity);
     }
 

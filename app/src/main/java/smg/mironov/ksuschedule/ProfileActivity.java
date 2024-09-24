@@ -539,8 +539,9 @@ public class ProfileActivity extends AppCompatActivity {
      * Метод для получения изображения профиля с сервера.
      */
     private void fetchProfileImageFromServer() {
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<ResponseBody> call = apiService.getProfileImage(token, userEmail); // предполагается, что API предоставляет такой метод
+        Call<ResponseBody> call = apiService.getProfileImage(token, preferences.getLong("user_id", 0)); // предполагается, что API предоставляет такой метод
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override

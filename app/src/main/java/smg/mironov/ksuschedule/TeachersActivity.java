@@ -175,7 +175,7 @@ public class TeachersActivity extends AppCompatActivity {
         popupPost.setText(post);
         popupInfo.setText(user.getInfo());
 
-        fetchTeacherPhotoFromServer(user.getTeacherId(), popupPhoto, profileImageView);
+        fetchTeacherPhotoFromServer(user.getId(), popupPhoto, profileImageView);
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
         popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -231,7 +231,7 @@ public class TeachersActivity extends AppCompatActivity {
      * @param popupPhoto ImageView для отображения фотографии во всплывающем окне
      * @param profileImageView ImageView для отображения фотографии в списке
      */
-    private void fetchTeacherPhotoFromServer(int userId, final ImageView popupPhoto, final ImageView profileImageView) {
+    private void fetchTeacherPhotoFromServer(Long userId, final ImageView popupPhoto, final ImageView profileImageView) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         Call<ResponseBody> call = apiService.getUserTeacherPhoto(token, userId);
 
@@ -359,7 +359,7 @@ public class TeachersActivity extends AppCompatActivity {
      * @param bitmap объект {@link Bitmap}, представляющий изображение
      * @param userId идентификатор пользователя
      */
-    private void saveImageToInternalStorage(Bitmap bitmap, int userId) {
+    private void saveImageToInternalStorage(Bitmap bitmap, Long userId) {
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
         File mypath = new File(directory, "profile_" + userId + ".jpg");

@@ -135,12 +135,12 @@ public interface ApiService {
      * Получение изображения профиля по email.
      *
      * @param token токен авторизации
-     * @param email email пользователя
+     * @param id id фотографии
      * @return объект {@link Call} с {@link ResponseBody}
      */
-    @GET("/api/photos/download/email")
+    @GET("/api/photos/download/id")
     Call<ResponseBody> getProfileImage(@Header("Authorization") String token,
-                                       @Query("email") String email);
+                                       @Query("email") Long id);
 
     /**
      * Получение изображения профиля по ID.
@@ -152,7 +152,7 @@ public interface ApiService {
     @GET("/api/photos/download/id")
     Call<ResponseBody> getUserTeacherPhoto(
             @Header("Authorization") String token,
-            @Query("id") int id
+            @Query("id") Long id
     );
 
     /**

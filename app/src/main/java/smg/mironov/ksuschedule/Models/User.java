@@ -33,8 +33,6 @@ public class User {
     private String role;
     /** Объект фото пользователя */
     private Photo photo;
-    /** Идентификатор преподавателя */
-    private int teacherId;
 
     /**
      * Конструктор для создания объекта {@link User}.
@@ -358,12 +356,4 @@ public class User {
         this.photo = photo;
     }
 
-    /**
-     * Возвращает идентификатор преподавателя.
-     *
-     * @return идентификатор преподавателя
-     */
-    public int getTeacherId() {
-        return teacherId;
-    }
 }

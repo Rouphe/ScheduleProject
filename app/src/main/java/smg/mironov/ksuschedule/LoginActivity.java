@@ -234,6 +234,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void loadUserData() {
         SharedPreferences preferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        Long userId = preferences.getLong("user_id", 0);
         String userLastName = preferences.getString("user_lastName", null);
         String userFirstName = preferences.getString("user_firstName", null);
         String userMiddleName = preferences.getString("user_middleName", null);
@@ -245,7 +246,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (userLastName != null && userFirstName != null && userMiddleName != null &&
                 userEmail != null && userPassword != null && userGroupNumber != null &&
-                userSubgroupNumber != null && userRole != null) {
+                userSubgroupNumber != null && userRole != null && userId != 0) {
             User user = new User(userFirstName, userLastName, userMiddleName, userEmail, userPassword, userGroupNumber, userSubgroupNumber, userRole);
             UserData.getInstance().setUser(user);
         }
