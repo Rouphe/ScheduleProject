@@ -140,7 +140,7 @@ public interface ApiService {
      */
     @GET("/api/photos/download/id")
     Call<ResponseBody> getProfileImage(@Header("Authorization") String token,
-                                       @Query("email") Long id);
+                                       @Query("id") Long id);
 
     /**
      * Получение изображения профиля по ID.

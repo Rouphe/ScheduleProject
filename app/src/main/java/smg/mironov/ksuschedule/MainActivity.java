@@ -76,6 +76,17 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+
+        user = loadUserData();
+
+        if (user == null && !isTokenValid(token)) {
+            //Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+            startActivity(intent);
+            //finish();
+            return;
+        }
+
         // Получаем SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
 
@@ -95,15 +106,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         String currentParity = updatedPreferences.getString("parity", "Нет данных");
 
-        user = loadUserData();
 
-        if (user == null && !isTokenValid(token)) {
-            Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            //finish();
-            return;
-        }
 
         parity = findViewById(R.id.weekType);
 
@@ -144,9 +147,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         subgroupSpinner = findViewById(R.id.Subgroup);
-        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item, new ArrayList<>());
-        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item, new ArrayList<>());
+//        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        subgroupSpinner.setAdapter(spinnerAdapter);
+
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner, new ArrayList<>());
+        // Устанавливаем разметку для выпадающего списка
+        spinnerAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         subgroupSpinner.setAdapter(spinnerAdapter);
+
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
@@ -168,6 +177,8 @@ public class MainActivity extends AppCompatActivity {
                 switchToScreen2();
             }
         });
+
+
 
         subgroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -411,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
             long exp = jsonObject.getLong("exp");
 
             // Проверка срока действия
-            long currentTime = System.currentTimeMillis() / 1000;
+            long currentTime = System.currentTimeMillis() / (1000 * 60 * 60 * 24) ;
             return exp > currentTime;
         } catch (Exception e) {
             e.printStackTrace();

@@ -23,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,13 +68,21 @@ public class TeachersActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        // Проверяем, какая тема была выбрана
+        boolean isDarkMode = preferences.getBoolean("dark_mode", false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.info_teacher_screen);
 
         listView = findViewById(R.id.list_teachers);
         teacherList = new ArrayList<>();
 
-        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+
         token = "Bearer " + preferences.getString("auth_token", null);
 
         adapter = new TeacherAdapter(this, teacherList, new TeacherAdapter.OnItemClickListener() {

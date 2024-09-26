@@ -50,9 +50,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sign_in_screen);
 
-
-
-
         // Инициализация элементов
         emailEditText = findViewById(R.id.Login);
         passwordEditText = findViewById(R.id.Password);

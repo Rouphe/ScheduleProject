@@ -6,7 +6,10 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -54,43 +57,49 @@ public class EditProfileActivity extends AppCompatActivity {
     /** Контейнер для актуальной информации */
     private LinearLayout actual_information;
 
+    private String userEmail;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.editing_screen);
 
+
+
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         token = "Bearer " + preferences.getString("auth_token", null);
+        userEmail = preferences.getString("user_email", null); // Получите email пользователя
 
         userFirstName = findViewById(R.id.userFirstNameEdit);
         userLastName = findViewById(R.id.userLastNameEdit);
         userMiddleName = findViewById(R.id.userMiddleNameEdit);
         teachersFaculty = findViewById(R.id.teachersFacultyEdit);
+        teachersDepartment = findViewById(R.id.teacherDepartmentEdit); // Initialize here
+        teachersInfo = findViewById(R.id.teachersInfoEdit); // Initialize here
+        saveButton = findViewById(R.id.saveButtonText);
+        actual_information = findViewById(R.id.actual_information);
         String userInfo = preferences.getString("user_info", null);
 
-        if (Objects.equals(preferences.getString("user_role", null), "TEACHER")){
+        // Загружаем данные пользователя из сервера
+        loadUserDataFromServer();
 
-            if(userInfo != null) {
+        if (Objects.equals(preferences.getString("user_role", null), "TEACHER")) {
+            if (userInfo != null) {
                 String faculty = extractInfo(userInfo, "Факультет:");
                 String department = extractInfo(userInfo, "Кафедра:");
                 String addInfo = extractInfo(userInfo, "Дополнительная информация:");
 
                 teachersFaculty.setText(faculty);
+                teachersDepartment.setText(department); // Set text only if userInfo is available
+                teachersInfo.setText(addInfo); // Set text only if userInfo is available
 
-                teachersDepartment = findViewById(R.id.teacherDepartmentEdit);
-                teachersDepartment.setText(department);
-
-                teachersInfo = findViewById(R.id.teachersInfoEdit);
-                teachersInfo.setText(addInfo);
+                actual_information.setVisibility(View.VISIBLE);
             }
         }
+        else {
+            actual_information.setVisibility(View.GONE);
+        }
 
-
-
-        saveButton = findViewById(R.id.saveButtonText);
-        actual_information = findViewById(R.id.actual_information);
-
-        loadUserData();
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,7 +107,96 @@ public class EditProfileActivity extends AppCompatActivity {
                 saveChanges();
             }
         });
+
+        userFirstName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    userLastName.requestFocus(); // Переход к следующему полю
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        userLastName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    userMiddleName.requestFocus(); // Переход к следующему полю
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        userMiddleName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    // Закрыть клавиатуру или выполнить другое действие
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                    return true;
+                }
+                return false;
+            }
+        });
+
     }
+
+    private void loadUserDataFromServer() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        // Предполагаем, что у вас есть переменная userEmail, содержащая email пользователя
+        Call<User> call = apiService.getUser(token, userEmail); // вызываем API метод
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    updateUIWithUserData(user);
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(EditProfileActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUIWithUserData(User user) {
+        // Устанавливаем информацию в соответствующие поля
+        userFirstName.setText(user.getFirstName());
+        userLastName.setText(user.getLastName());
+        userMiddleName.setText(user.getMiddleName());
+
+        if ("TEACHER".equals(user.getRole()) && user.getInfo() != null) {
+            String faculty = extractInfo(user.getInfo(), "Факультет:");
+            String department = extractInfo(user.getInfo(), "Кафедра:");
+            String addInfo = extractInfo(user.getInfo(), "Дополнительная информация:");
+
+            // Вставляем данные только если они не пустые
+            if (!TextUtils.isEmpty(faculty)) {
+                teachersFaculty.setText(faculty);
+            }
+            if (!TextUtils.isEmpty(department)) {
+                teachersDepartment.setText(department);
+            }
+            if (!TextUtils.isEmpty(addInfo)) {
+                teachersInfo.setText(addInfo);
+            }
+        }
+    }
+
+
+
+
+
 
     /**
      * Метод для сохранения изменений профиля.
@@ -126,7 +224,18 @@ public class EditProfileActivity extends AppCompatActivity {
 
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
-        String informationConstruct = "Факультет: \n" + faculty + "\n" + "Кафедра: \n" + department + "\n" + "Дополнительная информация: \n" + info;
+        String informationConstruct = "";
+
+        if (!TextUtils.isEmpty(faculty)) {
+            informationConstruct += "Факультет: \n" + faculty + "\n";
+        }
+        if (!TextUtils.isEmpty(department)) {
+            informationConstruct += "Кафедра: \n" + department + "\n";
+        }
+        if (!TextUtils.isEmpty(info)) {
+            informationConstruct += "Дополнительная информация: \n" + info;
+        }
+
         Log.d("EditProfileActivity", "Information Construct: " + informationConstruct);
         editor.putString("user_info", informationConstruct).apply();
 
@@ -191,6 +300,8 @@ public class EditProfileActivity extends AppCompatActivity {
             actual_information.setVisibility(View.GONE);
         }
     }
+
+
 
     /**
      * Метод для отправки новой информации о студенте на сервер.

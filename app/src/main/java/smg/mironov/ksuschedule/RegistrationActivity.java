@@ -219,10 +219,13 @@ public class RegistrationActivity extends AppCompatActivity {
                     // Сохранение токена в SharedPreferences
                     assert registrationResponse != null;
                     String token = registrationResponse.getToken();
+                    long userId = registrationResponse.getUserId(); // Получение user_id
                     SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString("auth_token", token);
+                    editor.putLong("user_id", userId); // Сохранение user_id
                     editor.apply();
+
 
                     saveUserData(user);
 
@@ -249,7 +252,6 @@ public class RegistrationActivity extends AppCompatActivity {
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong("user_id", user.getId());
         editor.putString("user_lastName", user.getLastName());
         editor.putString("user_firstName", user.getFirstName());
         editor.putString("user_middleName", user.getMiddleName());

@@ -45,6 +45,7 @@ import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
 import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
+import smg.mironov.ksuschedule.Models.User;
 
 /**
  * Класс {@link ProfileActivity} отвечает за отображение и редактирование профиля пользователя.
@@ -109,12 +110,23 @@ public class ProfileActivity extends AppCompatActivity {
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        // Проверяем, какая тема была выбрана
+        boolean isDarkMode = preferences.getBoolean("dark_mode", false);
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile_screen);
 
-        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+
         token = "Bearer " + preferences.getString("auth_token", null);
         userEmail = preferences.getString("user_email", null);
+
+        // Загружаем данные пользователя с сервера
+        loadUserDataFromServer();
 
         // Настройка кнопок навигационной панели
         ImageView navButton1 = findViewById(R.id.teachers_icon);
@@ -212,6 +224,42 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void loadUserDataFromServer() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        Call<User> call = apiService.getUser(token, userEmail); // вызываем API метод
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    updateUIWithUserData(user);
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateUIWithUserData(User user) {
+        String userInfo = user.getInfo(); // предположим, что у вас есть такой метод
+
+
+        if ("TEACHER".equals(user.getRole())){
+            // Теперь установим информацию в соответствующий элемент UI
+            TextView infoTextView = findViewById(R.id.userGroupDirectionTitle); // замените на ваш реальный ID
+            infoTextView.setText(userInfo);
+
+        }
+    }
+
+
     /**
      * Метод для переключения на экран редактирования профиля.
      */
@@ -282,7 +330,7 @@ public class ProfileActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         // Сохраняем логин и пароль
-        boolean darkMode = sharedPreferences.getBoolean("dark_mode", false);
+        boolean darkMode = sharedPreferences.getBoolean("dark_mode", false); // Сохраните текущее состояние темы
         String savedEmail = sharedPreferences.getString("saved_email", null);
         String savedPassword = sharedPreferences.getString("saved_password", null);
 
@@ -294,14 +342,13 @@ public class ProfileActivity extends AppCompatActivity {
             editor.putString("saved_email", savedEmail);
             editor.putString("saved_password", savedPassword);
             editor.putBoolean("remember_me", true);
-            editor.putBoolean("dark_mode", false);
+            editor.putBoolean("dark_mode", darkMode); // Восстановите состояние темы
         }
 
         editor.apply();
 
         // Очистить расписание в MainActivity
         Intent intent = new Intent(this, MainActivity.class);
-        //intent.putExtra("clear_schedule", true);
         startActivity(intent);
 
         // Перейти к экрану входа
@@ -309,6 +356,7 @@ public class ProfileActivity extends AppCompatActivity {
         startActivity(loginIntent);
         finish();
     }
+
 
 
     /**
@@ -394,12 +442,14 @@ public class ProfileActivity extends AppCompatActivity {
         userMiddleName.setText(middleName);
         userGroupNumber.setText(groupNumber);
 
-        Bitmap profileBitmap = loadImageFromInternalStorage();
-        if (profileBitmap == null) {
-            fetchProfileImageFromServer();
-        } else {
-            profilePhoto.setImageBitmap(profileBitmap);
-        }
+        fetchProfileImageFromServer();
+
+//        Bitmap profileBitmap = loadImageFromInternalStorage();
+//        if (profileBitmap == null) {
+//            fetchProfileImageFromServer();
+//        } else {
+//            profilePhoto.setImageBitmap(profileBitmap);
+//        }
 
         if (role.equals("STUDENT")) {
             userGroupNumber.setText(groupNumber);
@@ -492,6 +542,8 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+
 
     /**
      * Метод для отправки изображения профиля на сервер.

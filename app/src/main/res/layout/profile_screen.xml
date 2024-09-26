@@ -179,6 +179,7 @@
                 android:layout_gravity="center_horizontal"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
+                android:layout_marginVertical="4dp"
                 android:visibility="gone">
 
                 <TextView
@@ -188,7 +189,7 @@
                     android:fontFamily="@font/involve_regular"
                     android:text="Направление подготовки:"
                     android:textColor="@color/navbar_white_text"
-                    android:textSize="11sp"
+                    android:textSize="14sp"
                     android:gravity="center"
                     android:textAlignment="center"/>
 
@@ -200,7 +201,7 @@
                     android:gravity="center_horizontal"
                     android:text="09.03.01 Информатика и вычислительная техника"
                     android:textColor="@color/navbar_white_text"
-                    android:textSize="11sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/userGroupProfileTitle"
@@ -210,7 +211,7 @@
                     android:fontFamily="@font/involve_regular"
                     android:text="Профиль:"
                     android:textColor="@color/navbar_white_text"
-                    android:textSize="11sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/userGroupProfile"
@@ -220,7 +221,7 @@
                     android:gravity="center_horizontal"
                     android:text="Автоматизированные системы обработки информации"
                     android:textColor="@color/navbar_white_text"
-                    android:textSize="11sp" />
+                    android:textSize="14sp" />
 
                 <LinearLayout
                     android:id="@+id/editButton"
@@ -257,6 +258,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:src="@drawable/chewron_down_white_borders">
             </ImageView>
         </LinearLayout>

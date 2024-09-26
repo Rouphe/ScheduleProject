@@ -42,7 +42,7 @@
                 android:layout_marginStart="19dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="19dp"
-                android:background="@drawable/custom_edit_button_profile_item"
+                android:background="@android:color/transparent"
                 android:fontFamily="@font/involve_regular"
                 android:hint="Имя..."
                 android:textColor="@color/colorSecondary"
@@ -58,7 +58,7 @@
                 android:layout_marginStart="19dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="19dp"
-                android:background="@drawable/custom_edit_button_profile_item"
+                android:background="@android:color/transparent"
                 android:fontFamily="@font/involve_regular"
                 android:hint="Фамилия..."
                 android:textColor="@color/colorSecondary"
@@ -75,7 +75,7 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="19dp"
                 android:layout_marginBottom="12dp"
-                android:background="@drawable/custom_edit_button_profile_item"
+                android:background="@android:color/transparent"
                 android:fontFamily="@font/involve_regular"
                 android:hint="Отчество..."
                 android:textColor="@color/colorSecondary"
@@ -116,89 +116,98 @@
                 android:background="@drawable/custom_registr_semcorners_item"
                 android:orientation="vertical">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="9dp"
-                    android:layout_marginTop="7dp"
-                    android:fontFamily="@font/involve_regular"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:text="Факультет:"
-                    android:textColor="#C0CEFF"
-                    android:textSize="16dp"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/involve_regular"
+                        android:background="@drawable/custom_edit_button_profile_item"
+                        android:text="Факультет:"
+                        android:textColor="#C0CEFF"
+                        android:textSize="16dp"
+                        android:paddingVertical="2dp"
+                        android:paddingHorizontal="5dp"/>
 
-                <EditText
-                    android:id="@+id/teachersFacultyEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:layout_marginStart="9dp"
-                    android:layout_marginVertical="8dp"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:fontFamily="@font/involve_regular"
-                    android:hint="..."
-                    android:textColorHint="#8194D9"
-                    android:textSize="16dp"
-                    android:textColor="#C0CEFF"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
+                    <EditText
+                        android:id="@+id/teachersFacultyEdit"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/involve_regular"
+                        android:textColorHint="#8194D9"
+                        android:textSize="16dp"
+                        android:textColor="#C0CEFF"
+                        android:inputType="textShortMessage"/>
+                </LinearLayout>
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="9dp"
-                    android:fontFamily="@font/involve_regular"
-                    android:text="Кафедра:"
-                    android:textColor="#C0CEFF"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:textSize="16dp"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
-
-                <EditText
-                    android:id="@+id/teacherDepartmentEdit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:layout_marginStart="9dp"
-                    android:layout_marginTop="6dp"
-                    android:layout_marginBottom="6dp"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:fontFamily="@font/involve_regular"
-                    android:hint="..."
-                    android:textColorHint="#8194D9"
-                    android:textSize="16dp"
-                    android:textColor="#C0CEFF"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
-
-                <TextView
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="9dp"
-                    android:fontFamily="@font/involve_regular"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:text="Дополнительная информация:"
-                    android:textColor="#C0CEFF"
-                    android:textSize="16dp"
-                    android:layout_marginVertical="6dp"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/involve_regular"
+                        android:text="Кафедра:"
+                        android:textColor="#C0CEFF"
+                        android:background="@drawable/custom_edit_button_profile_item"
+                        android:textSize="16dp"
+                        android:paddingVertical="2dp"
+                        android:paddingHorizontal="5dp"/>
 
-                <EditText
-                    android:id="@+id/teachersInfoEdit"
+                    <EditText
+                        android:id="@+id/teacherDepartmentEdit"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/involve_regular"
+                        android:textColorHint="#8194D9"
+                        android:textSize="16sp"
+                        android:textColor="#C0CEFF"
+                        android:inputType="textShortMessage"/>
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
-                    android:layout_height="25dp"
-                    android:layout_marginStart="9dp"
-                    android:layout_marginBottom="6dp"
-                    android:background="@drawable/custom_edit_button_profile_item"
-                    android:fontFamily="@font/involve_regular"
-                    android:hint="..."
-                    android:textColorHint="#8194D9"
-                    android:textSize="16dp"
-                    android:textColor="#C0CEFF"
-                    android:paddingVertical="2dp"
-                    android:paddingHorizontal="5dp"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/involve_regular"
+                        android:background="@drawable/custom_edit_button_profile_item"
+                        android:text="Доп. информация:"
+                        android:textColor="#C0CEFF"
+                        android:textSize="16sp"
+                        android:layout_marginVertical="6dp"
+                        android:paddingVertical="2dp"
+                        android:paddingHorizontal="5dp"/>
+
+                    <EditText
+                        android:id="@+id/teachersInfoEdit"
+                        android:layout_width="250dp"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/involve_regular"
+                        android:textColorHint="#8194D9"
+                        android:textSize="16sp"
+                        android:textColor="#C0CEFF"
+                        android:inputType="textShortMessage"/>
+                </LinearLayout>
+
+
+
+
             </LinearLayout>
 
         </LinearLayout>
