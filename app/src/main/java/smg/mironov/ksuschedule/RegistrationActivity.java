@@ -172,11 +172,11 @@ public class RegistrationActivity extends AppCompatActivity {
      * Проверяет корректность введенных данных и отправляет запрос на сервер для регистрации.
      */
     private void registerUser() {
-        String surname = surnameEditText.getText().toString();
-        String name = nameEditText.getText().toString();
-        String midName = midNameEditText.getText().toString();
-        String email = emailEditText.getText().toString();
-        String password = passwordEditText.getText().toString();
+        String surname = surnameEditText.getText().toString().trim();
+        String name = nameEditText.getText().toString().trim();
+        String midName = midNameEditText.getText().toString().trim();
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
 
         if (TextUtils.isEmpty(surname) || TextUtils.isEmpty(name) || TextUtils.isEmpty(midName) ||
                 TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
@@ -192,8 +192,8 @@ public class RegistrationActivity extends AppCompatActivity {
         // Создаем пользователя в зависимости от выбранной роли
         User user;
         if ("STUDENT".equals(selectedRole)) {
-            String groupNumber = groupNumberEditText.getText().toString();
-            String subgroupNumber = subgroupNumberEditText.getText().toString();
+            String groupNumber = groupNumberEditText.getText().toString().trim();
+            String subgroupNumber = subgroupNumberEditText.getText().toString().trim();
             user = new User(name, surname, midName, email, password, groupNumber, subgroupNumber, selectedRole);
         } else {
             user = new User(name, surname, midName, email, password, null, null, selectedRole);
@@ -252,14 +252,14 @@ public class RegistrationActivity extends AppCompatActivity {
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("user_lastName", user.getLastName());
-        editor.putString("user_firstName", user.getFirstName());
-        editor.putString("user_middleName", user.getMiddleName());
-        editor.putString("user_email", user.getEmail());
-        editor.putString("user_password", user.getPassword());
-        editor.putString("user_groupNumber", user.getGroup_number());
-        editor.putString("user_subgroupNumber", user.getSubgroup_number());
-        editor.putString("user_role", user.getRole());
+        editor.putString("user_lastName", user.getLastName().trim());
+        editor.putString("user_firstName", user.getFirstName().trim());
+        editor.putString("user_middleName", user.getMiddleName().trim());
+        editor.putString("user_email", user.getEmail().trim());
+        editor.putString("user_password", user.getPassword().trim());
+        editor.putString("user_groupNumber", user.getGroup_number().trim());
+        editor.putString("user_subgroupNumber", user.getSubgroup_number().trim());
+        editor.putString("user_role", user.getRole().trim());
         editor.apply();
     }
 }

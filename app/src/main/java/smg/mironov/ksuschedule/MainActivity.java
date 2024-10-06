@@ -41,6 +41,7 @@ import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.User;
+import smg.mironov.ksuschedule.Utils.NetworkUtils;
 
 
 /**
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        serverError = findViewById(R.id.server_error);
 
         user = loadUserData();
 
@@ -85,6 +87,10 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             //finish();
             return;
+        }
+
+        if (!NetworkUtils.isNetworkConnected(this)){
+            finish();
         }
 
         // Получаем SharedPreferences

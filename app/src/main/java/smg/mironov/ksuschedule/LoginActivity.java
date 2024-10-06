@@ -121,12 +121,10 @@ public class LoginActivity extends AppCompatActivity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         // Восстановление данных пользователя
-        if (savedInstanceState != null) {
-            String savedEmail = savedInstanceState.getString("email");
-            String savedPassword = savedInstanceState.getString("password");
-            emailEditText.setText(savedEmail);
-            passwordEditText.setText(savedPassword);
-        }
+        String savedEmail = savedInstanceState.getString("email");
+        String savedPassword = savedInstanceState.getString("password");
+        emailEditText.setText(savedEmail);
+        passwordEditText.setText(savedPassword);
     }
 
 
