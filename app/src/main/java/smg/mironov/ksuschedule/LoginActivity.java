@@ -27,6 +27,7 @@ import retrofit2.Response;
 import smg.mironov.ksuschedule.API.ApiClient;
 import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Utils.AuthRequest;
+import smg.mironov.ksuschedule.Utils.NetworkUtils;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
 import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.SimpleTextWatcher;
@@ -68,7 +69,7 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = getIntent();
         boolean fromMainActivity = intent.getBooleanExtra("from_main_activity", false);
 
-        if (token != null && isTokenValid(token)) {
+        if (token != null && isTokenValid(token) && NetworkUtils.isNetworkConnected(this)) {
             loadUserData();
             navigateToMainActivity();
             return;

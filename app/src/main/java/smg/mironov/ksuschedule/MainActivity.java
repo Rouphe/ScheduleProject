@@ -82,16 +82,12 @@ public class MainActivity extends AppCompatActivity {
         user = loadUserData();
 
         if (user == null && !isTokenValid(token)) {
-            //Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-            startActivity(intent);
-            //finish();
-            return;
+            logout();
         }
 
-        if (!NetworkUtils.isNetworkConnected(this)){
-            finish();
-        }
+        //if (!NetworkUtils.isNetworkConnected(this)){
+        //    logout();
+        //}
 
         // Получаем SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -122,21 +118,35 @@ public class MainActivity extends AppCompatActivity {
 
 
         TextView groupNumberTextView = findViewById(R.id.group_number);
-        if (Objects.equals(user.getRole(), "TEACHER")) {
-            groupNumberTextView.setVisibility(View.INVISIBLE);
-            TextView teacherName = findViewById(R.id.Group);
-            teacherName.setText(user.getLastName() + " " + user.getFirstName());
+        if ((NetworkUtils.isNetworkConnected(this) || isTokenValid(token)) && user.getRole() != null){
+            if (Objects.equals(user.getRole(), "TEACHER")) {
+                groupNumberTextView.setVisibility(View.INVISIBLE);
+                TextView teacherName = findViewById(R.id.Group);
+                teacherName.setText(user.getLastName() + " " + user.getFirstName());
+
+            }
+        }
+        else {
+            Toast.makeText(MainActivity.this, "Отсутствует подключение к интернету", Toast.LENGTH_LONG).show();
+            logout();
         }
 
         groupNumberTextView.setText(user.getGroup_number());
+
+
+
         subgroupSpinner = findViewById(R.id.Subgroup);
 
 
         // Извлечение и установка четности недели в TextView
         //parity.setText(currentParity);
-
-        if (user.getRole().equals("TEACHER")) {
-            subgroupSpinner.setVisibility(View.INVISIBLE);
+        if (NetworkUtils.isNetworkConnected(this)){
+            if (user.getRole().equals("TEACHER")) {
+                subgroupSpinner.setVisibility(View.INVISIBLE);
+            }
+        }
+        else {
+            logout();
         }
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -165,8 +175,15 @@ public class MainActivity extends AppCompatActivity {
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
-        if (user.getRole().equals("STUDENT"))
-            fetchSubgroups();
+        if (NetworkUtils.isNetworkConnected(this) || isTokenValid(token)){
+            if (user.getRole().equals("STUDENT")){
+                fetchSubgroups();
+            }
+        }
+        else {
+            logout();
+        }
+
 
         navButton1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,8 +217,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // Получение данных с сервера
-        fetchScheduleFromServer();
+        if (NetworkUtils.isNetworkConnected(this)){
+            // Получение данных с сервера
+            fetchScheduleFromServer();
+        }
+        else {
+            logout();
+        }
+
     }
 
     @Override
@@ -304,13 +327,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
                 SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-                if (!(Objects.equals(preferences.getString("user_role", null), "TEACHER"))){
-                    Toast.makeText(MainActivity.this, "Ошибка при получении подгрупп: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    intent.putExtra("from_main_activity", true);
-                    startActivity(intent);
-                    //finish();
-                }
+
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.putExtra("from_main_activity", true);
+                startActivity(intent);
+                finish();
             }
         });
     }
@@ -337,10 +358,10 @@ public class MainActivity extends AppCompatActivity {
                     scheduleAdapter.updateScheduleList(uniqueScheduleList);
                     Log.d("MainActivity", "Schedule loaded successfully");
                 } else {
-//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//                    intent.putExtra("from_main_activity", true);
-//                    startActivity(intent);
-                    //finish();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    intent.putExtra("from_main_activity", true);
+                    startActivity(intent);
+                    finish();
                     serverError = findViewById(R.id.server_error);
                     serverError.setVisibility(View.VISIBLE);
 
@@ -354,7 +375,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.putExtra("from_main_activity", true);
                 startActivity(intent);
-                //finish();
+                finish();
             }
         };
 
@@ -428,11 +449,23 @@ public class MainActivity extends AppCompatActivity {
             long exp = jsonObject.getLong("exp");
 
             // Проверка срока действия
-            long currentTime = System.currentTimeMillis() / (1000 * 60 * 60 * 24) ;
+            //long currentTime = System.currentTimeMillis() / (1000 * 60 * 60 * 24) ;
+            long currentTime = System.currentTimeMillis();
             return exp > currentTime;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private void logout() {
+        // Очистить расписание в MainActivity
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+
+        // Перейти к экрану входа
+        Intent loginIntent = new Intent(this, LoginActivity.class);
+        startActivity(loginIntent);
+        finish();
     }
 }
