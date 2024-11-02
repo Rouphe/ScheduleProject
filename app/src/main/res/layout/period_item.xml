@@ -16,8 +16,8 @@
 
         <TextView
             android:id="@+id/FirstTimeStartAndEnd"
-            android:layout_width="31dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:fontFamily="@font/involve_medium"
             android:gravity="center"
@@ -61,6 +61,10 @@
             android:layout_height="wrap_content"
             android:text="Водолад С.Н. Декан"
             android:textSize="10dp"
+            android:maxLines="4"
+            android:ellipsize="end"
+            android:breakStrategy="high_quality"
+            android:scrollHorizontally="false"
             android:textColor="?attr/colorBackgroundFloating"
             android:fontFamily="@font/involve_regular" />
 

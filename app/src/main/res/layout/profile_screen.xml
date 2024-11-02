@@ -14,7 +14,7 @@
         android:background="@drawable/custom_profile_cap_item"
         android:padding="16dp">
 
-        <LinearLayout
+        <!-- <LinearLayout
             android:id="@+id/settings_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                 android:textSize="10sp"
                 android:textColor="@color/navbar_white_text"
                 android:text="Настройки"/>
-        </LinearLayout>
+        </LinearLayout> -->
 
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -265,41 +265,107 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/spinners"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/custom_new_features_soon"
-        android:layout_gravity="center_horizontal"
         android:orientation="vertical"
-        android:layout_marginTop="15dp">
+        android:layout_marginTop="16dp"
+        android:gravity="center_horizontal">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Скоро здесь что-то появится..."
-            android:fontFamily="@font/involve_medium"
-            android:textSize="16dp"
-            android:textColor="?attr/colorButtonNormal"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:layout_marginHorizontal="40dp">
-        </TextView>
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/wrench"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginVertical="8dp">
-        </ImageView>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Новые функции в разработке :)"
             android:fontFamily="@font/involve_regular"
-            android:textSize="13dp"
-            android:textColor="?attr/colorButtonNormal"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="20dp">
-        </TextView>
+            android:text="Выберите факультет:"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="14sp" />
+
+        <Spinner
+            android:id="@+id/facultySpinner"
+            android:layout_width="281dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_spinner_background"
+            android:padding="10dp"
+            android:dropDownHeight="200dp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/involve_regular"
+            android:text="Выберите группу по умолчанию:"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp"/>
+
+        <Spinner
+            android:id="@+id/groupSpinner"
+            android:layout_width="281dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_spinner_background"
+            android:padding="10dp"
+            android:dropDownHeight="200dp"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/involve_regular"
+            android:text="Выберите подгруппу по умолчанию::"
+            android:textColor="?attr/colorOnBackground"
+            android:textSize="14sp"
+            android:layout_marginTop="16dp" />
+
+        <Spinner
+            android:id="@+id/subgroupSpinner"
+            android:layout_width="281dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/custom_spinner_background"
+            android:padding="10dp"
+            android:dropDownHeight="250dp"
+            android:layout_marginTop="8dp"/>
+
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/changeTheme"
+        android:layout_width="281dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/custom_blue_semcorners_item"
+        android:orientation="horizontal"
+        android:paddingHorizontal="5dp"
+        android:layout_marginTop="15dp"
+        android:layout_gravity="center_horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Сменить тему"
+            android:layout_gravity="center_vertical"
+            android:fontFamily="@font/involve_semibold"
+            android:textColor="?attr/colorButtonNormal"
+            android:padding="10dp"/>
+        <ImageView
+            android:id="@+id/moon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/moon"
+            android:layout_gravity="center_vertical"
+            android:padding="7dp"
+            android:layout_marginLeft="100dp"
+            android:visibility="gone"/>
+        <ImageView
+            android:id="@+id/sun"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/sun"
+            android:layout_gravity="center_vertical"
+            android:padding="7dp"
+            android:layout_marginLeft="100dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+
+
+
+
 
     <Space
         android:layout_width="wrap_content"

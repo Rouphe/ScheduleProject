@@ -26,6 +26,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import smg.mironov.ksuschedule.API.ApiClient;
 import smg.mironov.ksuschedule.API.ApiService;
+import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.Utils.AuthRequest;
 import smg.mironov.ksuschedule.Utils.NetworkUtils;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
@@ -67,17 +68,19 @@ public class LoginActivity extends AppCompatActivity {
         token = preferences.getString("auth_token", null);
 
         Intent intent = getIntent();
-        boolean fromMainActivity = intent.getBooleanExtra("from_main_activity", false);
 
-        if (token != null && isTokenValid(token) && NetworkUtils.isNetworkConnected(this)) {
-            loadUserData();
-            navigateToMainActivity();
-            return;
-        } else if (fromMainActivity && savedEmail != null && savedPassword != null) {
+        boolean fromMainError = intent.getBooleanExtra("from_main_activity_error", false);
+        boolean isLogout = intent.getBooleanExtra("logout", false);
+
+
+        if (fromMainError && savedEmail != null && savedPassword != null){
             AuthRequest authRequest = new AuthRequest(savedEmail, savedPassword);
             sendAuthResponse(authRequest);
             return;
-        } else if (savedEmail != null && savedPassword != null) {
+        } else if (isLogout && savedEmail != null && savedPassword != null) {
+            emailEditText.setText(savedEmail);
+            passwordEditText.setText(savedPassword);
+        } else if(savedEmail != null && savedPassword != null) {
             emailEditText.setText(savedEmail);
             passwordEditText.setText(savedPassword);
         }
@@ -213,6 +216,30 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+    private void getGroupByNumber(String groupNumber) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<GroupDto> call = apiService.getGroupByNumber(groupNumber);
+
+        call.enqueue(new Callback<GroupDto>() {
+            @Override
+            public void onResponse(Call<GroupDto> call, Response<GroupDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    GroupDto groupDto = response.body();
+                    String faculty = groupDto.getFacultyDto().getFacultyName();
+                    SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString("user_faculty", faculty);
+                    editor.apply();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GroupDto> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -221,6 +248,12 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("user_firstName", user.getFirstName());
         editor.putString("user_middleName", user.getMiddleName());
         editor.putString("user_email", user.getEmail());
+        if (user.getFacultyDto() != null){
+            editor.putString("user_faculty", user.getFacultyDto().getFacultyName());
+        }
+        else if (user.getGroup_number() != null){
+            getGroupByNumber(user.getGroup_number());
+        }
         editor.putString("user_password", user.getPassword());
         editor.putString("user_groupNumber", user.getGroup_number());
         editor.putString("user_subgroupNumber", user.getSubgroup_number());

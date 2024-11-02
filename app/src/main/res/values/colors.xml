@@ -19,6 +19,7 @@
     <!-- Темная тема -->
     <color name="bg_dark">#000A2D</color>
     <color name="colorPrimary_dark">#001D82</color>
+    <color name="colorPairIsNow_dark">#022293</color>
     <color name="text_dark">#C0CEFF</color>
     <color name="colorSecondary_dark">#001355</color>
     <color name="textSecondary_dark">#A0B4FE</color>

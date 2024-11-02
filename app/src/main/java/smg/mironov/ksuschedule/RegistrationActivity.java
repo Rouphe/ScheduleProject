@@ -1,53 +1,39 @@
 package smg.mironov.ksuschedule;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.Manifest;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.text.method.HideReturnsTransformationMethod;
-import android.text.method.PasswordTransformationMethod;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
-import okhttp3.MediaType;
-import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import smg.mironov.ksuschedule.API.ApiClient;
 import smg.mironov.ksuschedule.API.ApiService;
+import smg.mironov.ksuschedule.Models.Faculty;
+import smg.mironov.ksuschedule.Models.GroupDto;
+import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.Utils.RegistrationResponse;
-import smg.mironov.ksuschedule.Utils.UserData;
 
 /**
  * Класс {@link RegistrationActivity} отвечает за процесс регистрации пользователя.
@@ -92,6 +78,10 @@ public class RegistrationActivity extends AppCompatActivity {
     /** Чекбокс для отображения пароля */
     private CheckBox showPasswordCheckbox;
 
+    private Spinner subgroupSpinner;
+    private Spinner facultySpinner;
+    private Spinner groupSpinner;
+
     @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,8 +91,9 @@ public class RegistrationActivity extends AppCompatActivity {
         surnameEditText = findViewById(R.id.surname);
         nameEditText = findViewById(R.id.name);
         midNameEditText = findViewById(R.id.mid_name);
-        groupNumberEditText = findViewById(R.id.group_number_for_reg);
-        subgroupNumberEditText = findViewById(R.id.subgroup_number_for_reg);
+        //groupNumberEditText = findViewById(R.id.group_number_for_reg);
+        //subgroupNumberEditText = findViewById(R.id.subgroup_number_for_reg);
+        subgroupSpinner = findViewById(R.id.subgroup_number_for_reg);
         emailEditText = findViewById(R.id.Email);
         passwordEditText = findViewById(R.id.Password);
         registerButton = findViewById(R.id.register_button);
@@ -112,6 +103,12 @@ public class RegistrationActivity extends AppCompatActivity {
         teacherRoleBg = findViewById(R.id.teacher);
         teacherRoleTitle = findViewById(R.id.teacherRoleTitle);
         studentRoleTitle = findViewById(R.id.studentRoleTitle);
+        facultySpinner = findViewById(R.id.faculty);
+        groupSpinner = findViewById(R.id.group_for_reg);
+
+        fetchFaculties();
+
+
 
         studentRole.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,7 +133,141 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
+        facultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedFaculty = facultySpinner.getSelectedItem().toString();
+                fetchGroups(selectedFaculty);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle if needed
+            }
+        });
+
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedGroup = groupSpinner.getSelectedItem().toString();
+                fetchSubgroups(selectedGroup);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle if needed
+            }
+        });
+
+
     }
+
+    private void fetchGroups(String facultyName) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<GroupDto>> call = apiService.getGroupsByFaculty(facultyName); // Assuming your API returns groups by faculty
+
+        call.enqueue(new Callback<List<GroupDto>>() {
+            @Override
+            public void onResponse(Call<List<GroupDto>> call, Response<List<GroupDto>> response) {
+                if (response.isSuccessful()) {
+                    List<GroupDto> groups = response.body();
+                    if (groups != null) {
+                        populateGroupSpinner(groups);
+                    }
+                } else {
+                    Toast.makeText(RegistrationActivity.this, "Ошибка получения групп", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<GroupDto>> call, Throwable t) {
+                Toast.makeText(RegistrationActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+    private void fetchSubgroups(String groupNumber) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(groupNumber); // Assuming the response is a list of subgroups
+
+        call.enqueue(new Callback<List<SubgroupDto>>() {
+            @Override
+            public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
+                if (response.isSuccessful()) {
+                    List<SubgroupDto> subgroups = response.body();
+                    if (subgroups != null) {
+                        populateSubgroupSpinner(subgroups);
+                    }
+                } else {
+                    Toast.makeText(RegistrationActivity.this, "Ошибка получения подгрупп", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
+                Toast.makeText(RegistrationActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchFaculties() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<Faculty>> call = apiService.getAllFaculties();
+
+        call.enqueue(new Callback<List<Faculty>>() {
+            @Override
+            public void onResponse(Call<List<Faculty>> call, Response<List<Faculty>> response) {
+                if (response.isSuccessful()){
+                    List<Faculty> faculties = response.body();
+                    if (faculties != null){
+                        populateFacultySpinner(faculties);
+                    }
+                }
+                else {
+                    Toast.makeText(RegistrationActivity.this, "Ошибка получения факультетов", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Faculty>> call, Throwable t) {
+                Toast.makeText(RegistrationActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void populateFacultySpinner(List<Faculty> faculties) {
+        ArrayAdapter<Faculty> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, faculties);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_reg);
+        facultySpinner.setAdapter(adapter);
+    }
+
+
+    private void populateSubgroupSpinner(List<SubgroupDto> subgroups) {
+        List<String> subgroupNumbers = new ArrayList<>();
+        for (SubgroupDto subgroup : subgroups) {
+            subgroupNumbers.add(subgroup.getNumber());
+        }
+
+        // Используйте уже созданный subgroupSpinner
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, subgroupNumbers);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_reg);
+        subgroupSpinner.setAdapter(adapter);
+    }
+
+    private void populateGroupSpinner(List<GroupDto> groups) {
+        List<String> groupNumbers = new ArrayList<>();
+        for (GroupDto group : groups) {
+            groupNumbers.add(group.getNumber());
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, groupNumbers);
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_reg);
+        groupSpinner.setAdapter(adapter);
+    }
+
+
 
     /**
      * Метод для обновления отображения выбранной роли.
@@ -147,8 +278,9 @@ public class RegistrationActivity extends AppCompatActivity {
             studentRoleBg.setBackgroundResource(R.drawable.custom_registr_semcorners_item);
             studentRoleTitle.setTextColor(Color.parseColor("#DAE2FF"));
 
-            groupNumberEditText.setVisibility(View.VISIBLE);
-            subgroupNumberEditText.setVisibility(View.VISIBLE);
+            groupSpinner.setVisibility(View.VISIBLE);
+            subgroupSpinner.setVisibility(View.VISIBLE);
+            facultySpinner.setVisibility(View.VISIBLE);
 
             teacherRole.setColorFilter(Color.parseColor("#0229B3"));
             teacherRoleBg.setBackgroundResource(R.drawable.custom_white_semcorners_item);
@@ -158,8 +290,9 @@ public class RegistrationActivity extends AppCompatActivity {
             teacherRoleBg.setBackgroundResource(R.drawable.custom_registr_semcorners_item);
             teacherRoleTitle.setTextColor(Color.parseColor("#DAE2FF"));
 
-            groupNumberEditText.setVisibility(View.GONE);
-            subgroupNumberEditText.setVisibility(View.GONE);
+            groupSpinner.setVisibility(View.GONE);
+            subgroupSpinner.setVisibility(View.GONE);
+            facultySpinner.setVisibility(View.GONE);
 
             studentRole.setColorFilter(Color.parseColor("#0229B3")); // Сброс цвета иконки
             studentRoleBg.setBackgroundResource(R.drawable.custom_white_semcorners_item);
@@ -192,9 +325,10 @@ public class RegistrationActivity extends AppCompatActivity {
         // Создаем пользователя в зависимости от выбранной роли
         User user;
         if ("STUDENT".equals(selectedRole)) {
-            String groupNumber = groupNumberEditText.getText().toString().trim();
-            String subgroupNumber = subgroupNumberEditText.getText().toString().trim();
-            user = new User(name, surname, midName, email, password, groupNumber, subgroupNumber, selectedRole);
+            String selectedGroupNumber = (String) groupSpinner.getSelectedItem();
+            String selectedSubgroupNumber = (String) subgroupSpinner.getSelectedItem();
+            Faculty faculty = (Faculty) facultySpinner.getSelectedItem();
+            user = new User(name, surname, midName, email, password, selectedGroupNumber, selectedSubgroupNumber, faculty, selectedRole);
         } else {
             user = new User(name, surname, midName, email, password, null, null, selectedRole);
         }
@@ -252,14 +386,27 @@ public class RegistrationActivity extends AppCompatActivity {
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("user_lastName", user.getLastName().trim());
-        editor.putString("user_firstName", user.getFirstName().trim());
-        editor.putString("user_middleName", user.getMiddleName().trim());
-        editor.putString("user_email", user.getEmail().trim());
-        editor.putString("user_password", user.getPassword().trim());
-        editor.putString("user_groupNumber", user.getGroup_number().trim());
-        editor.putString("user_subgroupNumber", user.getSubgroup_number().trim());
-        editor.putString("user_role", user.getRole().trim());
-        editor.apply();
+        if (Objects.equals(user.getRole(), "TEACHER")){
+            editor.putString("user_lastName", user.getLastName().trim());
+            editor.putString("user_firstName", user.getFirstName().trim());
+            editor.putString("user_middleName", user.getMiddleName().trim());
+            editor.putString("user_email", user.getEmail().trim());
+            editor.putString("user_password", user.getPassword().trim());
+            editor.putString("user_role", user.getRole().trim());
+            editor.apply();
+        }
+        else {
+            editor.putString("user_lastName", user.getLastName().trim());
+            editor.putString("user_firstName", user.getFirstName().trim());
+            editor.putString("user_middleName", user.getMiddleName().trim());
+            editor.putString("user_email", user.getEmail().trim());
+            editor.putString("user_password", user.getPassword().trim());
+            editor.putString("user_groupNumber", user.getGroup_number().trim());
+            editor.putString("user_subgroupNumber", user.getSubgroup_number().trim());
+            editor.putString("user_faculty", user.getFacultyDto().getFacultyName().trim());
+            editor.putString("user_role", user.getRole().trim());
+            editor.apply();
+        }
+
     }
 }

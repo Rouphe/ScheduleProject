@@ -10,8 +10,8 @@ android {
         applicationId = "smg.mironov.ksuschedule"
         minSdk = 26
         targetSdk = 34
-        versionCode = 13
-        versionName = "1.2.4"
+        versionCode = 15
+        versionName = "1.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

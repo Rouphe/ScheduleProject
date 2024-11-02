@@ -1,5 +1,6 @@
 package smg.mironov.ksuschedule;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,6 +30,7 @@ import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -67,27 +69,28 @@ public class MainActivity extends AppCompatActivity {
     private TextView parity;
     /** Объект {@link User} для хранения данных пользователя */
     private User user;
-
+    private DayWeekAdapter dayWeekAdapter;
     /** Токен аутентификации */
     private String token;
 
     private LinearLayout serverError;
+    /** Объект для работы с SharedPreferences */
+    private SharedPreferences sharedPreferences;
 
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        serverError = findViewById(R.id.server_error);
+
+
+
+        sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
 
         user = loadUserData();
 
         if (user == null && !isTokenValid(token)) {
             logout();
         }
-
-        //if (!NetworkUtils.isNetworkConnected(this)){
-        //    logout();
-        //}
 
         // Получаем SharedPreferences
         SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -101,46 +104,64 @@ public class MainActivity extends AppCompatActivity {
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_screen);
+        serverError = findViewById(R.id.server_error);
+
 
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         token = "Bearer " + preferences.getString("auth_token", null);
 
-        SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-        String currentParity = updatedPreferences.getString("parity", "Нет данных");
+        saveCurrentParity();
+
+
+        Spinner editTextWeek = findViewById(R.id.editTextWeek);
+        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item_settings, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
+        editTextWeek.setAdapter(spinnerAdapter);
+
+        // Устанавливаем значение Spinner из SharedPreferences
+        String savedParity = sharedPreferences.getString("parity", null);
+        if (savedParity != null) {
+            int spinnerPosition = spinnerAdapter.getPosition(savedParity);
+            editTextWeek.setSelection(spinnerPosition);
+        }
 
 
 
-        parity = findViewById(R.id.weekType);
-
-        //saveCurrentParity();
-
-        updateParityUI();
 
 
         TextView groupNumberTextView = findViewById(R.id.group_number);
-        if ((NetworkUtils.isNetworkConnected(this) || isTokenValid(token)) && user.getRole() != null){
+        if (user != null) {
             if (Objects.equals(user.getRole(), "TEACHER")) {
+                // Для учителя прячем поле с номером группы
                 groupNumberTextView.setVisibility(View.INVISIBLE);
+
                 TextView teacherName = findViewById(R.id.Group);
                 teacherName.setText(user.getLastName() + " " + user.getFirstName());
-
+            } else if (Objects.equals(user.getRole(), "STUDENT")) {
+                if (user.getGroup_number() != null) {
+                    groupNumberTextView.setText(user.getGroup_number());
+                } else {
+                    Log.e("MainActivity", "User group number is null");
+                    Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+                    logout();  // Переход на логин, если группа не найдена для студента
+                }
+            } else {
+                Log.e("MainActivity", "Unknown user role: " + user.getRole());
+                Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+                logout();
             }
-        }
-        else {
-            Toast.makeText(MainActivity.this, "Отсутствует подключение к интернету", Toast.LENGTH_LONG).show();
+        } else {
+            Log.e("MainActivity", "User is null");
+            Toast.makeText(this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
             logout();
         }
 
-        groupNumberTextView.setText(user.getGroup_number());
 
 
 
         subgroupSpinner = findViewById(R.id.Subgroup);
 
 
-        // Извлечение и установка четности недели в TextView
-        //parity.setText(currentParity);
-        if (NetworkUtils.isNetworkConnected(this)){
+        if (NetworkUtils.isNetworkConnected(this) && user != null){
             if (user.getRole().equals("TEACHER")) {
                 subgroupSpinner.setVisibility(View.INVISIBLE);
             }
@@ -172,10 +193,15 @@ public class MainActivity extends AppCompatActivity {
         spinnerAdapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
         subgroupSpinner.setAdapter(spinnerAdapter);
 
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        dayWeekAdapter = new DayWeekAdapter(this);
+        recyclerView.setAdapter(dayWeekAdapter);
+
+
 
         apiService = ApiClient.getClient().create(ApiService.class);
 
-        if (NetworkUtils.isNetworkConnected(this) || isTokenValid(token)){
+        if (NetworkUtils.isNetworkConnected(this) || user != null){
             if (user.getRole().equals("STUDENT")){
                 fetchSubgroups();
             }
@@ -207,9 +233,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedSubgroup = (String) parent.getItemAtPosition(position);
+                String savedParity = sharedPreferences.getString("parity", null);
                 changeSubgroup(selectedSubgroup); // Сохранение выбранной подгруппы
                 // Вызов метода для загрузки расписания по новой подгруппе
-                fetchScheduleFromServer();
+                fetchScheduleFromServer(savedParity);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedValue = (String) parent.getItemAtPosition(position);
+                changeParity(selectedValue);
+                fetchScheduleFromServer(selectedValue);
             }
 
             @Override
@@ -219,10 +259,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (NetworkUtils.isNetworkConnected(this)){
             // Получение данных с сервера
-            fetchScheduleFromServer();
+            fetchScheduleFromServer(savedParity);
         }
         else {
             logout();
+        }
+        // Получение всех значений
+        Map<String, ?> allEntries = sharedPreferences.getAll();
+
+        // Вывод в логи
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Log.d("SharedPreferences", entry.getKey() + ": " + entry.getValue().toString());
         }
 
     }
@@ -232,31 +279,29 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         // Ваш код, который будет выполнен при перезапуске активности
         Log.d("MainActivity", "Activity was restarted");
+        //logout();
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Обновляем UI с учетом текущего значения parity
-        updateParityUI();
-    }
 
-//    private void saveCurrentParity() {
-//        LocalDate today = LocalDate.now();
-//        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
-//        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
-//        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
-//
-//        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("parity", currentWeekParity);
-//        editor.apply();
-//    }
+    private void saveCurrentParity() {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
+        String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("parity", currentWeekParity);
+        editor.apply();
+    }
     LocalDate today = LocalDate.now();
     LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
     boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
     String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
+
+
+
 
     private void updateParityUI() {
         SharedPreferences updatedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
@@ -274,6 +319,7 @@ public class MainActivity extends AppCompatActivity {
         String firstName = preferences.getString("user_firstName", null);
         String middleName = preferences.getString("user_middleName", null);
         String email = preferences.getString("user_email", null);
+        String faculty = preferences.getString("user_faculty", null);
         String role = preferences.getString("user_role", null);
         String groupNumber = preferences.getString("user_groupNumber", null);
         String subgroupNumber = preferences.getString("user_subgroupNumber", null);
@@ -291,7 +337,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void fetchSubgroups() {
         String savedGroupNumber = user.getGroup_number();
-        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(token, savedGroupNumber);
+        Call<List<SubgroupDto>> call = apiService.getSubgroupsByGroupNumber(savedGroupNumber);
         call.enqueue(new Callback<List<SubgroupDto>>() {
             @Override
             public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
@@ -317,21 +363,13 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    intent.putExtra("from_main_activity", true);
-                    startActivity(intent);
-                    //finish();
+                    logout();
                 }
             }
 
             @Override
             public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
-                SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
-
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                intent.putExtra("from_main_activity", true);
-                startActivity(intent);
-                finish();
+                logout();
             }
         });
     }
@@ -339,7 +377,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Метод для получения расписания с сервера.
      */
-    private void fetchScheduleFromServer() {
+    private void fetchScheduleFromServer(String newParity) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
         String savedSubgroupNumber = user.getSubgroup_number();
         String role = user.getRole();
@@ -352,30 +390,31 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     refreshTokenIfNeeded(response);
                     List<DayWeek> scheduleList = response.body();
+
+                    // Убираем ошибку сервера, показываем расписание
+                    serverError.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+
+                    dayWeekAdapter.setFilterParity(newParity);
+                    dayWeekAdapter.updateScheduleList(scheduleList);
                     Set<DayWeek> uniqueScheduleSet = new HashSet<>(scheduleList);
                     List<DayWeek> uniqueScheduleList = new ArrayList<>(uniqueScheduleSet);
-
                     scheduleAdapter.updateScheduleList(uniqueScheduleList);
                     Log.d("MainActivity", "Schedule loaded successfully");
                 } else {
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    intent.putExtra("from_main_activity", true);
-                    startActivity(intent);
-                    finish();
-                    serverError = findViewById(R.id.server_error);
+                    // Ошибка - показываем плашку с ошибкой сервера и скрываем расписание
+                    recyclerView.setVisibility(View.GONE);
                     serverError.setVisibility(View.VISIBLE);
-
+                    Log.e("MainActivity", "Error loading schedule, showing server error message");
                 }
             }
 
             @Override
             public void onFailure(Call<List<DayWeek>> call, Throwable t) {
                 Log.e("MainActivity", "Error fetching schedule", t);
+                recyclerView.setVisibility(View.GONE);
+                serverError.setVisibility(View.VISIBLE);
                 Toast.makeText(MainActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                intent.putExtra("from_main_activity", true);
-                startActivity(intent);
-                finish();
             }
         };
 
@@ -389,6 +428,7 @@ public class MainActivity extends AppCompatActivity {
             call.enqueue(callback);
         }
     }
+
 
     /**
      * Метод для изменения подгруппы пользователя.
@@ -449,8 +489,7 @@ public class MainActivity extends AppCompatActivity {
             long exp = jsonObject.getLong("exp");
 
             // Проверка срока действия
-            //long currentTime = System.currentTimeMillis() / (1000 * 60 * 60 * 24) ;
-            long currentTime = System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis() / 1000 ;
             return exp > currentTime;
         } catch (Exception e) {
             e.printStackTrace();
@@ -465,7 +504,20 @@ public class MainActivity extends AppCompatActivity {
 
         // Перейти к экрану входа
         Intent loginIntent = new Intent(this, LoginActivity.class);
+        loginIntent.putExtra("from_main_activity_error", true);
         startActivity(loginIntent);
         finish();
+    }
+
+    /**
+     * Метод для изменения четности недели.
+     * @param newParity новое значение четности недели.
+     */
+    private void changeParity(String newParity) {
+        // Сохранение нового значения parity в SharedPreferences
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("parity", newParity);
+        editor.apply();
+        Log.d("MainActivity", "Parity saved: " + newParity);
     }
 }

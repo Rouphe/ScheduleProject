@@ -170,16 +170,15 @@
                 android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/group_number_for_reg"
+                <Spinner
+                    android:id="@+id/faculty"
                     android:layout_width="281dp"
                     android:layout_height="50dp"
                     android:background="@drawable/custom_white_semcorners_item"
                     android:fontFamily="@font/involve_semibold"
-                    android:hint="Номер группы..."
-                    android:inputType="textShortMessage"
                     android:padding="12dp"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    />
 
             </LinearLayout>
 
@@ -190,16 +189,37 @@
                 android:layout_marginTop="12dp"
                 android:orientation="horizontal">
 
-                <EditText
+                <Spinner
+                    android:id="@+id/group_for_reg"
+                    android:layout_width="281dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/custom_white_semcorners_item"
+                    android:fontFamily="@font/involve_semibold"
+                    android:padding="12dp"
+                    android:dropDownHeight="250dp"
+                    android:textSize="15sp"
+                    />
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal">
+
+                <Spinner
                     android:id="@+id/subgroup_number_for_reg"
                     android:layout_width="281dp"
                     android:layout_height="50dp"
                     android:background="@drawable/custom_white_semcorners_item"
                     android:fontFamily="@font/involve_semibold"
-                    android:hint="Номер подгруппы... (100.1)"
-                    android:inputType="textShortMessage"
                     android:padding="12dp"
-                    android:textSize="15sp" />
+                    android:textSize="15sp"
+                    />
 
             </LinearLayout>
 

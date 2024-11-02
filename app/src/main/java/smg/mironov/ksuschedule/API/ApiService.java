@@ -15,6 +15,7 @@ import retrofit2.http.Part;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import smg.mironov.ksuschedule.Models.DayWeek;
+import smg.mironov.ksuschedule.Models.Faculty;
 import smg.mironov.ksuschedule.Models.GroupDto;
 import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
@@ -31,6 +32,12 @@ import smg.mironov.ksuschedule.Utils.RegistrationResponse;
  * Александр Миронов
  */
 public interface ApiService {
+
+    @GET("/faculty")
+    Call<List<Faculty>> getAllFaculties();
+
+    @GET("/batches/faculty/name/{name}")
+    Call<List<GroupDto>> getGroupsByFaculty(@Path("name") String name);
 
     /**
      * Регистрация пользователя.
@@ -208,17 +215,16 @@ public interface ApiService {
      * @return объект {@link Call} с {@link GroupDto}
      */
     @GET("/batches/number/{number}")
-    Call<GroupDto> getGroupByNumber(@Header("Authorization") String token, @Path("number") String group_number);
+    Call<GroupDto> getGroupByNumber(@Path("number") String group_number);
 
     /**
      * Получение подгрупп по номеру группы.
      *
-     * @param token        токен авторизации
      * @param group_number номер группы
      * @return объект {@link Call} с списком {@link SubgroupDto}
      */
     @GET("/api/v1/subgroup/groupNumber/{group_number}")
-    Call<List<SubgroupDto>> getSubgroupsByGroupNumber(@Header("Authorization") String token, @Path("group_number") String group_number);
+    Call<List<SubgroupDto>> getSubgroupsByGroupNumber(@Path("group_number") String group_number);
 
     /**
      * Получение расписания по номеру подгруппы.
@@ -287,4 +293,6 @@ public interface ApiService {
      */
     @GET("/schedule/filter/subgroup_number/{subgroup_number}/subject_name/{subject_name}")
     Call<List<DayWeek>> getSchedulesBySubgroupNumberAndSubjectName(@Path("subgroup_number") String subgroup_number, @Path("subject_name") String subject_view);
+    @PUT("/api/v1/user/update/student/groups/{email}")
+    Call<Void> updateUserGroupAndFaculty(@Header("Authorization") String token, @Path("email")  String userEmail, @Query("groupNumber") String groupNumber, @Query("subgroupNumber")String subgroupNumber, @Query("facultyName") String facultyName);
 }

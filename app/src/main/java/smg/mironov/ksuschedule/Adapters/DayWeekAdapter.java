@@ -22,10 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import smg.mironov.ksuschedule.Models.DayWeek;
 import smg.mironov.ksuschedule.R;
@@ -44,6 +46,8 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
     private Map<String, List<DayWeek>> scheduleMap;
     private SharedPreferences sharedPreferences;
     private String filterParity;
+
+
 
     /**
      * Конструктор для создания объекта {@link DayWeekAdapter}.
@@ -85,18 +89,15 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
      * @param newScheduleList новый список расписания
      */
     public void updateScheduleList(List<DayWeek> newScheduleList) {
-        scheduleMap.clear();
-        dayList.clear();
+        scheduleMap.clear(); // Очищаем старый список
+        dayList.clear(); // Очищаем список дней
 
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.minusDays(today.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
         boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
         String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
 
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("parity", currentWeekParity);
-//        editor.apply();
-
+        // Оставляем логику фильтрации расписания по четности недели
         for (DayWeek dayWeek : newScheduleList) {
             if (filterParity == null || filterParity.equals(dayWeek.getParity()) || "ВСЕГДА".equals(dayWeek.getParity())) {
                 String day = dayWeek.getDayWeek();
@@ -108,6 +109,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             }
         }
 
+        // Сортируем дни недели
         Collections.sort(dayList, new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
@@ -115,6 +117,7 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             }
         });
 
+        // Сортируем расписание по времени начала занятий
         for (String day : scheduleMap.keySet()) {
             Collections.sort(scheduleMap.get(day), new Comparator<DayWeek>() {
                 @Override
@@ -124,8 +127,9 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             });
         }
 
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Обновляем адаптер после изменения данных
     }
+
 
     /**
      * Возвращает порядок дней недели для сортировки.
@@ -153,20 +157,16 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         return new ScheduleViewHolder(view);
     }
 
+
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         String day = dayList.get(position);
         List<DayWeek> daySchedule = scheduleMap.get(day);
-
         LocalDate today = LocalDate.now();
         DayOfWeek currentDayOfWeek = today.getDayOfWeek();
         LocalDate startOfWeek = today.minusDays(currentDayOfWeek.getValue() - DayOfWeek.MONDAY.getValue());
         boolean isEvenWeek = startOfWeek.get(WeekFields.ISO.weekOfWeekBasedYear()) % 2 == 0;
         String currentWeekParity = isEvenWeek ? "ЧИСЛИТЕЛЬ" : "ЗНАМЕНАТЕЛЬ";
-
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("parity", currentWeekParity);
-        editor.apply();
 
         String savedParity = sharedPreferences.getString("parity", "ЧИСЛИТЕЛЬ");
         if (!currentWeekParity.equals(savedParity)) {
@@ -185,50 +185,79 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
 
         holder.pairsLayout.removeAllViews();
 
-        String timeStartAndEndPrevious = "";
-
+        // Группируем занятия по времени
+        Map<LocalTime, List<DayWeek>> groupedByTime = new HashMap<>();
         for (DayWeek dayWeek : daySchedule) {
+            LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
+            if (!groupedByTime.containsKey(timeStart)) {
+                groupedByTime.put(timeStart, new ArrayList<>());
+            }
+            groupedByTime.get(timeStart).add(dayWeek);
+        }
+
+        // Сортируем время начала занятий
+        List<LocalTime> sortedTimes = new ArrayList<>(groupedByTime.keySet());
+        Collections.sort(sortedTimes);
+
+        // Отображаем группы
+        for (LocalTime timeStart : sortedTimes) {
+            List<DayWeek> pairsAtSameTime = groupedByTime.get(timeStart);
+
+            // Создаем view для отображения
             View pairView = LayoutInflater.from(context).inflate(R.layout.period_item, holder.pairsLayout, false);
             TextView timeStartAndEnd = pairView.findViewById(R.id.FirstTimeStartAndEnd);
             TextView typeAndNameDis = pairView.findViewById(R.id.typeAndNameDis);
             TextView infoTeacher = pairView.findViewById(R.id.infoTeacher);
-
-            String role = sharedPreferences.getString("user_role", "");
-
-            if (Objects.equals(role, "TEACHER")) {
-                infoTeacher.setText(dayWeek.getSubgroup().getNumber());
-            } else {
-                infoTeacher.setText(dayWeek.getTeacher().getName() + " " + dayWeek.getTeacher().getPost());
-            }
-
             TextView numAudit = pairView.findViewById(R.id.numAudit);
 
-            timeStartAndEnd.setText(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd());
-            typeAndNameDis.setText(dayWeek.getSubject().getType() + " | " + dayWeek.getSubject().getName());
+            // Устанавливаем время пары
+            DayWeek firstPair = pairsAtSameTime.get(0);
+            timeStartAndEnd.setText(firstPair.getTimeStart() + " - " + firstPair.getTimeEnd());
 
-            numAudit.setText(dayWeek.getClassroom());
+            // Показ информации о дисциплине
+            typeAndNameDis.setText(firstPair.getSubject().getType() + " | " + firstPair.getSubject().getName());
 
-            if (timeStartAndEndPrevious.equals(dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd())) {
-                continue;
+            // Проверяем роль и отображаем нужную информацию
+            String role = sharedPreferences.getString("user_role", "");
+            if (Objects.equals(role, "TEACHER")) {
+                // Считаем уникальные группы (до точки)
+                Set<String> uniqueGroups = new HashSet<>();
+                for (DayWeek pair : pairsAtSameTime) {
+                    String fullGroupName = pair.getSubgroup().getNumber(); // Полное название группы с подгруппой
+                    String groupName = fullGroupName.split("\\.")[0]; // Имя группы до точки
+                    uniqueGroups.add(groupName);
+                }
+
+                // Отображаем количество уникальных групп
+                infoTeacher.setText("Групп: " + uniqueGroups.size());
+
+                // Также можно показать список подгрупп для этого времени
+                StringBuilder subgroups = new StringBuilder();
+                for (int i = 0; i < pairsAtSameTime.size(); i++) {
+                    String subgroupNumber = pairsAtSameTime.get(i).getSubgroup().getNumber();
+                    subgroups.append(subgroupNumber);
+                    // Если это последняя подгруппа или единственная, добавляем точку
+                    if (i == pairsAtSameTime.size() - 1 || pairsAtSameTime.size() == 1) {
+                        subgroups.append(".");
+                    }
+                    else {
+                        subgroups.append(", ");
+                    }
+                }
+                infoTeacher.append("\nПодгруппы: " + subgroups.toString().trim());
+            } else {
+                infoTeacher.setText(firstPair.getTeacher().getName() + " " + firstPair.getTeacher().getPost());
             }
 
-            timeStartAndEndPrevious = dayWeek.getTimeStart() + " " + dayWeek.getTimeEnd();
+            // Устанавливаем номер аудитории (можно добавить логику, если аудитории разные)
+            numAudit.setText(firstPair.getClassroom());
 
-            LocalTime timeStart = LocalTime.parse(dayWeek.getTimeStart(), DateTimeFormatter.ofPattern("HH:mm"));
-            LocalTime timeEnd = LocalTime.parse(dayWeek.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
-
-            LocalDate localDate = LocalDate.now();
-            String date1 = localDate.format(formatter);
-
+            // Логика для выделения текущей пары
             LocalTime now = LocalTime.now();
-            if (now.isAfter(timeStart) && now.isBefore(timeEnd) && (formattedDate.equals(date1))) {
-                // Проверяем, какая тема была выбрана
+            LocalTime timeEnd = LocalTime.parse(firstPair.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
+            if (now.isAfter(timeStart) && now.isBefore(timeEnd) && formattedDate.equals(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM")))) {
                 boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", false);
-                if (isDarkMode) {
-                    pairView.setBackgroundColor(Color.parseColor("#022293"));
-                } else {
-                    pairView.setBackgroundColor(Color.parseColor("#95ACFF"));
-                }
+                pairView.setBackgroundColor(R.drawable.custom_pair_is_now);
             } else {
                 pairView.setBackgroundColor(Color.TRANSPARENT);
             }
@@ -236,6 +265,8 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             holder.pairsLayout.addView(pairView);
         }
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -266,4 +297,23 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
         dayList.clear();
         notifyDataSetChanged();
     }
+
+    private void setSubgroupsText(TextView infoTeacher, List<String> subgroups) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < subgroups.size(); i++) {
+            // Добавляем подгруппу в строку
+            builder.append(subgroups.get(i).trim());
+
+            // Проверяем, добавили ли мы 4 подгруппы
+            if ((i + 1) % 4 == 0) {
+                builder.append("\n"); // Добавляем перенос строки после 4 элементов
+            } else if (i < subgroups.size() - 1) {
+                builder.append(", "); // Добавляем запятую между подгруппами
+            }
+        }
+
+        // Устанавливаем текст в TextView
+        infoTeacher.setText(builder.toString());
+    }
+
 }

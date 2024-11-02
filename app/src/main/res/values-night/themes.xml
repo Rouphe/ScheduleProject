@@ -11,6 +11,7 @@
         <item name="backgroundColor">@color/bg_dark</item>
         <item name="colorOnContainer">@color/inputs</item>
         <item name="colorControlNormal">@color/colorPairIsNow</item>
+        <item name="colorSecondary">@color/colorPairIsNow_dark</item>
         <item name="colorOnBackground">@color/text_dark</item>
         <item name="colorBackgroundFloating">@color/textSecondary_dark</item>
         <item name="colorButtonNormal">@color/text_dark</item>

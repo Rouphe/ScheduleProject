@@ -1,7 +1,5 @@
 package smg.mironov.ksuschedule.Models;
 
-import java.util.Objects;
-
 /**
  * Класс {@link GroupDto} представляет данные группы.
  *
@@ -20,7 +18,13 @@ public class GroupDto {
     /** Профиль группы */
     private String profile;
 
+    private Faculty faculty;
+
     // Getters and Setters
+
+    public Faculty getFacultyDto() {
+        return faculty;
+    }
 
     /**
      * Возвращает идентификатор группы.

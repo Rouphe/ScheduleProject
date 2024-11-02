@@ -27,6 +27,16 @@ public class User {
     private String group_number;
     /** Номер подгруппы */
     private String subgroup_number;
+
+    private String facultyName;
+
+    private Faculty faculty;
+
+
+    public Faculty getFacultyDto() {
+        return faculty;
+    }
+
     /** Информация о пользователе */
     private String info;
     /** Роль пользователя */
@@ -143,6 +153,33 @@ public class User {
         this.subgroup_number = userSubgroupNumber;
         this.role = userRole;
         this.info = info;
+    }
+
+    public User(Long id, String firstName, String lastName, String middleName, String email, String password, String group_number, String subgroup_number, Faculty faculty, String info, String role, Photo photo) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.middleName = middleName;
+        this.email = email;
+        this.password = password;
+        this.group_number = group_number;
+        this.subgroup_number = subgroup_number;
+        this.faculty = faculty;
+        this.info = info;
+        this.role = role;
+        this.photo = photo;
+    }
+
+    public User(String name, String surname, String midName, String email, String password, String selectedGroupNumber, String selectedSubgroupNumber, Faculty faculty, String selectedRole) {
+        this.firstName = name;
+        this.lastName = surname;
+        this.middleName = midName;
+        this.email = email;
+        this.password = password;
+        this.group_number = selectedGroupNumber;
+        this.subgroup_number = selectedSubgroupNumber;
+        this.faculty = faculty;
+        this.role = selectedRole;
     }
 
     /**

@@ -17,8 +17,11 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +35,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -43,7 +49,9 @@ import retrofit2.Response;
 import smg.mironov.ksuschedule.API.ApiClient;
 import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Adapters.DayWeekAdapter;
+import smg.mironov.ksuschedule.Models.Faculty;
 import smg.mironov.ksuschedule.Models.GroupDto;
+import smg.mironov.ksuschedule.Models.SubgroupDto;
 import smg.mironov.ksuschedule.Models.TeacherDto;
 import smg.mironov.ksuschedule.Models.User;
 
@@ -107,6 +115,23 @@ public class ProfileActivity extends AppCompatActivity {
     /** Адаптер для расписания */
     private DayWeekAdapter adapter;
 
+    private Spinner groupSpinner;
+    private Spinner subgroupSpinner;
+    private Spinner facultySpinner;
+    private LinearLayout spinners;
+
+    private List<String> groupList; // Список групп
+    private List<String> subgroupList; // Список подгрупп
+    private List<String> facultyList;
+
+    private String selectedGroup;
+    private String selectedFaculty;
+    
+    private LinearLayout switchTheme;
+    private ImageView sun;
+    private ImageView moon;
+
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +166,7 @@ public class ProfileActivity extends AppCompatActivity {
         userGroupDirection = findViewById(R.id.userGroupDirection);
         userGroupProfile = findViewById(R.id.userGroupProfile);
         logoutButton = findViewById(R.id.logout_icon);
-        settingsButton = findViewById(R.id.settings_icon);
+        //settingsButton = findViewById(R.id.settings_icon);
         profilePhoto = findViewById(R.id.profilePhoto);
         addPhotoButton = findViewById(R.id.addPhoto);
         userGroupProfileTitle = findViewById(R.id.userGroupProfileTitle);
@@ -149,8 +174,39 @@ public class ProfileActivity extends AppCompatActivity {
         chevronDown = findViewById(R.id.chevron_down);
         editButton = findViewById(R.id.editButton);
         userGroupDirectionTitle = findViewById(R.id.userGroupDirectionTitle);
+        groupSpinner = findViewById(R.id.groupSpinner);
+        subgroupSpinner = findViewById(R.id.subgroupSpinner);
+        facultySpinner = findViewById(R.id.facultySpinner);
+        subgroupSpinner.setDropDownVerticalOffset(100);
 
+        groupSpinner.setDropDownVerticalOffset(100);
+        switchTheme = findViewById(R.id.changeTheme);
+        moon = findViewById(R.id.moon);
+        sun = findViewById(R.id.sun);
+        spinners = findViewById(R.id.spinners);
+
+        
+
+        if (preferences.getString("user_role", "STUDENT").equals("TEACHER")){
+            spinners.setVisibility(View.GONE);
+        }
+        
+        if (preferences.getBoolean("dark_mode", false)){
+            sun.setVisibility(View.VISIBLE);
+            moon.setVisibility(View.GONE);
+        }
+        else {
+            sun.setVisibility(View.GONE);
+            moon.setVisibility(View.VISIBLE);
+        }
         loadUserData();
+        loadFaculties();
+
+
+
+
+
+
 
         // Настройка жестов для profileCap
         gestureDetector = new GestureDetector(this, new SwipeGestureListener());
@@ -203,12 +259,12 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switchToSettings();
-            }
-        });
+//        settingsButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                switchToSettings();
+//            }
+//        });
 
         profileCap.post(new Runnable() {
             @Override
@@ -222,6 +278,64 @@ public class ProfileActivity extends AppCompatActivity {
                 switchToEdit();
             }
         });
+        facultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String selectedFaculty = facultySpinner.getSelectedItem().toString();
+                loadGroupsAndSubgroups(selectedFaculty);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Handle if needed
+            }
+        });
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                GroupDto selectedGroup = (GroupDto) parent.getItemAtPosition(position);
+                loadSubgroups(String.valueOf(selectedGroup));
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Действия при отсутствии выбора
+            }
+        });
+        
+        switchTheme.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeTheme();
+            }
+        });
+        // Получение всех значений
+        Map<String, ?> allEntries = preferences.getAll();
+
+        // Вывод в логи
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Log.d("SharedPreferences", entry.getKey() + ": " + entry.getValue().toString());
+        }
+
+    }
+
+
+
+    private void changeTheme() {
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        boolean isDarkTheme = preferences.getBoolean("dark_mode", false); // Получаем текущее значение темы
+
+        // Меняем тему на противоположную
+        if (isDarkTheme) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            preferences.edit().putBoolean("dark_mode", false).apply();
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            preferences.edit().putBoolean("dark_mode", true).apply();
+        }
+
+        // Перезапуск активности для применения темы
+        recreate();
     }
 
     private void loadUserDataFromServer() {
@@ -347,12 +461,14 @@ public class ProfileActivity extends AppCompatActivity {
 
         editor.apply();
 
+
         // Очистить расписание в MainActivity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
         // Перейти к экрану входа
         Intent loginIntent = new Intent(this, LoginActivity.class);
+        intent.putExtra("logout", true);
         startActivity(loginIntent);
         finish();
     }
@@ -483,7 +599,7 @@ public class ProfileActivity extends AppCompatActivity {
      */
     private void fetchGroupInfo(String groupNumber) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<GroupDto> call = apiService.getGroupByNumber(token, groupNumber);
+        Call<GroupDto> call = apiService.getGroupByNumber(groupNumber);
 
         call.enqueue(new Callback<GroupDto>() {
             @Override
@@ -491,6 +607,8 @@ public class ProfileActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     refreshTokenIfNeeded(response);
                     GroupDto groupDto = response.body();
+                    //String groupFaculty = groupDto.getFacultyDto().getFacultyName();
+
 
                     if (groupDto.getProfile() == null) {
                         userGroupProfile.setVisibility(View.GONE);
@@ -718,5 +836,233 @@ public class ProfileActivity extends AppCompatActivity {
             return true;
         }
     }
+
+    private void loadFaculties() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<Faculty>> call = apiService.getAllFaculties();
+
+        call.enqueue(new Callback<List<Faculty>>() {
+            @Override
+            public void onResponse(Call<List<Faculty>> call, Response<List<Faculty>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    facultyList = new ArrayList<>();
+                    for (Faculty faculty : response.body()) {
+                        facultyList.add(faculty.getFacultyName()); // Добавьте необходимое поле
+                    }
+                    populateFacultySpinner(facultyList);}
+                else {
+                    Toast.makeText(ProfileActivity.this, "Ошибка получения факультетов", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Faculty>> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void populateFacultySpinner(List<String> faculties) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, faculties);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
+        facultySpinner.setAdapter(adapter);
+
+        // Получаем SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String defaultFaculty = sharedPreferences.getString("user_faculty", null);
+        if (!facultyList.isEmpty()) {
+            if (defaultFaculty != null) {
+                int position = adapter.getPosition(defaultFaculty);
+                if (position >= 0) {
+                    facultySpinner.setSelection(position);
+                }
+            } else {
+                // Если нет сохраненного значения, устанавливаем первое значение по умолчанию
+                facultySpinner.setSelection(0);
+            }
+        } else {
+            // Если список пуст, можете установить спиннер в неактивное состояние или скрыть его
+            facultySpinner.setEnabled(false); // или subgroupSpinner.setVisibility(View.GONE);
+        }
+
+        // Установка слушателя
+        facultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                selectedFaculty = facultyList.get(position);
+                loadGroupsAndSubgroups(selectedFaculty); // Загружаем подгруппы при выборе группы
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Обработка, если ничего не выбрано
+            }
+        });
+    }
+
+
+    private void loadGroupsAndSubgroups(String faculty) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+
+        // Получаем группы
+        Call<List<GroupDto>> groupCall = apiService.getGroupsByFaculty(faculty);
+        groupCall.enqueue(new Callback<List<GroupDto>>() {
+            @Override
+            public void onResponse(Call<List<GroupDto>> call, Response<List<GroupDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    groupList = new ArrayList<>();
+                    for (GroupDto group : response.body()) {
+                        groupList.add(group.getNumber()); // Добавьте необходимое поле
+                    }
+                    setupGroupSpinner();
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки групп", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<GroupDto>> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Получаем подгруппы на основе выбранной группы
+    private void loadSubgroups(String groupNumber) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<List<SubgroupDto>> subgroupCall = apiService.getSubgroupsByGroupNumber(groupNumber);
+
+        subgroupCall.enqueue(new Callback<List<SubgroupDto>>() {
+            @Override
+            public void onResponse(Call<List<SubgroupDto>> call, Response<List<SubgroupDto>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    subgroupList = new ArrayList<>();
+                    for (SubgroupDto subgroup : response.body()) {
+                        subgroupList.add(subgroup.getNumber()); // Добавьте необходимое поле
+                    }
+                    setupSubgroupSpinner();
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки подгрупп", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<SubgroupDto>> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setupGroupSpinner() {
+        groupSpinner = findViewById(R.id.groupSpinner); // Убедитесь, что ваш ID соответствует XML
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, groupList);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
+        groupSpinner.setAdapter(adapter);
+
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String defaultGroup = preferences.getString("user_groupNumber", null);
+        if (!groupList.isEmpty()){
+            int position = adapter.getPosition(defaultGroup);
+            if (position >= 0) {
+                groupSpinner.setSelection(position);
+            } else {
+                // Если нет сохраненного значения, устанавливаем первое значение по умолчанию
+                groupSpinner.setSelection(0);
+            }
+        } else {
+            // Если список пуст, можете установить спиннер в неактивное состояние или скрыть его
+            groupSpinner.setEnabled(false); // или subgroupSpinner.setVisibility(View.GONE);
+        }
+
+
+        groupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedGroup = groupList.get(position);
+                loadSubgroups(selectedGroup); // Загружаем подгруппы при выборе группы
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void setupSubgroupSpinner() {
+        subgroupSpinner = findViewById(R.id.subgroupSpinner); // Убедитесь, что ваш ID соответствует XML
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, subgroupList);
+        adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown);
+        subgroupSpinner.setAdapter(adapter);
+
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        String defaultSubgroup = preferences.getString("user_subgroupNumber", null);
+        // Установите текст по умолчанию, если список не пуст
+        if (!subgroupList.isEmpty()) {
+
+            if (defaultSubgroup != null) {
+                int position = adapter.getPosition(defaultSubgroup);
+                if (position >= 0) {
+                    subgroupSpinner.setSelection(position);
+                }
+            } else {
+                // Если нет сохраненного значения, устанавливаем первое значение по умолчанию
+                subgroupSpinner.setSelection(0);
+            }
+        } else {
+            // Если список пуст, можете установить спиннер в неактивное состояние или скрыть его
+            subgroupSpinner.setEnabled(false); // или subgroupSpinner.setVisibility(View.GONE);
+        }
+
+
+        subgroupSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedSubgroup = subgroupList.get(position);
+                // Здесь вы можете отправить запрос на изменение данных пользователя в БД
+                updateUserGroupAndSubgroup(selectedGroup, selectedSubgroup, selectedFaculty);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+
+    private void updateUserGroupAndSubgroup(String groupNumber, String subgroupNumber, String selectedFaculty) {
+        // Обновление данных в SharedPreferences
+        SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("user_faculty", selectedFaculty);
+        editor.putString("user_groupNumber", groupNumber);
+        editor.putString("user_subgroupNumber", subgroupNumber);
+        editor.apply();
+
+        // Отправляем запрос на изменение данных пользователя
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<Void> updateCall = apiService.updateUserGroupAndFaculty(token, userEmail, groupNumber, subgroupNumber,selectedFaculty); // Предполагается наличие такого метода в вашем API
+
+        updateCall.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    //Toast.makeText(ProfileActivity.this, "Данные успешно обновлены", Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(ProfileActivity.this, "Ошибка обновления данных", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(ProfileActivity.this, "Ошибка подключения к серверу", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
+
+
 
 }

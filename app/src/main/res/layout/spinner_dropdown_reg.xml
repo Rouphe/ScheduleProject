@@ -2,10 +2,9 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textColor="?attr/colorOnBackground"
+    android:textColor="@color/black"
     android:textSize="16sp"
     android:padding="10dp"
-    android:dropDownHeight="100dp"
     android:fontFamily="@font/involve_semibold"
     android:gravity="center_vertical"
-    android:background="?attr/backgroundColor" />
+    android:background="@color/inputs" />

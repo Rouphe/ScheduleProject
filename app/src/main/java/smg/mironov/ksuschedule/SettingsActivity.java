@@ -59,16 +59,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         groupEditText.setText(sharedPreferences.getString("user_groupNumber", ""));
 
-        Spinner editTextWeek = findViewById(R.id.editTextWeek);
-        spinnerAdapter = new ArrayAdapter<>(this, R.layout.custom_spinner_item_settings, new String[]{"ЧИСЛИТЕЛЬ", "ЗНАМЕНАТЕЛЬ"});
-        editTextWeek.setAdapter(spinnerAdapter);
 
-        // Устанавливаем значение Spinner из SharedPreferences
-        String savedParity = sharedPreferences.getString("parity", null);
-        if (savedParity != null) {
-            int spinnerPosition = spinnerAdapter.getPosition(savedParity);
-            editTextWeek.setSelection(spinnerPosition);
-        }
 
         Switch themeSwitch = findViewById(R.id.themeSwitch);
 
@@ -97,17 +88,7 @@ public class SettingsActivity extends AppCompatActivity {
 
 
 
-        editTextWeek.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedValue = (String) parent.getItemAtPosition(position);
-                changeParity(selectedValue);
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
 
         // Обработка нажатий на иконки редактирования
         editGroupIcon.setOnClickListener(new View.OnClickListener() {
@@ -147,15 +128,5 @@ public class SettingsActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    /**
-     * Метод для изменения четности недели.
-     * @param newParity новое значение четности недели.
-     */
-    private void changeParity(String newParity) {
-        // Сохранение нового значения parity в SharedPreferences
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("parity", newParity);
-        editor.apply();
-        Log.d("SettingsActivity", "Parity saved: " + newParity);
-    }
+
 }
