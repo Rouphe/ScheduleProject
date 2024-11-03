@@ -16,6 +16,7 @@
         <item name="colorBackgroundFloating">@color/textSecondary</item>
         <item name="colorButtonNormal">@color/colorPrimaryDark</item>
         <item name="colorSecondaryContainer">@color/colorPrimaryDarker</item>
+        <item name="android:textColorHint">@color/text</item>
         <!-- Отключаем верхнюю панель действия (ActionBar) -->
         <!-- <item name="windowActionBar">false</item> -->
         <item name="windowNoTitle">true</item>

@@ -7,6 +7,8 @@
     android:orientation="vertical"
     android:background="?attr/backgroundColor">
 
+
+
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -17,21 +19,43 @@
         android:fontFamily="@font/involve_semibold"
         android:text="Состав преподавателей"
         android:textColor="?attr/colorOnBackground"
+        android:layout_gravity="center_horizontal"
         android:textSize="24sp" />
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/search_view"
+        android:layout_width="328dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:queryHint="Поиск преподавателей"
+        android:iconifiedByDefault="false"
+        android:theme="@style/CustomSearchView"/>
+
+    <TextView
+        android:id="@+id/no_results_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Преподаватель не найден"
+        android:textColor="?attr/colorOnBackground"
+        android:fontFamily="@font/involve_medium"
+        android:textSize="16sp"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"/>
+
 
     <ListView
         android:id="@+id/list_teachers"
-        android:layout_width="match_parent"
+        android:layout_width="328dp"
         android:layout_height="0dp"
-        android:layout_weight="100"
-        android:layout_marginStart="16dp"
+        android:layout_gravity="center_horizontal"
         android:layout_marginTop="20dp"
         android:layout_marginBottom="16dp"
+        android:layout_weight="100"
         android:divider="@android:color/transparent"
         android:dividerHeight="8.0sp"
-        tools:listitem="@layout/item_info_teacher"
-        android:scrollbars="none"/>
-
+        android:scrollbars="none"
+        tools:listitem="@layout/item_info_teacher" />
 
     <Space
         android:layout_width="wrap_content"

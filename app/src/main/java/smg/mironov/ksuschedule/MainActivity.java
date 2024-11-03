@@ -405,6 +405,7 @@ public class MainActivity extends AppCompatActivity {
                     // Ошибка - показываем плашку с ошибкой сервера и скрываем расписание
                     recyclerView.setVisibility(View.GONE);
                     serverError.setVisibility(View.VISIBLE);
+                    logout();
                     Log.e("MainActivity", "Error loading schedule, showing server error message");
                 }
             }

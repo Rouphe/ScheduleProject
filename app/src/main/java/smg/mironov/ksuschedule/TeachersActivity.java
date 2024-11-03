@@ -12,13 +12,16 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SearchView; // Импортируем SearchView
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,8 +51,6 @@ import smg.mironov.ksuschedule.Models.User;
 /**
  * Класс {@link TeachersActivity} отвечает за отображение списка преподавателей и информацию о каждом преподавателе.
  *
- * @author Егор Гришанов, Алекснадр Миронов
- *
  * @version 1.0
  */
 public class TeachersActivity extends AppCompatActivity {
@@ -66,6 +67,13 @@ public class TeachersActivity extends AppCompatActivity {
     /** Должность преподавателя */
     private String post;
 
+    private TextView noResultsText;
+
+    /** SearchView для поиска преподавателей */
+    private androidx.appcompat.widget.SearchView searchView;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
@@ -79,9 +87,21 @@ public class TeachersActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.info_teacher_screen);
 
-        listView = findViewById(R.id.list_teachers);
-        teacherList = new ArrayList<>();
+        // Инициализация SearchView
+        searchView = findViewById(R.id.search_view);
 
+        EditText searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        TypedValue typedValue = new TypedValue();
+        this.getTheme().resolveAttribute(com.google.android.material.R.attr.colorOnBackground, typedValue, true);
+        searchEditText.setTextColor(typedValue.data);
+
+        noResultsText = findViewById(R.id.no_results_text);
+
+        listView = findViewById(R.id.list_teachers);
+
+
+
+        teacherList = new ArrayList<>();
 
         token = "Bearer " + preferences.getString("auth_token", null);
 
@@ -116,6 +136,9 @@ public class TeachersActivity extends AppCompatActivity {
             }
         });
 
+        // Настройка слушателя для SearchView
+        setupSearch();
+
         fetchTeachersFromServer();
     }
 
@@ -128,6 +151,39 @@ public class TeachersActivity extends AppCompatActivity {
             popupWindow.dismiss();
         }
     }
+
+    private void setupSearch() {
+        searchView.setOnQueryTextListener(new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Фильтрация при отправке запроса
+                adapter.getFilter().filter(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // Фильтрация при изменении текста
+                adapter.getFilter().filter(newText);
+                // Проверка на пустую строку
+                if (newText.isEmpty()) {
+                    noResultsText.setVisibility(View.GONE);
+                } else if (adapter.isEmpty()) {
+                    noResultsText.setVisibility(View.VISIBLE);
+                } else {
+                    noResultsText.setVisibility(View.GONE);
+                }
+
+                return true;
+            }
+        });
+        // Дополнительные настройки SearchView
+        searchView.setIconifiedByDefault(false);
+        searchView.setSubmitButtonEnabled(true);
+    }
+
+
+
 
     /**
      * Метод для получения информации о пользователе по идентификатору преподавателя.
@@ -213,6 +269,7 @@ public class TeachersActivity extends AppCompatActivity {
         View dimView = new View(this);
         dimView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         dimView.setBackgroundColor(Color.parseColor("#80000000"));
+        dimView.setTag("dim_view"); // Устанавливаем тег для идентификации
         root.addView(dimView);
         popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
@@ -253,7 +310,7 @@ public class TeachersActivity extends AppCompatActivity {
                         Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
                         popupPhoto.setImageBitmap(bitmap);
                         profileImageView.setImageBitmap(bitmap);
-                        adapter.updateTeacherPhoto(userId, bitmap);
+                        //adapter.updateTeacherPhoto(userId, bitmap);
                         saveImageToInternalStorage(bitmap, userId);
                     } else {
                         Toast.makeText(TeachersActivity.this, "Ошибка загрузки фото преподавателя", Toast.LENGTH_SHORT).show();
@@ -318,7 +375,8 @@ public class TeachersActivity extends AppCompatActivity {
                     teacherList.clear();
                     teacherList.addAll(response.body());
 
-                    adapter.notifyDataSetChanged();
+                    // Обновляем данные адаптера
+                    adapter.updateData(teacherList);
                 } else {
                     Toast.makeText(TeachersActivity.this, "Ошибка при получении данных: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
@@ -381,7 +439,9 @@ public class TeachersActivity extends AppCompatActivity {
             e.printStackTrace();
         } finally {
             try {
-                fos.close();
+                if (fos != null) { // Добавляем проверку на null
+                    fos.close();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
