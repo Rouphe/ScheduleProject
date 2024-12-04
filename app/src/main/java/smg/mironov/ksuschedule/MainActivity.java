@@ -1,10 +1,12 @@
 package smg.mironov.ksuschedule;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -16,11 +18,16 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.my.tracker.MyTracker;
+import com.my.tracker.MyTrackerConfig;
+import com.my.tracker.MyTrackerParams;
 
 import org.json.JSONObject;
 
@@ -78,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
 
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
 
@@ -103,6 +109,20 @@ public class MainActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
         super.onCreate(savedInstanceState);
+
+        // При необходимости, настройте конфигурацию трекера
+        MyTrackerParams trackerParams = MyTracker.getTrackerParams();
+        MyTrackerConfig trackerConfig = MyTracker.getTrackerConfig();
+        // Настройте параметры трекера
+        trackerParams.setCustomParam("android_id", getAndroidId(getApplicationContext()));
+        trackerParams.setCustomUserId(String.valueOf(sharedPreferences.getLong("user_id", 1)));
+        trackerConfig.setLaunchTimeout(60);
+        trackerConfig.setAutotrackingPurchaseEnabled(false);
+        // Инициализируйте трекер
+        String SDK_KEY = "76249747832706624692";
+        MyTracker.initTracker(SDK_KEY, getApplication());
+        MyTracker.trackLaunchManually(this);
+
         setContentView(R.layout.main_screen);
         serverError = findViewById(R.id.server_error);
 
@@ -272,6 +292,22 @@ public class MainActivity extends AppCompatActivity {
             Log.d("SharedPreferences", entry.getKey() + ": " + entry.getValue().toString());
         }
 
+    }
+
+    // Метод получения Android ID
+    static @Nullable String getAndroidId(Context context)
+    {
+        try
+        {
+            ContentResolver cr = context.getContentResolver();
+            if (cr != null)
+            {
+                return Settings.Secure.getString(cr, Settings.Secure.ANDROID_ID);
+            }
+        }
+        catch (Throwable e) {}
+
+        return null;
     }
 
     @Override
@@ -502,6 +538,28 @@ public class MainActivity extends AppCompatActivity {
         // Очистить расписание в MainActivity
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+
+        // Получить доступ к SharedPreferences
+        SharedPreferences sharedPreferences = getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        // Сохраняем логин и пароль
+        boolean darkMode = sharedPreferences.getBoolean("dark_mode", false); // Сохраните текущее состояние темы
+        String savedEmail = sharedPreferences.getString("saved_email", null);
+        String savedPassword = sharedPreferences.getString("saved_password", null);
+
+        // Очищаем все данные, кроме логина и пароля
+        editor.clear();
+
+        // Восстанавливаем логин и пароль
+        if (savedEmail != null && savedPassword != null) {
+            editor.putString("saved_email", savedEmail);
+            editor.putString("saved_password", savedPassword);
+            editor.putBoolean("remember_me", true);
+            editor.putBoolean("dark_mode", darkMode); // Восстановите состояние темы
+        }
+
+        editor.apply();
 
         // Перейти к экрану входа
         Intent loginIntent = new Intent(this, LoginActivity.class);

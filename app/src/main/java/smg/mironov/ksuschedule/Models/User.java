@@ -1,5 +1,7 @@
 package smg.mironov.ksuschedule.Models;
 
+import androidx.annotation.Nullable;
+
 /**
  * Класс {@link User} представляет данные пользователя.
  * <p>Содержит информацию об идентификаторе пользователя, имени, фамилии, отчестве, email, пароле, номере группы, номере подгруппы, информации, роли, фото и идентификаторе преподавателя.</p>
@@ -42,6 +44,7 @@ public class User {
     /** Роль пользователя */
     private String role;
     /** Объект фото пользователя */
+    @Nullable
     private Photo photo;
 
     /**

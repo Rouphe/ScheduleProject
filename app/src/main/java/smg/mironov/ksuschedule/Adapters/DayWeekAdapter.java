@@ -256,9 +256,18 @@ public class DayWeekAdapter extends RecyclerView.Adapter<DayWeekAdapter.Schedule
             LocalTime now = LocalTime.now();
             LocalTime timeEnd = LocalTime.parse(firstPair.getTimeEnd(), DateTimeFormatter.ofPattern("HH:mm"));
             if (now.isAfter(timeStart) && now.isBefore(timeEnd) && formattedDate.equals(LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM")))) {
-                boolean isDarkMode = sharedPreferences.getBoolean("dark_mode", false);
-                pairView.setBackgroundColor(R.drawable.custom_pair_is_now);
-            } else {
+                SharedPreferences preferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+                boolean isDarkMode = preferences.getBoolean("dark_mode", false);
+                if (isDarkMode){
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    pairView.setBackgroundResource(R.drawable.custom_pair_is_now_dark);
+                }
+                else {
+                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    pairView.setBackgroundResource(R.drawable.custom_pair_is_now);
+                }
+            }
+            else {
                 pairView.setBackgroundColor(Color.TRANSPARENT);
             }
 

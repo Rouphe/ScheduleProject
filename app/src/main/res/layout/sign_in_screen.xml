@@ -53,6 +53,7 @@
             android:id="@+id/Login"
             android:layout_width="281dp"
             android:layout_height="50dp"
+            android:autofillHints=""
             android:background="@drawable/custom_white_semcorners_item"
             android:fontFamily="@font/involve_regular"
             android:hint="E-mail..."

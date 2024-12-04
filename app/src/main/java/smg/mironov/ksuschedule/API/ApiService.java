@@ -188,6 +188,9 @@ public interface ApiService {
     @GET("/batches")
     Call<List<GroupDto>> getAllGroups();
 
+    @GET("/api/v1/user/teacher/fullName")
+    Call<User> getUserByFullName(@Header("Authorization") String token, @Query("fullName") String fullName);
+
     /**
      * Получение данных о преподавателе по имени.
      *
@@ -210,7 +213,6 @@ public interface ApiService {
     /**
      * Получение данных о группе по номеру.
      *
-     * @param token        токен авторизации
      * @param group_number номер группы
      * @return объект {@link Call} с {@link GroupDto}
      */

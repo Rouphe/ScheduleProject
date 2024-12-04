@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -25,8 +26,15 @@ import android.widget.SearchView; // Импортируем SearchView
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,8 +72,6 @@ public class TeachersActivity extends AppCompatActivity {
 
     /** Токен аутентификации */
     private String token;
-    /** Должность преподавателя */
-    private String post;
 
     private TextView noResultsText;
 
@@ -105,16 +111,10 @@ public class TeachersActivity extends AppCompatActivity {
 
         token = "Bearer " + preferences.getString("auth_token", null);
 
-        adapter = new TeacherAdapter(this, teacherList, new TeacherAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int teacherId, ImageView profileImageView) {
-                getTeacherById(teacherId, new OnTeacherPostReceived() {
-                    @Override
-                    public void onPostReceived(String post) {
-                        getUserByTeacherId(teacherId, profileImageView, post);
-                    }
-                });
-            }
+
+        adapter = new TeacherAdapter(this, teacherList, (fullName, profileImageView) -> {
+            // Вызываем метод для поиска преподавателя по ФИО
+            getUserByFullName(token, fullName, profileImageView);
         }, token);
 
         listView.setAdapter(adapter);
@@ -185,43 +185,169 @@ public class TeachersActivity extends AppCompatActivity {
 
 
 
-    /**
-     * Метод для получения информации о пользователе по идентификатору преподавателя.
-     *
-     * @param teacherId идентификатор преподавателя
-     * @param profileImageView ImageView для отображения фотографии профиля
-     * @param post должность преподавателя
-     */
-    private void getUserByTeacherId(int teacherId, final ImageView profileImageView, String post) {
+    private void getUserByFullName(String token, String fullName, final ImageView profileImageView) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<User> call = apiService.getTeacherUserByTeacherId(token, teacherId);
+        Call<User> call = apiService.getUserByFullName(token, fullName);
 
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    showInfo(user, profileImageView, post);
+
+                    // Проверяем роль пользователя
+                    if ("TEACHER".equals(user.getRole())) {
+                        fetchTeacherPostAndShowPopup(fullName, user, profileImageView);
+                    } else {
+                        Toast.makeText(TeachersActivity.this, "Пользователь не является преподавателем", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    String error = "Преподаватель еще не зарегистрирован";
-                    Toast.makeText(TeachersActivity.this, error, Toast.LENGTH_LONG).show();
+                    // Преподаватель не зарегистрирован
+                    fetchTeacherPostAndShowPopup(fullName, null, profileImageView);
                 }
             }
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                Toast.makeText(TeachersActivity.this, "Ошибка при выполнении запроса: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(TeachersActivity.this, "Ошибка соединения: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    private void fetchTeacherPostAndShowPopup(String fullName, User user, ImageView profileImageView) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<TeacherDto> call = apiService.getTeacherByName(fullName); // Предполагается, что API возвращает строку с должностью
+
+        call.enqueue(new Callback<TeacherDto>() {
+            @Override
+            public void onResponse(Call<TeacherDto> call, Response<TeacherDto> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    TeacherDto teacherDto = response.body();
+
+                    String post = teacherDto.getPost();
+
+                    if (user != null) {
+                        showInfo(user, profileImageView, post);
+                    } else {
+                        showUnregisteredTeacherPopup(fullName, profileImageView, post);
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<TeacherDto> call, Throwable t) {
+                String post = "Должность не указана";
+
+                if (user != null) {
+                    showInfo(user, profileImageView, post);
+                } else {
+                    showUnregisteredTeacherPopup(fullName, profileImageView, post);
+                }
+            }
+        });
+    }
+
+
+
     /**
-     * Метод для отображения информации о преподавателе.
-     *
-     * @param user объект {@link User}, представляющий преподавателя
-     * @param profileImageView ImageView для отображения фотографии профиля
-     * @param post должность преподавателя
+     * Отображение информации о преподавателе.
      */
+    private void showTeacherDetails(User user, ImageView profileImageView, String post) {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.teacher_info_popup, null);
+
+        TextView popupLastName = popupView.findViewById(R.id.teacherLastname);
+        TextView popupFirstName = popupView.findViewById(R.id.teacherFirstName);
+        TextView popupMiddleName = popupView.findViewById(R.id.teacherMiddleName);
+        TextView popupPost = popupView.findViewById(R.id.post);
+        ImageView popupPhoto = popupView.findViewById(R.id.teacherPhoto);
+        TextView facultyView = popupView.findViewById(R.id.userGroupDirection);
+        TextView departmentView = popupView.findViewById(R.id.userGroupProfileTitle);
+
+        // Установка основных данных
+        popupLastName.setText(user.getLastName());
+        popupFirstName.setText(user.getFirstName());
+        popupMiddleName.setText(user.getMiddleName());
+        popupPost.setText(post);
+
+        // Извлекаем данные из info
+        String[] parsedInfo = parseInfo(user.getInfo());
+        String faculty = parsedInfo[0];
+        String department = parsedInfo[1];
+
+        // Устанавливаем факультет
+        if (!faculty.equals("Факультет не указан")) {
+            facultyView.setText(faculty);
+            facultyView.setVisibility(View.VISIBLE);
+        } else {
+            facultyView.setVisibility(View.GONE);
+        }
+
+        // Устанавливаем кафедру
+        if (!department.equals("Кафедра не указана")) {
+            departmentView.setText(department);
+            departmentView.setVisibility(View.VISIBLE);
+        } else {
+            departmentView.setVisibility(View.GONE);
+        }
+
+        // Загружаем фото, если оно существует
+        if (user.getPhoto() != null && user.getPhoto().getUrl() != null) {
+            String photoUrl = user.getPhoto().getUrl();
+            if (photoUrl.startsWith("/root/app/uploads")) {
+                // Заменяем локальный путь на доступный HTTP-URL
+                photoUrl = photoUrl.replace("/root/app/uploads", "http://24schedule.ru/uploads");
+            }
+
+            Glide.with(this)
+                    .load(photoUrl)
+                    .placeholder(R.drawable.placeholder_image)
+                    .error(R.drawable.error_image)
+                    .into(popupPhoto);
+
+        } else {
+            Log.w("PhotoLoader", "Photo or URL is null for user: " + user.getLastName());
+            popupPhoto.setImageResource(R.drawable.placeholder_image); // Фото по умолчанию
+        }
+
+
+        showPopup(popupView, profileImageView);
+    }
+
+    private void showUnregisteredTeacherPopup(String fullName, ImageView profileImageView, String post) {
+        LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.teacher_info_popup, null);
+
+        TextView popupLastName = popupView.findViewById(R.id.teacherLastname);
+        TextView popupFirstName = popupView.findViewById(R.id.teacherFirstName);
+        popupFirstName.setVisibility(View.GONE);
+        TextView popupMiddleName = popupView.findViewById(R.id.teacherMiddleName);
+        popupMiddleName.setVisibility(View.GONE);
+        TextView popupPost = popupView.findViewById(R.id.post);
+        ImageView popupPhoto = popupView.findViewById(R.id.teacherPhoto);
+
+        // Устанавливаем минимальные данные
+        popupLastName.setText(fullName);
+        popupPost.setText(post);
+
+        // Устанавливаем фото по умолчанию
+        popupPhoto.setImageResource(R.drawable.placeholder_image);
+
+        showPopup(popupView, profileImageView);
+    }
+
+    private void showPopup(View popupView, ImageView profileImageView) {
+        PopupWindow popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        popupWindow.setOutsideTouchable(true);
+        popupWindow.showAtLocation(profileImageView, Gravity.CENTER, 0, 0);
+
+        // Закрытие окна
+        ImageView closeButton = popupView.findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(v -> popupWindow.dismiss());
+    }
+
     private void showInfo(User user, ImageView profileImageView, String post) {
         Log.d(TAG, "Showing info for user: " + user.toString());
         LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -234,12 +360,14 @@ public class TeachersActivity extends AppCompatActivity {
         TextView popupInfo = popupView.findViewById(R.id.teacherInfo);
         ImageView popupPhoto = popupView.findViewById(R.id.teacherPhoto);
 
+        // Устанавливаем текстовые данные
         popupLastName.setText(user.getLastName());
         popupFirstName.setText(user.getFirstName());
         popupMiddleName.setText(user.getMiddleName());
         popupPost.setText(post);
         popupInfo.setText(user.getInfo());
 
+        // Загружаем фото
         fetchTeacherPhotoFromServer(user.getId(), popupPhoto, profileImageView);
 
         popupWindow = new PopupWindow(popupView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
@@ -291,71 +419,61 @@ public class TeachersActivity extends AppCompatActivity {
     }
 
     /**
-     * Метод для получения фотографии преподавателя с сервера.
+     * Метод для получения фотографии преподавателя с сервера и отображения в ImageView.
      *
      * @param userId идентификатор пользователя
      * @param popupPhoto ImageView для отображения фотографии во всплывающем окне
-     * @param profileImageView ImageView для отображения фотографии в списке
+     * @param profileImageView ImageView для отображения фотографии в списке (если нужно)
      */
     private void fetchTeacherPhotoFromServer(Long userId, final ImageView popupPhoto, final ImageView profileImageView) {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        Call<ResponseBody> call = apiService.getUserTeacherPhoto(token, userId);
+        Call<ResponseBody> call = apiService.getProfileImage(token, userId);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (!isDestroyed()) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        refreshTokenIfNeeded(response);
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        // Декодируем поток данных в Bitmap
                         Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                        popupPhoto.setImageBitmap(bitmap);
-                        profileImageView.setImageBitmap(bitmap);
-                        //adapter.updateTeacherPhoto(userId, bitmap);
-                        saveImageToInternalStorage(bitmap, userId);
-                    } else {
-                        Toast.makeText(TeachersActivity.this, "Ошибка загрузки фото преподавателя", Toast.LENGTH_SHORT).show();
+
+                        if (bitmap != null) {
+                            // Устанавливаем изображение в ImageView
+                            popupPhoto.setImageBitmap(bitmap);
+
+                            if (profileImageView != null) {
+                                profileImageView.setImageBitmap(bitmap);
+                            }
+
+                            // Сохраняем изображение во внутреннее хранилище
+                            //saveImageToInternalStorage(bitmap, userId);
+                        } else {
+                            // Устанавливаем фото по умолчанию при ошибке декодирования
+                            popupPhoto.setImageResource(R.drawable.placeholder_image);
+                            if (profileImageView != null) {
+                                profileImageView.setImageResource(R.drawable.placeholder_image);
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e("PhotoLoader", "Ошибка при декодировании изображения: " + e.getMessage());
+                        popupPhoto.setImageResource(R.drawable.placeholder_image);
                     }
+                } else {
+                    Log.e("PhotoLoader", "Ошибка загрузки изображения: " + response.code());
+                    popupPhoto.setImageResource(R.drawable.placeholder_image);
                 }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                if (!isDestroyed()) {
-                    Toast.makeText(TeachersActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
-                }
+                Log.e("PhotoLoader", "Ошибка сети: " + t.getMessage());
+                popupPhoto.setImageResource(R.drawable.placeholder_image);
             }
         });
     }
 
 
-    /**
-     * Метод для получения преподавателя по его идентификатору.
-     *
-     * @param teacherId идентификатор преподавателя
-     * @param callback объект {@link OnTeacherPostReceived} для получения должности преподавателя
-     */
-    private void getTeacherById(int teacherId, OnTeacherPostReceived callback) {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
 
-        Call<TeacherDto> teacherCall = apiService.getTeacherById(token, teacherId);
-        teacherCall.enqueue(new Callback<TeacherDto>() {
-            @Override
-            public void onResponse(Call<TeacherDto> call, Response<TeacherDto> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    refreshTokenIfNeeded(response);
-                    TeacherDto teacher = response.body();
-                    callback.onPostReceived(teacher.getPost());
-                } else {
-                    Toast.makeText(TeachersActivity.this, "Ошибка при получении данных о преподавателе", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<TeacherDto> call, Throwable t) {
-                Toast.makeText(TeachersActivity.this, "Ошибка при выполнении запроса: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     /**
      * Метод для получения списка преподавателей с сервера.
@@ -420,56 +538,40 @@ public class TeachersActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Метод для сохранения изображения во внутреннее хранилище.
-     *
-     * @param bitmap объект {@link Bitmap}, представляющий изображение
-     * @param userId идентификатор пользователя
-     */
-    private void saveImageToInternalStorage(Bitmap bitmap, Long userId) {
-        ContextWrapper cw = new ContextWrapper(getApplicationContext());
-        File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-        File mypath = new File(directory, "profile_" + userId + ".jpg");
 
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(mypath);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null) { // Добавляем проверку на null
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+    /**
+     * Метод для извлечения факультета, кафедры и дополнительной информации из строки info.
+     *
+     * @param info строка формата "Факультет:\n<Факультет>\nКафедра:\n<Кафедра>\nДоп.информация:\n<Доп.информация>"
+     * @return массив строк: [факультет, кафедра, дополнительная информация]
+     */
+    private String[] parseInfo(String info) {
+        if (info == null || info.trim().isEmpty()) {
+            return new String[]{"Факультет не указан", "Кафедра не указана", "Доп. информация отсутствует"};
+        }
+
+        String faculty = "Факультет не указан";
+        String department = "Кафедра не указана";
+        String additionalInfo = "Доп. информация отсутствует";
+
+        // Разделяем строку по строкам
+        String[] lines = info.split("\n");
+
+        for (int i = 0; i < lines.length; i++) {
+            String line = lines[i].trim();
+
+            if (line.startsWith("Факультет:") && i + 1 < lines.length) {
+                faculty = lines[i + 1].trim();
+            } else if (line.startsWith("Кафедра:") && i + 1 < lines.length) {
+                department = lines[i + 1].trim();
+            } else if (line.startsWith("Доп.информация:") && i + 1 < lines.length) {
+                additionalInfo = lines[i + 1].trim();
             }
         }
+
+        return new String[]{faculty, department, additionalInfo};
     }
 
-    /**
-     * Метод для загрузки изображения из внутреннего хранилища.
-     *
-     * @param userId идентификатор пользователя
-     * @return объект {@link Bitmap}, представляющий изображение
-     */
-    private Bitmap loadImageFromInternalStorage(int userId) {
-        try {
-            ContextWrapper cw = new ContextWrapper(getApplicationContext());
-            File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);
-            File f = new File(directory, "profile_" + userId + ".jpg");
-            return BitmapFactory.decodeStream(new FileInputStream(f));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 
-    /**
-     * Интерфейс для получения должности преподавателя.
-     */
-    public interface OnTeacherPostReceived {
-        void onPostReceived(String post);
-    }
+
 }

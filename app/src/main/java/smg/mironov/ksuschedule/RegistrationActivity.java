@@ -20,6 +20,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.my.tracker.MyTracker;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -131,6 +133,7 @@ public class RegistrationActivity extends AppCompatActivity {
             public void onClick(View view) {
                 registerUser();
             }
+
         });
 
         facultySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

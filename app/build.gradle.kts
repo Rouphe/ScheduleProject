@@ -10,8 +10,8 @@ android {
         applicationId = "smg.mironov.ksuschedule"
         minSdk = 26
         targetSdk = 34
-        versionCode = 15
-        versionName = "1.4"
+        versionCode = 17
+        versionName = "1.4.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation (libs.mytracker)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

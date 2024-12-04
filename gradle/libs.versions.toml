@@ -12,6 +12,7 @@ constraintlayout = "2.1.4"
 navigationFragment = "2.7.7"
 navigationUi = "2.7.7"
 retrofit = "2.9.0"
+mytracker = "3.3.0"
 
 [libraries]
 compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
@@ -28,6 +29,7 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+mytracker = {module = "com.my.tracker:mytracker-sdk", version.ref = "mytracker"}
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

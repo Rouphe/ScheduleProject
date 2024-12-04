@@ -2,12 +2,12 @@ package smg.mironov.ksuschedule.Adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-// Импортируйте необходимые классы для фильтрации
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -16,29 +16,32 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import smg.mironov.ksuschedule.API.ApiClient;
+import smg.mironov.ksuschedule.API.ApiService;
 import smg.mironov.ksuschedule.Models.TeacherDto;
+import smg.mironov.ksuschedule.Models.User;
 import smg.mironov.ksuschedule.R;
-import smg.mironov.ksuschedule.Utils.LoadImageTask;
 
 public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterable {
 
     private OnItemClickListener clickListener;
     private String token;
-    private List<TeacherDto> originalList; // Оригинальный список данных
-    private List<TeacherDto> filteredList; // Отфильтрованный список данных
+    private List<TeacherDto> originalList;
+    private List<TeacherDto> filteredList;
     private TeacherFilter filter;
+    private Map<Long, Bitmap> photoCache = new HashMap<>(); // Кеш для фотографий преподавателей
 
-    /**
-     * Конструктор для создания объекта {@link TeacherAdapter}.
-     *
-     * @param context  контекст
-     * @param teachers список преподавателей
-     * @param listener обработчик кликов на элементах списка
-     * @param token    токен для аутентификации
-     */
     public TeacherAdapter(Context context, List<TeacherDto> teachers, OnItemClickListener listener, String token) {
         super(context, 0, teachers);
         this.clickListener = listener;
@@ -61,15 +64,10 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
     @NonNull
     @Override
     public Filter getFilter() {
-        if (filter == null){
+        if (filter == null) {
             filter = new TeacherFilter();
         }
         return filter;
-    }
-
-    // Метод для отображения сообщения при отсутствии результатов
-    public boolean isEmpty() {
-        return filteredList.isEmpty();
     }
 
     private class TeacherFilter extends Filter {
@@ -79,14 +77,13 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
             FilterResults results = new FilterResults();
             List<TeacherDto> filtered = new ArrayList<>();
 
-            if (constraint == null || constraint.length() == 0){
+            if (constraint == null || constraint.length() == 0) {
                 filtered.addAll(originalList);
             } else {
                 String filterPattern = constraint.toString().toLowerCase().trim();
-                for (TeacherDto teacher : originalList){
-                    // Фильтрация по имени и должности
+                for (TeacherDto teacher : originalList) {
                     if (teacher.getName().toLowerCase().contains(filterPattern) ||
-                            teacher.getPost().toLowerCase().contains(filterPattern)){
+                            teacher.getPost().toLowerCase().contains(filterPattern)) {
                         filtered.add(teacher);
                     }
                 }
@@ -94,7 +91,6 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
 
             results.values = filtered;
             results.count = filtered.size();
-
             return results;
         }
 
@@ -106,16 +102,13 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
         }
     }
 
-    // Обновление данных адаптера
-    public void updateData(List<TeacherDto> teachers){
+    public void updateData(List<TeacherDto> teachers) {
         originalList.clear();
         originalList.addAll(teachers);
         filteredList.clear();
         filteredList.addAll(teachers);
         notifyDataSetChanged();
     }
-
-    // Остальные методы адаптера остаются без изменений
 
     private static class ViewHolder {
         TextView nameTextView;
@@ -127,6 +120,7 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_info_teacher, parent, false);
             viewHolder = new ViewHolder();
@@ -139,23 +133,19 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
             viewHolder = (ViewHolder) convertView.getTag();
         }
 
-        final TeacherDto currentTeacher = getItem(position);
+        final TeacherDto teacher = getItem(position);
 
-        if (currentTeacher != null) {
-            viewHolder.nameTextView.setText(currentTeacher.getName());
-            viewHolder.positionTextView.setText(currentTeacher.getPost());
+        if (teacher != null) {
+            viewHolder.nameTextView.setText(teacher.getName());
+            viewHolder.positionTextView.setText(teacher.getPost());
 
-            // Перед загрузкой изображения проверяем, не уничтожена ли активность
-            if (getContext() instanceof smg.mironov.ksuschedule.TeachersActivity &&
-                    !((smg.mironov.ksuschedule.TeachersActivity) getContext()).isDestroyed()) {
-                // Загрузка изображения профиля
-                new LoadImageTask(currentTeacher.getId(), viewHolder.profileImageView, this).execute();
-            }
+            // Загружаем фото преподавателя
+            loadTeacherPhoto(teacher, viewHolder.profileImageView);
 
-            // Обработка клика на элемент списка
+            // Обрабатываем клики
             viewHolder.getInfo.setOnClickListener(v -> {
                 if (clickListener != null) {
-                    clickListener.onItemClick(currentTeacher.getId(), viewHolder.profileImageView);
+                    clickListener.onItemClick(teacher.getName(), viewHolder.profileImageView);
                 }
             });
         }
@@ -163,10 +153,75 @@ public class TeacherAdapter extends ArrayAdapter<TeacherDto> implements Filterab
         return convertView;
     }
 
-    /**
-     * Интерфейс для обработки кликов на элементах списка.
-     */
+    private void loadTeacherPhoto(TeacherDto teacher, ImageView imageView) {
+        // Проверка кеша
+        if (photoCache.containsKey(teacher.getId())) {
+            imageView.setImageBitmap(photoCache.get(teacher.getId()));
+        } else {
+            // Загружаем фотографию через API
+            fetchTeachersProfileId(teacher.getName(), teacher.getId(), imageView);
+        }
+    }
+
+    private void fetchTeachersProfileId(String name, long userId, ImageView imageView) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<User> call = apiService.getUserByFullName(token, name);
+
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    if ("TEACHER".equals(user.getRole())) {
+                        loadTeacherPhotoFromServer(user.getId(), imageView);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.e("TeacherAdapter", "Ошибка сети: " + t.getMessage());
+                imageView.setImageResource(R.drawable.placeholder_image);
+            }
+        });
+    }
+
+    private void loadTeacherPhotoFromServer(Long teacherId, ImageView imageView) {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        Call<ResponseBody> call = apiService.getProfileImage(token, teacherId);
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    try {
+                        Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                        if (bitmap != null) {
+                            // Сохраняем в кеш
+                            photoCache.put(teacherId, bitmap);
+                            imageView.setImageBitmap(bitmap);
+                        } else {
+                            imageView.setImageResource(R.drawable.placeholder_image);
+                        }
+                    } catch (Exception e) {
+                        Log.e("TeacherAdapter", "Ошибка загрузки фото: " + e.getMessage());
+                        imageView.setImageResource(R.drawable.placeholder_image);
+                    }
+                } else {
+                    Log.e("TeacherAdapter", "Не удалось загрузить фото: " + response.code());
+                    imageView.setImageResource(R.drawable.placeholder_image);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e("TeacherAdapter", "Ошибка сети: " + t.getMessage());
+                imageView.setImageResource(R.drawable.placeholder_image);
+            }
+        });
+    }
+
     public interface OnItemClickListener {
-        void onItemClick(int teacherId, ImageView infoTeacher);
+        void onItemClick(String fullName, ImageView infoTeacher);
     }
 }

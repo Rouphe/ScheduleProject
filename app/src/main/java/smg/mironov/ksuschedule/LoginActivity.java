@@ -19,6 +19,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.my.tracker.MyTracker;
+
 import org.json.JSONObject;
 
 import retrofit2.Call;
@@ -66,23 +68,21 @@ public class LoginActivity extends AppCompatActivity {
         String savedEmail = preferences.getString("saved_email", null);
         String savedPassword = preferences.getString("saved_password", null);
         token = preferences.getString("auth_token", null);
+        boolean remember_me = preferences.getBoolean("remember_me", true);
 
         Intent intent = getIntent();
 
         boolean fromMainError = intent.getBooleanExtra("from_main_activity_error", false);
         boolean isLogout = intent.getBooleanExtra("logout", false);
 
-
-        if (fromMainError && savedEmail != null && savedPassword != null){
-            AuthRequest authRequest = new AuthRequest(savedEmail, savedPassword);
-            sendAuthResponse(authRequest);
-            return;
-        } else if (isLogout && savedEmail != null && savedPassword != null) {
+        if ((fromMainError || isLogout) && savedEmail != null && savedPassword != null) {
             emailEditText.setText(savedEmail);
             passwordEditText.setText(savedPassword);
+            rememberMeCheckbox.setChecked(remember_me);
         } else if(savedEmail != null && savedPassword != null) {
             emailEditText.setText(savedEmail);
             passwordEditText.setText(savedPassword);
+            rememberMeCheckbox.setChecked(remember_me);
         }
 
         // Настройка поведения чекбокса отображения пароля
@@ -119,6 +119,7 @@ public class LoginActivity extends AppCompatActivity {
         // Сохранение данных пользователя
         outState.putString("email", emailEditText.getText().toString());
         outState.putString("password", passwordEditText.getText().toString());
+        outState.putBoolean("remember_me", rememberMeCheckbox.isChecked());
     }
 
     @Override
@@ -127,8 +128,10 @@ public class LoginActivity extends AppCompatActivity {
         // Восстановление данных пользователя
         String savedEmail = savedInstanceState.getString("email");
         String savedPassword = savedInstanceState.getString("password");
+        boolean remember_me = savedInstanceState.getBoolean("remember_me");
         emailEditText.setText(savedEmail);
         passwordEditText.setText(savedPassword);
+        rememberMeCheckbox.setChecked(remember_me);
     }
 
 
@@ -240,6 +243,7 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
+
     private void saveUserData(User user) {
         SharedPreferences preferences = getSharedPreferences("user_prefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -248,6 +252,7 @@ public class LoginActivity extends AppCompatActivity {
         editor.putString("user_firstName", user.getFirstName());
         editor.putString("user_middleName", user.getMiddleName());
         editor.putString("user_email", user.getEmail());
+        editor.putBoolean("remember_me", rememberMeCheckbox.isChecked());
         if (user.getFacultyDto() != null){
             editor.putString("user_faculty", user.getFacultyDto().getFacultyName());
         }
